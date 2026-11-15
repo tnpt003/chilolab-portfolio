@@ -29,10 +29,13 @@ export const copy = {
     projects: 'Dự án',
     about: 'Về ChiloLab',
     switch: 'English',
-    title: 'Những ý tưởng có chỗ để lớn lên.',
+    title: 'Tôi là Phát. Tôi làm phần mềm nhỏ cho Windows.',
     intro:
-      'ChiloLab là nơi tôi giới thiệu những dự án mình xây dựng, từ công cụ đến những người bạn nhỏ trên desktop.',
-    explore: 'Khám phá dự án',
+      'ChiloLab là nơi tôi để những gì mình đã làm: một chú mèo sống trên desktop và một công cụ kiểm tra website.',
+    explore: 'Xem hai dự án',
+    portraitAlt:
+      'Nguyễn Tấn Phát mặc áo khoác xám, đứng trước một bức tường treo ảnh.',
+    portraitCaption: 'Nguyễn Tấn Phát, người làm ChiloLab',
     selected: 'Hai dự án đầu tiên',
     detail: 'Xem dự án',
     back: 'Tất cả dự án',
@@ -49,10 +52,13 @@ export const copy = {
     projects: 'Projects',
     about: 'About ChiloLab',
     switch: 'Tiếng Việt',
-    title: 'A place for ideas to grow.',
+    title: 'I’m Phát. I make small software for Windows.',
     intro:
-      'ChiloLab is where I share the projects I build, from practical tools to little desktop companions.',
-    explore: 'Explore projects',
+      'ChiloLab is where I keep what I’ve made: a cat that lives on your desktop and a tool for checking websites.',
+    explore: 'See both projects',
+    portraitAlt:
+      'Nguyễn Tấn Phát in a grey jacket, standing in front of a wall of framed photos.',
+    portraitCaption: 'Nguyễn Tấn Phát, who makes ChiloLab',
     selected: 'The first two projects',
     detail: 'Explore project',
     back: 'All projects',

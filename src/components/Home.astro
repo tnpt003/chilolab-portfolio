@@ -1,6 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
+import { Image } from 'astro:assets';
 import ProjectVisual from './ProjectVisual.astro';
+import portrait from '../assets/phat-portrait.jpg';
 import { listProjects, pathFor, copy, type Locale } from '../lib/content';
 interface Props {
   locale: Locale;
@@ -17,36 +19,30 @@ const projects = await listProjects(locale);
 >
   <section class="hero wrap">
     <div class="hero-copy">
-      <p class="intro-label">
-        {locale === 'vi'
-          ? 'Một góc nhỏ, nhiều ý tưởng.'
-          : 'A small space. Many ideas.'}
-      </p>
       <h1>{t.title}</h1>
       <p class="lead">{t.intro}</p>
       <a class="button" href="#projects">
         {t.explore}
       </a>
     </div>
-    <div class="hero-art" aria-hidden="true">
-      <div class="orbit"></div>
-      <span class="art-word">
-        hello
-        <br />
-        world.
-      </span>
-      <span class="art-dot"></span>
-      <span class="art-caption">
-        ChiloLab / {locale === 'vi' ? 'đang lớn lên' : 'growing'}
-      </span>
-    </div>
+    <figure class="portrait">
+      <Image
+        src={portrait}
+        alt={t.portraitAlt}
+        widths={[320, 500]}
+        sizes="(max-width: 720px) 80vw, 400px"
+        format="webp"
+        loading="eager"
+      />
+      <figcaption>{t.portraitCaption}</figcaption>
+    </figure>
   </section>
   <section class="projects wrap" id="projects" aria-labelledby="projects-title">
     <div class="section-heading">
       <h2 id="projects-title">{t.projects}</h2>
       <p>{t.selected}</p>
     </div>
-    <div class="project-grid">
+    <div class="project-list">
       {projects.map(({ data }) => (
         <article class="project">
           <a class="project-link" href={pathFor(locale, data.slug)}>
@@ -58,9 +54,7 @@ const projects = await listProjects(locale);
             <div class="project-copy">
               <h3>{data.title}</h3>
               <p>{data.description}</p>
-              <span class="text-link">
-                {t.detail} <span aria-hidden="true">↗</span>
-              </span>
+              <span class="text-link">{t.detail}</span>
             </div>
           </a>
         </article>

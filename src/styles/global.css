@@ -135,6 +135,13 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 2rem;
+  scrollbar-color: var(--muted) var(--paper);
+  accent-color: var(--ink);
+  caret-color: var(--ink);
+}
+::selection {
+  background: var(--mint);
+  color: var(--ink);
 }
 body {
   margin: 0;
@@ -166,11 +173,11 @@ h1,
 h2,
 h3 {
   line-height: 1.15;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
 }
 h1 {
   font-size: clamp(2.5rem, 6vw, 5.8rem);
-  font-weight: 650;
+  font-weight: 700;
 }
 h2 {
   font-size: clamp(1.9rem, 3vw, 2.6rem);
@@ -197,7 +204,7 @@ h3 {
   font-weight: 750;
   font-size: 1.25rem;
   text-decoration: none;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.03em;
 }
 .brand-mark {
   display: grid;
@@ -224,7 +231,7 @@ nav a:hover {
 .language {
   border: 1px solid var(--line);
   padding: 0.45rem 0.85rem;
-  border-radius: 2rem;
+  border-radius: 0.5rem;
 }
 .skip {
   position: absolute;
@@ -239,23 +246,24 @@ nav a:hover {
 }
 .hero {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  align-items: center;
-  gap: 3rem;
-  padding-block: 5.5rem 7rem;
+  grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+  align-items: end;
+  gap: clamp(2rem, 6vw, 6rem);
+  padding-block: 4.5rem 6.5rem;
 }
 .intro-label {
   color: var(--muted);
   margin-bottom: 1.6rem;
 }
 .hero h1 {
-  max-width: 12ch;
+  max-width: 13ch;
+  text-wrap: balance;
 }
 .lead {
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   color: var(--muted);
-  max-width: 49ch;
-  margin-block: 1.7rem 2rem;
+  max-width: 44ch;
+  margin-block: 1.75rem 2.25rem;
 }
 .button {
   display: inline-flex;
@@ -265,75 +273,61 @@ nav a:hover {
   padding: 0.8rem 1.4rem;
   background: var(--ink);
   color: white;
-  border-radius: 2rem;
+  border-radius: 0.6rem;
   text-decoration: none;
-  font-weight: 600;
+  font-weight: 500;
 }
 .button:hover {
   background: var(--muted);
 }
-.hero-art {
-  position: relative;
-  display: grid;
-  place-items: center;
-  aspect-ratio: 1;
+.portrait {
+  justify-self: end;
+  width: min(100%, 400px);
+}
+.portrait img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
+  object-fit: cover;
+  border-radius: 14px;
   background: var(--mint);
-  border-radius: 46% 54% 45% 55%;
-  transform: rotate(-5deg);
-  overflow: hidden;
 }
-.art-word {
-  font-size: clamp(4rem, 8vw, 7rem);
-  font-weight: 750;
-  letter-spacing: -0.09em;
-  line-height: 0.85;
-  transform: rotate(5deg);
-  z-index: 1;
-}
-.orbit {
-  position: absolute;
-  inset: 14%;
-  border: 1px solid var(--ink);
-  border-radius: 50%;
-  transform: rotate(35deg) scaleX(1.45);
-}
-.art-dot {
-  position: absolute;
-  right: 13%;
-  top: 16%;
-  width: 2.6rem;
-  height: 2.6rem;
-  border-radius: 50%;
-  background: var(--apricot);
-}
-.art-caption {
-  position: absolute;
-  bottom: 13%;
-  font-size: 0.8rem;
-  transform: rotate(5deg);
+.portrait figcaption {
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+  color: var(--muted);
 }
 .section-heading {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
 }
 .section-heading p {
   color: var(--muted);
 }
-.project-grid {
+.project-list {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2.2rem;
+  gap: clamp(3.5rem, 7vw, 6rem);
 }
 .project-link {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(1.5rem, 4vw, 3.5rem);
   text-decoration: none;
-  display: block;
+}
+.project:nth-child(even) .project-link {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+}
+.project:nth-child(even) .project-visual {
+  order: 2;
 }
 .project-visual {
   overflow: hidden;
-  border-radius: 1.4rem;
+  border-radius: 14px;
   background: var(--mint);
 }
 .project-visual.auditor {
@@ -345,28 +339,26 @@ nav a:hover {
   place-items: center;
 }
 .project-visual figcaption {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   color: var(--ink);
   padding: 0.8rem 1.2rem;
   border-top: 1px solid rgb(24 75 88 / 0.13);
 }
-.project-copy {
-  padding: 1.7rem 0.2rem;
-}
 .project-copy p {
-  margin-top: 0.7rem;
+  margin-top: 0.8rem;
   color: var(--muted);
+  max-width: 40ch;
 }
 .text-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 1.2rem;
-  margin-top: 1.3rem;
+  display: inline-block;
+  margin-top: 1.4rem;
+  font-weight: 500;
   text-decoration: underline;
+  text-decoration-thickness: 1px;
   text-underline-offset: 0.3em;
 }
 .project-link:hover .text-link {
-  color: var(--muted);
+  text-decoration-thickness: 2px;
 }
 .pet-scene {
   position: relative;
@@ -427,18 +419,12 @@ nav a:hover {
   background: rgb(24 75 88 / 0.15);
   border-radius: 50%;
 }
-.pet-spark {
-  position: absolute;
-  right: -8px;
-  top: 3px;
-  font-size: 38px;
-}
 .audit-scene {
   width: min(270px, 80%);
   padding: 15px 22px 26px;
   border-radius: 12px;
   background: var(--paper);
-  box-shadow: 14px 15px 0 rgb(24 75 88 / 0.1);
+  box-shadow: 0 12px 28px rgb(24 75 88 / 0.12);
 }
 .window-top {
   display: flex;
@@ -574,15 +560,16 @@ nav a:hover {
   .hero h1 {
     max-width: 14ch;
   }
-  .hero-art {
-    width: min(80%, 340px);
-    justify-self: center;
+  .portrait {
+    justify-self: start;
+    width: min(85%, 340px);
   }
-  .art-word {
-    font-size: 5rem;
-  }
-  .project-grid {
+  .project-link,
+  .project:nth-child(even) .project-link {
     grid-template-columns: 1fr;
+  }
+  .project:nth-child(even) .project-visual {
+    order: 0;
   }
   .section-heading {
     align-items: start;

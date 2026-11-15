@@ -16,23 +16,26 @@ Source of truth: `src/styles/tokens.css`.
 - Mint `#C6E8DE`: pet illustration surface.
 - Lavender `#E3DFF3`: auditor illustration surface.
 - Apricot `#FFBD8D`: a small accent in the homepage illustration.
-- System font stack with Vietnamese coverage. Avoid external font requests in the initial scaffold. A future brand font must cover Vietnamese diacritics and be self-hosted with its license.
+- Type: Be Vietnam Pro (SIL OFL, self-hosted through `@fontsource/be-vietnam-pro`, weights 400/500/700) with the system stack as fallback. Chosen because it was designed for Vietnamese diacritics. No external font requests. Heading tracking stays at -0.03em.
+- Radii: 14px for media, 0.5–0.6rem for buttons and the language switch. No pills, no hard offset shadows.
+- Browser surfaces (selection, caret, scrollbar, accent) take their colors from the palette.
 
 ## Layout
 
 Version pages use the existing tokens and readable article layout. Each product has a version index, an explicit status label and a detail article. Keep preview/development notices visible, links descriptive, and version history ordered by the editorial order field. Lists stay simple, with separators instead of repeated decorative cards.
 
-All body text is left aligned. The homepage introduces the maker's space alongside a single playful illustration, then presents two large project previews and a short about section.
+All body text is left aligned. The homepage opens with a first-person headline next to the owner's real portrait (cropped to head and shoulders from the original photo, metadata stripped, `src/assets/phat-portrait.jpg`). It then shows each project as a full-width row that alternates media and text, followed by a short about section. Headings have no eyebrow labels, and links carry no arrow glyphs.
 
 ```text
 brand                         projects / about / language
-intro + headline              playful illustration
-project preview               project preview
+headline + lead + button      portrait + caption
+[project media     ] title + description + link
+title + description + link [project media     ]
 about heading                 description
 footer
 ```
 
-Two columns collapse to one on narrow screens. Project pages retain shared navigation and offer a large preview, explicit preparation notice and readable article content. Product-specific visuals can diverge while tokens and navigation stay consistent.
+Rows and the hero collapse to one column on narrow screens, with media above the text. Project pages retain shared navigation and offer a large preview, explicit preparation notice and readable article content. Product-specific visuals can diverge while tokens and navigation stay consistent.
 
 ## Review decisions
 
