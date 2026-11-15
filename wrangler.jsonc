@@ -1,0 +1,11 @@
+// Cloudflare Worker serving the static Astro build. No Worker script runs;
+// requests are answered from ./dist, including _headers and _redirects.
+{
+  "name": "chilolab-portfolio",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "drop-trailing-slash",
+  },
+}

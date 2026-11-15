@@ -2,9 +2,9 @@
 
 ## Quyết định hiện tại: ưu tiên miễn phí
 
-Chủ sở hữu đã chọn hướng free-first và chấp nhận GitHub public. Đợt đầu dùng Markdown trong repo để quản lý nội dung, GitHub Actions để kiểm tra và Cloudflare Pages để phục vụ website. WordPress được hoãn; phần đánh giá bên dưới chỉ dành cho tương lai, không phải bước bắt buộc trước khi ra mắt.
+Chủ sở hữu đã chọn hướng free-first và chấp nhận GitHub public. Đợt đầu dùng Markdown trong repo để quản lý nội dung, GitHub Actions để kiểm tra và Cloudflare Worker (static assets) để phục vụ website. WordPress được hoãn; phần đánh giá bên dưới chỉ dành cho tương lai, không phải bước bắt buộc trước khi ra mắt.
 
-Không cần mua hosting CMS, database hoặc plugin. Domain là khoản đăng ký/gia hạn riêng; có thể dùng pages.dev trước. Các gói miễn phí có giới hạn và cần kiểm tra lại khi triển khai: [Cloudflare Pages limits](https://developers.cloudflare.com/pages/platform/limits/) và [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
+Không cần mua hosting CMS, database hoặc plugin. Domain là khoản đăng ký/gia hạn riêng; có thể dùng workers.dev trước. Các gói miễn phí có giới hạn và cần kiểm tra lại khi triển khai: [Cloudflare Workers limits](https://developers.cloudflare.com/workers/platform/limits/) và [GitHub Actions billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
 
 ## CMS đang dùng: Sveltia CMS (git-based, miễn phí)
 
@@ -14,7 +14,7 @@ Giao diện soạn thảo tại `/admin/index.html`, ghi trực tiếp vào Mark
 
 - Chủ sở hữu: Nguyễn Tấn Phát.
 - Frontend: Astro static + TypeScript, song ngữ Việt–Anh.
-- Hosting: Cloudflare; đề xuất Pages cho bản static hiện tại.
+- Hosting: Cloudflare Worker với static assets cho bản static hiện tại.
 - Domain: dự kiến mua chilolab.com tại Porkbun sau setup; chưa mua hoặc cấu hình DNS.
 - CMS đang nghiêng về WordPress; chưa cài đặt hay kết nối.
 
@@ -22,7 +22,7 @@ Giao diện soạn thảo tại `/admin/index.html`, ghi trực tiếp vào Mark
 
 WordPress phù hợp nếu muốn soạn nội dung trực quan, quản lý media và viết bài thường xuyên. Với hai dự án, Markdown hiện có chi phí vận hành thấp hơn. Nhu cầu mở rộng sau này vẫn là lý do hợp lý để chuẩn bị WordPress.
 
-Hướng đề xuất: **WordPress headless + Astro static trên Cloudflare Pages**. WordPress quản lý nội dung; Astro lấy dữ liệu khi build và kiểm soát giao diện. Theme hoặc Elementor không trực tiếp thiết kế giao diện Astro.
+Hướng đề xuất: **WordPress headless + Astro static trên Cloudflare Worker**. WordPress quản lý nội dung; Astro lấy dữ liệu khi build và kiểm soát giao diện. Theme hoặc Elementor không trực tiếp thiết kế giao diện Astro.
 
 ```text
 Porkbun: đăng ký và gia hạn domain

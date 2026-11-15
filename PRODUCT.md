@@ -6,7 +6,7 @@ A personal portfolio and product showcase, owned by Nguyễn Tấn Phát.
 
 - Owner: Nguyễn Tấn Phát; GitHub: https://github.com/tnpt003.
 - Domain target: chilolab.com, planned purchase from Porkbun after setup. Not purchased or configured yet.
-- Hosting choice: Cloudflare; proposed first deployment: Astro static output on Cloudflare Pages.
+- Hosting: Cloudflare Worker `chilolab-portfolio` serving the Astro static build (static assets, Workers Builds from GitHub). Temporary URL: https://chilolab-portfolio.tnpt003.workers.dev.
 - Budget preference: free services for the first phase; a public GitHub repository is acceptable. Use Markdown as the active CMS. WordPress is deferred; do not add paid hosting or services without an explicit decision.
 - Initial projects: Pet Desktop and PageSpeed-Auth-Auditor.
 - Bilingual Vietnamese and English; Vietnamese is the default.
