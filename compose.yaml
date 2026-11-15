@@ -1,0 +1,19 @@
+name: chilolab-lab
+services:
+  portfolio:
+    image: ${PORTFOLIO_IMAGE:-chilolab-portfolio:lab}
+    ports:
+      - '127.0.0.1:8080:8080'
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    logging:
+      driver: json-file
+      options:
+        max-size: '5m'
+        max-file: '2'

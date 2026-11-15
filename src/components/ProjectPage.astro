@@ -1,0 +1,124 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import { getImage } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import ProjectVisual from './ProjectVisual.astro';
+import { copy, pathFor } from '../lib/content';
+import {
+  latestDownload,
+  listVersions,
+  versionCopy,
+  versionPath,
+} from '../lib/versions';
+import VersionList from './VersionList.astro';
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+const { project } = Astro.props;
+const { data } = project;
+const t = copy[data.locale];
+const versions = await listVersions(data.locale, data.slug);
+const v = versionCopy[data.locale];
+const latest = (await latestDownload(data.locale, data.slug))?.data;
+const { Content } = await render(project);
+const poster =
+  data.video && data.preview
+    ? (await getImage({ src: data.preview.image, width: 800, format: 'webp' }))
+        .src
+    : undefined;
+---
+
+<Base
+  title={data.title}
+  description={data.description}
+  locale={data.locale}
+  slug={data.slug}
+>
+  <div class="project-detail wrap">
+    <a class="back" href={`${pathFor(data.locale)}#projects`}>
+      ← {t.back}
+    </a>
+    <header class="detail-heading">
+      <h1>{data.title}</h1>
+      <p class="lead">{data.description}</p>
+    </header>
+    {latest ? (
+      <section class="download-panel" aria-labelledby="download-heading">
+        <div>
+          <h2 id="download-heading">{v.latestHeading}</h2>
+          <p class="download-release">
+            <strong>v{latest.version}</strong>
+            <span>{latest.title}</span>
+            {latest.releasedAt && (
+              <time datetime={latest.releasedAt}>{latest.releasedAt}</time>
+            )}
+          </p>
+        </div>
+        <div class="actions">
+          <a class="button" href={latest.downloadUrl}>
+            {v.latestInstaller}
+          </a>
+          {latest.portableUrl && <a href={latest.portableUrl}>{v.portable}</a>}
+          <a href={versionPath(data.locale, data.slug, latest.version)}>
+            {v.latestNotes}
+          </a>
+        </div>
+      </section>
+    ) : (
+      <p class="project-version-link">
+        <a href={versionPath(data.locale, data.slug)}>{v.heading}</a>
+      </p>
+    )}
+    <ProjectVisual kind={data.kind} label={t.preview} preview={data.preview} />
+    {data.video && (
+      <figure class="project-video">
+        <video
+          poster={poster}
+          controls
+          preload="none"
+          width="1280"
+          height="720"
+          aria-label={
+            data.locale === 'vi'
+              ? 'Video giới thiệu Pet Desktop'
+              : 'Pet Desktop introduction video'
+          }
+        >
+          <source src={data.video} type="video/mp4" />
+          <a href={data.video}>
+            {data.locale === 'vi' ? 'Mở video' : 'Open video'}
+          </a>
+        </video>
+        <figcaption>
+          {data.locale === 'vi'
+            ? 'Video không âm thanh, 32 giây. Bản phát triển 1.5; bản phát hành có thể khác.'
+            : 'Silent, 32-second introduction. Development preview for 1.5; published releases may differ.'}
+        </figcaption>
+      </figure>
+    )}
+    <div class="detail-body">
+      <aside class="notice">
+        {t.note}
+        <div class="actions">
+          {data.demoUrl && (
+            <a class="button" href={data.demoUrl}>
+              {t.demo}
+            </a>
+          )}
+          {data.repoUrl && <a href={data.repoUrl}>{t.repo}</a>}
+          {data.downloadUrl && <a href={data.downloadUrl}>{t.download}</a>}
+        </div>
+      </aside>
+      <article class="prose">
+        <Content />
+      </article>
+    </div>
+    <section class="version-section" aria-labelledby="version-heading">
+      <div class="section-heading">
+        <h2 id="version-heading">{v.heading}</h2>
+        <a href={versionPath(data.locale, data.slug)}>{v.all}</a>
+      </div>
+      <VersionList entries={versions.slice(0, 3)} locale={data.locale} />
+    </section>
+  </div>
+</Base>

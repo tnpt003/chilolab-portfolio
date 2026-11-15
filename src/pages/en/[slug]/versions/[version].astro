@@ -1,0 +1,18 @@
+---
+import { listProjects } from '../../../../lib/content';
+import { listVersions } from '../../../../lib/versions';
+import VersionPage from '../../../../components/VersionPage.astro';
+export async function getStaticPaths() {
+  const paths = await Promise.all(
+    (await listProjects('en')).map(async (project) =>
+      (await listVersions('en', project.data.slug)).map((entry) => ({
+        params: { slug: project.data.slug, version: entry.data.version },
+        props: { project, entry },
+      })),
+    ),
+  );
+  return paths.flat();
+}
+---
+
+<VersionPage project={Astro.props.project} entry={Astro.props.entry} />

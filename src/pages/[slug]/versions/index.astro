@@ -1,0 +1,12 @@
+---
+import { listProjects } from '../../../lib/content';
+import VersionIndex from '../../../components/VersionIndex.astro';
+export async function getStaticPaths() {
+  return (await listProjects('vi')).map((project) => ({
+    params: { slug: project.data.slug },
+    props: { project },
+  }));
+}
+---
+
+<VersionIndex project={Astro.props.project} />

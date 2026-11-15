@@ -1,0 +1,44 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { versionCopy, versionPath } from '../lib/versions';
+import type { Locale } from '../lib/content';
+interface Props {
+  entries: CollectionEntry<'versions'>[];
+  locale: Locale;
+}
+const { entries, locale } = Astro.props;
+const t = versionCopy[locale];
+---
+
+{entries.length === 0 ? (
+  <p class="lead">{t.empty}</p>
+) : (
+  <ol class="version-list">
+    {entries.map(({ data }) => (
+      <li>
+        <article>
+          <div class="version-meta">
+            <span class="version-number">v{data.version}</span>
+            <span class="version-status">{t[data.status]}</span>
+            {data.releasedAt && (
+              <time datetime={data.releasedAt}>{data.releasedAt}</time>
+            )}
+          </div>
+          <h3>
+            <a href={versionPath(locale, data.project, data.version)}>
+              {data.title}
+            </a>
+          </h3>
+          <p>{data.summary}</p>
+          <a
+            class="text-link"
+            href={versionPath(locale, data.project, data.version)}
+          >
+            {t.read}
+            <span class="sr-only">: {data.version}</span>
+          </a>
+        </article>
+      </li>
+    ))}
+  </ol>
+)}

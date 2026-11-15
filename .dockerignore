@@ -1,0 +1,15 @@
+# Allowlist: no .git, .env, reports, local setup or skills enter the image.
+**
+!package.json
+!package-lock.json
+!astro.config.mjs
+!tsconfig.json
+!src/
+!src/**
+!public/
+!public/**
+!scripts/
+!scripts/**
+!infra/
+!infra/nginx.conf
+!Dockerfile

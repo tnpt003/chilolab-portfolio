@@ -1,0 +1,9 @@
+# Deliberate healthcheck failure for the local recovery exercise only.
+services:
+  portfolio:
+    healthcheck:
+      test: ['CMD', 'false']
+      interval: 2s
+      timeout: 1s
+      retries: 2
+      start_period: 0s

@@ -1,0 +1,74 @@
+---
+import Base from '../layouts/Base.astro';
+import ProjectVisual from './ProjectVisual.astro';
+import { listProjects, pathFor, copy, type Locale } from '../lib/content';
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = copy[locale];
+const projects = await listProjects(locale);
+---
+
+<Base
+  title={locale === 'vi' ? 'Những dự án của tôi' : 'My projects'}
+  description={t.intro}
+  locale={locale}
+>
+  <section class="hero wrap">
+    <div class="hero-copy">
+      <p class="intro-label">
+        {locale === 'vi'
+          ? 'Một góc nhỏ, nhiều ý tưởng.'
+          : 'A small space. Many ideas.'}
+      </p>
+      <h1>{t.title}</h1>
+      <p class="lead">{t.intro}</p>
+      <a class="button" href="#projects">
+        {t.explore}
+      </a>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="orbit"></div>
+      <span class="art-word">
+        hello
+        <br />
+        world.
+      </span>
+      <span class="art-dot"></span>
+      <span class="art-caption">
+        ChiloLab / {locale === 'vi' ? 'đang lớn lên' : 'growing'}
+      </span>
+    </div>
+  </section>
+  <section class="projects wrap" id="projects" aria-labelledby="projects-title">
+    <div class="section-heading">
+      <h2 id="projects-title">{t.projects}</h2>
+      <p>{t.selected}</p>
+    </div>
+    <div class="project-grid">
+      {projects.map(({ data }) => (
+        <article class="project">
+          <a class="project-link" href={pathFor(locale, data.slug)}>
+            <ProjectVisual
+              kind={data.kind}
+              label={t.preview}
+              preview={data.preview}
+            />
+            <div class="project-copy">
+              <h3>{data.title}</h3>
+              <p>{data.description}</p>
+              <span class="text-link">
+                {t.detail} <span aria-hidden="true">↗</span>
+              </span>
+            </div>
+          </a>
+        </article>
+      ))}
+    </div>
+  </section>
+  <section class="about wrap" id="about">
+    <h2>{t.about}</h2>
+    <p>{t.aboutText}</p>
+  </section>
+</Base>

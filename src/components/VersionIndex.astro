@@ -1,0 +1,32 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import VersionList from './VersionList.astro';
+import { pathFor } from '../lib/content';
+import { listVersions, versionCopy } from '../lib/versions';
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+const { data } = Astro.props.project;
+const t = versionCopy[data.locale];
+const entries = await listVersions(data.locale, data.slug);
+---
+
+<Base
+  title={`${data.title} — ${t.heading}`}
+  description={`${t.intro} ${data.title}`}
+  locale={data.locale}
+  slug={`${data.slug}/versions`}
+>
+  <div class="wrap version-page">
+    <a class="back" href={pathFor(data.locale, data.slug)}>
+      ← {t.back}
+    </a>
+    <header class="detail-heading">
+      <p class="intro-label">{data.title}</p>
+      <h1>{t.heading}</h1>
+      <p class="lead">{t.intro}</p>
+    </header>
+    <VersionList entries={entries} locale={data.locale} />
+  </div>
+</Base>

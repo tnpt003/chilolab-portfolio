@@ -1,0 +1,380 @@
+# yaml-language-server: $schema=https://unpkg.com/@sveltia/cms@0.264.0/schema/sveltia-cms.json
+# ChiloLab CMS (Sveltia CMS, git-based). Hướng dẫn: docs/CMS.md
+# Mỗi ngôn ngữ là một collection riêng; trường project/locale tự điền và ẩn.
+
+backend:
+  name: github
+  repo: tnpt003/chilolab-portfolio
+  branch: main
+
+logo_url: /favicon.svg
+media_folder: /public/media
+public_folder: /media
+
+output:
+  omit_empty_optional_fields: true
+  yaml:
+    quote: single
+
+collections:
+  # ---------- Pet Desktop: phiên bản ----------
+  - name: pet_versions_vi
+    label: Pet Desktop — Phiên bản (VI)
+    label_singular: Phiên bản Pet (VI)
+    folder: /src/content/versions/vi/pet-desktop
+    extension: md
+    format: frontmatter
+    create: true
+    slug: '{{version}}'
+    identifier_field: version
+    summary: 'v{{version}} — {{title}}'
+    sortable_fields: [order, version, releasedAt]
+    fields:
+      - { name: project, widget: hidden, default: pet-desktop }
+      - { name: locale, widget: hidden, default: vi }
+      - label: Phiên bản
+        name: version
+        widget: string
+        hint: Dạng 1.5.1. Là tên file và đường dẫn /pet-desktop/versions/<phiên bản>. Không đổi sau khi đăng.
+        pattern: ['^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$', 'Dạng x.y.z, ví dụ 1.5.1']
+      - { label: Tiêu đề, name: title, widget: string }
+      - { label: Tóm tắt, name: summary, widget: text }
+      - label: Trạng thái sản phẩm
+        name: status
+        widget: select
+        default: development
+        options:
+          - { label: Đang phát triển, value: development }
+          - { label: Xem trước, value: preview }
+          - { label: Đã phát hành, value: released }
+        hint: Chỉ bản "Đã phát hành" được có ngày phát hành và link tải.
+      - label: Thứ tự
+        name: order
+        widget: number
+        value_type: int
+        min: 0
+        hint: Số lớn hơn hiện trước. Quy ước 1.5.0 → 150, 1.5.1 → 151.
+      - label: Nháp (ẩn khỏi website)
+        name: draft
+        widget: boolean
+        default: false
+        required: false
+      - label: Ngày phát hành
+        name: releasedAt
+        widget: datetime
+        type: date
+        picker_utc: true
+        required: false
+        hint: Ngày thật trên trang Release/CHANGELOG. Bỏ trống nếu chưa phát hành.
+      - label: Link nguồn (release/changelog)
+        name: sourceUrl
+        widget: string
+        required: false
+        pattern: ['^https?://', 'Cần là URL http(s)']
+      - label: Link tải bộ cài (Setup.exe)
+        name: downloadUrl
+        widget: string
+        required: false
+        hint: Link cố định theo phiên bản, ví dụ https://github.com/tnpt003/Pet-Computer/releases/download/v1.5.0/PetComputer-win-Setup.exe. Không dùng releases/latest.
+        pattern: ['^https?://', 'Cần là URL http(s)']
+      - label: Link bản Portable (.zip)
+        name: portableUrl
+        widget: string
+        required: false
+        pattern: ['^https?://', 'Cần là URL http(s)']
+      - { label: Nội dung, name: body, widget: markdown }
+
+  - name: pet_versions_en
+    label: Pet Desktop — Versions (EN)
+    label_singular: Pet version (EN)
+    folder: /src/content/versions/en/pet-desktop
+    extension: md
+    format: frontmatter
+    create: true
+    slug: '{{version}}'
+    identifier_field: version
+    summary: 'v{{version}} — {{title}}'
+    sortable_fields: [order, version, releasedAt]
+    fields:
+      - { name: project, widget: hidden, default: pet-desktop }
+      - { name: locale, widget: hidden, default: en }
+      - label: Version
+        name: version
+        widget: string
+        hint: Must match the Vietnamese post, e.g. 1.5.1.
+        pattern: ['^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$', 'Use x.y.z, e.g. 1.5.1']
+      - { label: Title, name: title, widget: string }
+      - { label: Summary, name: summary, widget: text }
+      - label: Product status
+        name: status
+        widget: select
+        default: development
+        options:
+          - { label: In development, value: development }
+          - { label: Preview, value: preview }
+          - { label: Released, value: released }
+        hint: Keep status, order and release date identical to the Vietnamese post.
+      - { label: Order, name: order, widget: number, value_type: int, min: 0 }
+      - label: Draft (hidden from the site)
+        name: draft
+        widget: boolean
+        default: false
+        required: false
+      - label: Release date
+        name: releasedAt
+        widget: datetime
+        type: date
+        picker_utc: true
+        required: false
+      - label: Source link (release/changelog)
+        name: sourceUrl
+        widget: string
+        required: false
+        pattern: ['^https?://', 'Must be an http(s) URL']
+      - label: Installer link (Setup.exe)
+        name: downloadUrl
+        widget: string
+        required: false
+        pattern: ['^https?://', 'Must be an http(s) URL']
+      - label: Portable link (.zip)
+        name: portableUrl
+        widget: string
+        required: false
+        pattern: ['^https?://', 'Must be an http(s) URL']
+      - { label: Body, name: body, widget: markdown }
+
+  # ---------- PageSpeed-Auth-Auditor: phiên bản ----------
+  - name: auditor_versions_vi
+    label: Auditor — Phiên bản (VI)
+    label_singular: Phiên bản Auditor (VI)
+    folder: /src/content/versions/vi/pagespeed-auth-auditor
+    extension: md
+    format: frontmatter
+    create: true
+    slug: '{{version}}'
+    identifier_field: version
+    summary: 'v{{version}} — {{title}} ({{status}})'
+    fields:
+      - { name: project, widget: hidden, default: pagespeed-auth-auditor }
+      - { name: locale, widget: hidden, default: vi }
+      - label: Phiên bản
+        name: version
+        widget: string
+        pattern: ['^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$', 'Dạng x.y.z']
+      - { label: Tiêu đề, name: title, widget: string }
+      - { label: Tóm tắt, name: summary, widget: text }
+      - label: Trạng thái sản phẩm
+        name: status
+        widget: select
+        default: development
+        options:
+          - { label: Đang phát triển, value: development }
+          - { label: Xem trước, value: preview }
+          - { label: Đã phát hành, value: released }
+      - { label: Thứ tự, name: order, widget: number, value_type: int, min: 0 }
+      - {
+          label: Nháp,
+          name: draft,
+          widget: boolean,
+          default: false,
+          required: false,
+        }
+      - {
+          label: Ngày phát hành,
+          name: releasedAt,
+          widget: datetime,
+          type: date,
+          picker_utc: true,
+          required: false,
+        }
+      - {
+          label: Link nguồn,
+          name: sourceUrl,
+          widget: string,
+          required: false,
+          pattern: ['^https?://', 'URL http(s)'],
+        }
+      - {
+          label: Link tải,
+          name: downloadUrl,
+          widget: string,
+          required: false,
+          pattern: ['^https?://', 'URL http(s)'],
+        }
+      - { label: Nội dung, name: body, widget: markdown }
+
+  - name: auditor_versions_en
+    label: Auditor — Versions (EN)
+    label_singular: Auditor version (EN)
+    folder: /src/content/versions/en/pagespeed-auth-auditor
+    extension: md
+    format: frontmatter
+    create: true
+    slug: '{{version}}'
+    identifier_field: version
+    summary: 'v{{version}} — {{title}} ({{status}})'
+    fields:
+      - { name: project, widget: hidden, default: pagespeed-auth-auditor }
+      - { name: locale, widget: hidden, default: en }
+      - label: Version
+        name: version
+        widget: string
+        pattern: ['^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$', 'Use x.y.z']
+      - { label: Title, name: title, widget: string }
+      - { label: Summary, name: summary, widget: text }
+      - label: Product status
+        name: status
+        widget: select
+        default: development
+        options:
+          - { label: In development, value: development }
+          - { label: Preview, value: preview }
+          - { label: Released, value: released }
+      - { label: Order, name: order, widget: number, value_type: int, min: 0 }
+      - {
+          label: Draft,
+          name: draft,
+          widget: boolean,
+          default: false,
+          required: false,
+        }
+      - {
+          label: Release date,
+          name: releasedAt,
+          widget: datetime,
+          type: date,
+          picker_utc: true,
+          required: false,
+        }
+      - {
+          label: Source link,
+          name: sourceUrl,
+          widget: string,
+          required: false,
+          pattern: ['^https?://', 'http(s) URL'],
+        }
+      - {
+          label: Download link,
+          name: downloadUrl,
+          widget: string,
+          required: false,
+          pattern: ['^https?://', 'http(s) URL'],
+        }
+      - { label: Body, name: body, widget: markdown }
+
+  # ---------- Trang dự án ----------
+  - name: projects_vi
+    label: Dự án (VI)
+    label_singular: Dự án (VI)
+    folder: /src/content/projects/vi
+    extension: md
+    format: frontmatter
+    create: false
+    slug: '{{fields.slug}}'
+    media_folder: /src/assets
+    public_folder: ../../../assets
+    fields:
+      - { name: locale, widget: hidden, default: vi }
+      - { label: Tên dự án, name: title, widget: string }
+      - label: Slug
+        name: slug
+        widget: string
+        hint: Đường dẫn /<slug>. Giữ cố định và giống bản tiếng Anh.
+        pattern:
+          ['^[a-z0-9]+(?:-[a-z0-9]+)*$', 'Chữ thường, số, dấu gạch ngang']
+      - { label: Mô tả ngắn, name: description, widget: text }
+      - label: Loại minh họa
+        name: kind
+        widget: select
+        options: [pet, auditor]
+      - { label: Thứ tự, name: order, widget: number, value_type: int }
+      - {
+          label: Nháp,
+          name: draft,
+          widget: boolean,
+          default: false,
+          required: false,
+        }
+      - label: Ảnh xem trước
+        name: preview
+        widget: object
+        required: false
+        fields:
+          - { label: Ảnh, name: image, widget: image }
+          - { label: Mô tả ảnh (alt), name: alt, widget: string }
+          - { label: Chú thích, name: caption, widget: string }
+      - label: Video (/media/ten-video.mp4)
+        name: video
+        widget: string
+        required: false
+        pattern: ['^/media/[a-z0-9-]+\.mp4$', 'Dạng /media/ten-video.mp4']
+      - { label: Link dùng thử, name: demoUrl, widget: string, required: false }
+      - { label: Link mã nguồn, name: repoUrl, widget: string, required: false }
+      - label: Link tải (dự phòng)
+        name: downloadUrl
+        widget: string
+        required: false
+        hint: Nút tải trên trang dự án lấy từ phiên bản đã phát hành mới nhất; chỉ cần trường này khi dự án không có bài phiên bản.
+      - { label: Nội dung, name: body, widget: markdown }
+
+  - name: projects_en
+    label: Projects (EN)
+    label_singular: Project (EN)
+    folder: /src/content/projects/en
+    extension: md
+    format: frontmatter
+    create: false
+    slug: '{{fields.slug}}'
+    media_folder: /src/assets
+    public_folder: ../../../assets
+    fields:
+      - { name: locale, widget: hidden, default: en }
+      - { label: Title, name: title, widget: string }
+      - label: Slug
+        name: slug
+        widget: string
+        hint: Must match the Vietnamese project.
+        pattern:
+          ['^[a-z0-9]+(?:-[a-z0-9]+)*$', 'Lowercase letters, digits, hyphens']
+      - { label: Description, name: description, widget: text }
+      - {
+          label: Illustration kind,
+          name: kind,
+          widget: select,
+          options: [pet, auditor],
+        }
+      - { label: Order, name: order, widget: number, value_type: int }
+      - {
+          label: Draft,
+          name: draft,
+          widget: boolean,
+          default: false,
+          required: false,
+        }
+      - label: Preview image
+        name: preview
+        widget: object
+        required: false
+        fields:
+          - { label: Image, name: image, widget: image }
+          - { label: Alt text, name: alt, widget: string }
+          - { label: Caption, name: caption, widget: string }
+      - label: Video (/media/name.mp4)
+        name: video
+        widget: string
+        required: false
+        pattern: ['^/media/[a-z0-9-]+\.mp4$', 'Use /media/name.mp4']
+      - { label: Demo link, name: demoUrl, widget: string, required: false }
+      - {
+          label: Repository link,
+          name: repoUrl,
+          widget: string,
+          required: false,
+        }
+      - {
+          label: Download link (fallback),
+          name: downloadUrl,
+          widget: string,
+          required: false,
+        }
+      - { label: Body, name: body, widget: markdown }

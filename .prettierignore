@@ -1,0 +1,7 @@
+node_modules
+dist
+.astro
+.setup
+.agents/skills/frontend-design
+.agents/skills/impeccable
+package-lock.json

@@ -1,0 +1,55 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+interface Props {
+  kind: 'pet' | 'auditor';
+  label: string;
+  preview?: { image: ImageMetadata; alt: string; caption: string };
+}
+const { kind, label, preview } = Astro.props;
+---
+
+<figure class:list={['project-visual', kind]}>
+  {preview ? (
+    <Image
+      class="product-screenshot"
+      src={preview.image}
+      alt={preview.alt}
+      widths={[480, 800, 1200]}
+      sizes="(max-width: 720px) 100vw, 60vw"
+      format="webp"
+      loading="lazy"
+    />
+  ) : (
+    <div class="concept" aria-hidden="true">
+      {kind === 'pet' ? (
+        <div class="pet-scene">
+          <div class="pet-body">
+            <span class="eye"></span>
+            <span class="eye"></span>
+            <span class="mouth"></span>
+          </div>
+          <div class="pet-shadow"></div>
+          <span class="pet-spark">✦</span>
+        </div>
+      ) : (
+        <div class="audit-scene">
+          <div class="window-top">
+            <i></i>
+            <i></i>
+            <i></i>
+          </div>
+          <div class="audit-circle">
+            <span>↗</span>
+          </div>
+          <div class="audit-lines">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      )}
+    </div>
+  )}
+  <figcaption>{preview ? preview.caption : label}</figcaption>
+</figure>

@@ -1,0 +1,90 @@
+---
+import '../styles/global.css';
+import { copy, pathFor, type Locale } from '../lib/content';
+interface Props {
+  title: string;
+  description: string;
+  locale: Locale;
+  slug?: string;
+  noindex?: boolean;
+}
+const { title, description, locale, slug = '', noindex = false } = Astro.props;
+const t = copy[locale];
+const other = locale === 'vi' ? 'en' : 'vi';
+const canonical = new URL(pathFor(locale, slug), Astro.site);
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} | ChiloLab</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonical} />
+    {!noindex && (
+      <>
+        <link
+          rel="alternate"
+          hreflang="vi"
+          href={new URL(pathFor('vi', slug), Astro.site)}
+        />
+        <link
+          rel="alternate"
+          hreflang="en"
+          href={new URL(pathFor('en', slug), Astro.site)}
+        />
+        <link
+          rel="alternate"
+          hreflang="x-default"
+          href={new URL(pathFor('vi', slug), Astro.site)}
+        />
+      </>
+    )}
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`${title} | ChiloLab`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={locale === 'vi' ? 'vi_VN' : 'en_US'} />
+    <meta name="theme-color" content="#184b58" />
+  </head>
+  <body>
+    <a class="skip" href="#main">
+      {locale === 'vi' ? 'Đến nội dung' : 'Skip to content'}
+    </a>
+    <header class="header wrap">
+      <a class="brand" href={pathFor(locale)} aria-label="ChiloLab">
+        <span class="brand-mark" aria-hidden="true">
+          c.
+        </span>
+        ChiloLab
+      </a>
+      <nav
+        aria-label={locale === 'vi' ? 'Điều hướng chính' : 'Main navigation'}
+      >
+        <a href={`${pathFor(locale)}#projects`}>{t.projects}</a>
+        <a href={`${pathFor(locale)}#about`}>{t.about}</a>
+        <a
+          class="language"
+          href={pathFor(other, slug)}
+          lang={other}
+          hreflang={other}
+        >
+          {t.switch}
+        </a>
+      </nav>
+    </header>
+    <main id="main">
+      <slot />
+    </main>
+    <footer class="footer wrap">
+      <a class="brand" href={pathFor(locale)}>
+        ChiloLab
+      </a>
+      <p>{t.footer}</p>
+      <span>© {new Date().getFullYear()}</span>
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,58 @@
+---
+import { render, type CollectionEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { pathFor } from '../lib/content';
+import { versionCopy, versionPath } from '../lib/versions';
+interface Props {
+  entry: CollectionEntry<'versions'>;
+  project: CollectionEntry<'projects'>;
+}
+const { entry, project } = Astro.props;
+const { data } = entry;
+const t = versionCopy[data.locale];
+const { Content } = await render(entry);
+---
+
+<Base
+  title={`${project.data.title} ${data.version} — ${data.title}`}
+  description={data.summary}
+  locale={data.locale}
+  slug={`${data.project}/versions/${data.version}`}
+>
+  <div class="wrap version-page">
+    <a class="back" href={versionPath(data.locale, data.project)}>
+      ← {t.all}
+    </a>
+    <header class="detail-heading">
+      <a href={pathFor(data.locale, data.project)}>{project.data.title}</a>
+      <div class="version-meta">
+        <span class="version-status">{t[data.status]}</span>
+        {data.releasedAt && (
+          <span>
+            {t.date}: <time datetime={data.releasedAt}>{data.releasedAt}</time>
+          </span>
+        )}
+      </div>
+      <h1>v{data.version}</h1>
+      <p class="version-title">{data.title}</p>
+      <p class="lead">{data.summary}</p>
+      {data.status !== 'released' && <p class="version-notice">{t.pending}</p>}
+      <div class="actions">
+        {data.sourceUrl && <a href={data.sourceUrl}>{t.source}</a>}
+        {data.downloadUrl && (
+          <a class="button" href={data.downloadUrl}>
+            {t.download}
+          </a>
+        )}
+        {data.portableUrl && <a href={data.portableUrl}>{t.portable}</a>}
+      </div>
+    </header>
+    <article class="prose version-article">
+      <Content />
+    </article>
+    <nav class="version-bottom" aria-label={t.heading}>
+      <a href={versionPath(data.locale, data.project)}>{t.all}</a>
+      <a href={pathFor(data.locale, data.project)}>{t.back}</a>
+    </nav>
+  </div>
+</Base>
