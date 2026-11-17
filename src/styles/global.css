@@ -247,7 +247,7 @@ nav a:hover {
 .hero {
   display: grid;
   grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
-  align-items: end;
+  align-items: center;
   gap: clamp(2rem, 6vw, 6rem);
   padding-block: 4.5rem 6.5rem;
 }
@@ -282,19 +282,22 @@ nav a:hover {
 }
 .portrait {
   justify-self: end;
-  width: min(100%, 400px);
+  width: min(100%, 360px);
+  text-align: center;
 }
 .portrait img {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 1;
   object-fit: cover;
-  border-radius: 14px;
+  object-position: 50% 50%;
+  border-radius: 50%;
   background: var(--mint);
+  box-shadow: 0 0 0 8px var(--mint);
 }
 .portrait figcaption {
-  margin-top: 0.8rem;
+  margin-top: 1.4rem;
   font-size: 0.9rem;
   color: var(--muted);
 }
@@ -561,8 +564,8 @@ nav a:hover {
     max-width: 14ch;
   }
   .portrait {
-    justify-self: start;
-    width: min(85%, 340px);
+    justify-self: center;
+    width: min(70%, 280px);
   }
   .project-link,
   .project:nth-child(even) .project-link {

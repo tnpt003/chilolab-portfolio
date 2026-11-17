@@ -38,7 +38,6 @@ const { Content } = await render(entry);
       <p class="lead">{data.summary}</p>
       {data.status !== 'released' && <p class="version-notice">{t.pending}</p>}
       <div class="actions">
-        {data.sourceUrl && <a href={data.sourceUrl}>{t.source}</a>}
         {data.downloadUrl && (
           <a class="button" href={data.downloadUrl}>
             {t.download}

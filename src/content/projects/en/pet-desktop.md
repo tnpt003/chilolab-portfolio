@@ -5,7 +5,6 @@ locale: en
 description: An animated Windows desktop cat, with companion interactions and optional adventures.
 kind: pet
 order: 1
-repoUrl: https://github.com/tnpt003/Pet-Computer
 preview:
   image: ../../../assets/pet-battle-hub.png
   alt: Pet Desktop interface for choosing adventure and battle modes.
@@ -22,10 +21,6 @@ Battle Mode is optional: your desktop becomes an adventure space with slimes, sk
 ## Technology
 
 Built with C# / WPF on .NET 10, with an optional Python behavior service. C# handles movement, input, animation, and battles; local behavior remains available without the Python service.
-
-## See the actual project
-
-The repository includes an [introduction video](https://github.com/tnpt003/Pet-Computer/blob/HEAD/docs/media/desktop-pet-intro.mp4), actual screenshots, and usage guides. The [Releases page](https://github.com/tnpt003/Pet-Computer/releases) keeps every published version with full notes.
 
 ## Installing
 

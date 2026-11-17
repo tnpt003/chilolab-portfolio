@@ -12,3 +12,5 @@ dist/
 .agents/skills/impeccable/scripts/bin/
 test-results/
 playwright-report/
+# Ảnh gốc chưa cắt, không đưa lên repo công khai
+image/

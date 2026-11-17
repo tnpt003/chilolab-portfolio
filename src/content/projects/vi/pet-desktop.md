@@ -5,7 +5,6 @@ locale: vi
 description: Một chú mèo hoạt hình trên desktop Windows, với tương tác chăm sóc và những chuyến phiêu lưu tùy chọn.
 kind: pet
 order: 1
-repoUrl: https://github.com/tnpt003/Pet-Computer
 preview:
   image: ../../../assets/pet-battle-hub.png
   alt: Giao diện chọn chế độ phiêu lưu và chiến đấu trong Pet Desktop.
@@ -22,10 +21,6 @@ Chế độ chiến đấu là phần tùy chọn: desktop trở thành không g
 ## Công nghệ
 
 Dự án được xây bằng C# / WPF trên .NET 10, với dịch vụ hành vi Python tùy chọn. Chuyển động, tương tác, hoạt ảnh và chiến đấu được xử lý bằng C#; mèo vẫn có hành vi cục bộ khi dịch vụ Python không hoạt động.
-
-## Xem sản phẩm thật
-
-Repository có [video giới thiệu](https://github.com/tnpt003/Pet-Computer/blob/HEAD/docs/media/desktop-pet-intro.mp4), ảnh chụp thực tế và hướng dẫn sử dụng. [Trang Releases](https://github.com/tnpt003/Pet-Computer/releases) lưu mọi bản phát hành và ghi chú đầy đủ.
 
 ## Cài đặt
 
