@@ -16,8 +16,7 @@
     {
       "binding": "DB",
       "database_name": "chilolab",
-      // Replace with the id printed by `npx wrangler d1 create chilolab`.
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "d1c3e34e-6ddf-4761-ae7f-0c58f15371f6",
       "migrations_dir": "migrations",
     },
   ],
