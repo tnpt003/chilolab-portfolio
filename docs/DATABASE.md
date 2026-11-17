@@ -44,7 +44,7 @@ Làm xong các bước 1–4 **trước** khi merge vào `main`; nếu không, W
    ```
 2. **Turnstile** — Dashboard → Turnstile → Add widget. Hostname: `chilolab-portfolio.tnpt003.workers.dev` (thêm `chilolab.com` khi có domain), mode Managed.
    - Secret key: `npx wrangler secret put TURNSTILE_SECRET` rồi dán vào.
-   - Site key: Workers & Pages → chilolab-portfolio → Settings → Build → **Build variables**: `PUBLIC_TURNSTILE_SITE_KEY` = site key. Thiếu biến này, site dùng key thử nghiệm và mọi lượt gửi thật sẽ bị từ chối (an toàn, nhưng form không dùng được).
+   - Site key (công khai) nằm trong `.env.production`, được commit. `npm run dev` không đọc file này nên vẫn dùng key thử nghiệm.
 3. **Cloudflare Access cho `/manage`** — Zero Trust → Access → Applications → Add → Self-hosted.
    - Domain `chilolab-portfolio.tnpt003.workers.dev`, path `manage`. Thêm một dòng tương tự cho `chilolab.com` khi có domain.
    - Policy: Allow, Include → Emails → email của bạn. Login method: One-time PIN.
