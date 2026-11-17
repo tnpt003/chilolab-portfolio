@@ -13,9 +13,13 @@
     "test:browser": "playwright test",
     "test:container": "node scripts/smoke-container.mjs",
     "check": "astro check",
-    "verify": "npm run check && npm run build && node scripts/verify-build.mjs",
+    "verify": "npm run check && npm run check:worker && npm run build && node scripts/verify-build.mjs",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "check:worker": "tsc -p worker",
+    "db:migrate:local": "wrangler d1 migrations apply chilolab --local",
+    "db:migrate:remote": "wrangler d1 migrations apply chilolab --remote",
+    "dev:worker": "npm run build && wrangler dev"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.4",
@@ -26,9 +30,11 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.12",
     "@axe-core/playwright": "^4.14.0",
+    "@cloudflare/workers-types": "^5.20261117.1",
     "@playwright/test": "^1.64.1",
     "prettier": "^3.9.10",
     "prettier-plugin-astro": "^1.1.2",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "wrangler": "^4.164.0"
   }
 }

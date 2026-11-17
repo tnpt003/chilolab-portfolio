@@ -1,0 +1,58 @@
+// Copy for visitor features backed by the Worker API (worker/index.ts).
+export const communityCopy = {
+  vi: {
+    comments: 'Bình luận',
+    commentsIntro:
+      'Bình luận được duyệt trước khi hiển thị công khai. Vui lòng không ghi thông tin cá nhân.',
+    loading: 'Đang tải bình luận…',
+    empty: 'Chưa có bình luận nào.',
+    loadFailed: 'Chưa tải được bình luận. Vui lòng thử lại sau.',
+    name: 'Tên hiển thị',
+    comment: 'Bình luận',
+    sendComment: 'Gửi bình luận',
+    commentSent: 'Đã gửi. Bình luận sẽ hiện sau khi được duyệt.',
+    feedback: 'Góp ý và báo lỗi',
+    feedbackIntro:
+      'Chỉ người làm ChiloLab đọc được phần này. Báo lỗi càng chi tiết (đã làm gì, thấy gì) thì càng dễ sửa.',
+    kind: 'Loại',
+    kinds: { idea: 'Góp ý', bug: 'Báo lỗi', other: 'Khác' },
+    message: 'Nội dung',
+    appVersion: 'Phiên bản đang dùng (không bắt buộc)',
+    contact: 'Email hoặc cách liên hệ (không bắt buộc)',
+    contactHint: 'Chỉ dùng để hỏi thêm về góp ý này.',
+    sendFeedback: 'Gửi góp ý',
+    feedbackSent: 'Cảm ơn bạn! Góp ý đã được gửi.',
+    sending: 'Đang gửi…',
+    verifying:
+      'Đang xác minh chống spam, vui lòng đợi vài giây rồi bấm gửi lại.',
+    failed: 'Gửi chưa được. Kiểm tra nội dung rồi thử lại.',
+    noscript: 'Cần bật JavaScript để bình luận hoặc gửi góp ý.',
+  },
+  en: {
+    comments: 'Comments',
+    commentsIntro:
+      'Comments are reviewed before they appear publicly. Please leave out personal information.',
+    loading: 'Loading comments…',
+    empty: 'No comments yet.',
+    loadFailed: 'Comments could not be loaded. Please try again later.',
+    name: 'Display name',
+    comment: 'Comment',
+    sendComment: 'Post comment',
+    commentSent: 'Sent. Your comment will appear once it is approved.',
+    feedback: 'Feedback and bug reports',
+    feedbackIntro:
+      'Only the maker of ChiloLab reads these. Detailed bug reports (what you did, what you saw) are the easiest to fix.',
+    kind: 'Type',
+    kinds: { idea: 'Suggestion', bug: 'Bug report', other: 'Other' },
+    message: 'Message',
+    appVersion: 'Version you use (optional)',
+    contact: 'Email or other contact (optional)',
+    contactHint: 'Only used to follow up on this message.',
+    sendFeedback: 'Send feedback',
+    feedbackSent: 'Thank you! Your feedback was sent.',
+    sending: 'Sending…',
+    verifying: 'Checking for spam, please wait a few seconds and send again.',
+    failed: 'Could not send. Check your message and try again.',
+    noscript: 'JavaScript is needed to comment or send feedback.',
+  },
+} as const;

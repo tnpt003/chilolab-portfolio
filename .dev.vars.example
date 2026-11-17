@@ -1,0 +1,5 @@
+# Copy to .dev.vars for `npm run dev:worker`. Never commit .dev.vars.
+# Cloudflare's always-pass Turnstile test secret:
+TURNSTILE_SECRET=1x0000000000000000000000000000000AA
+# Lets /manage open on localhost without Cloudflare Access. Local only.
+ADMIN_DEV_BYPASS=1

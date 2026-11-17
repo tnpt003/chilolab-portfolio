@@ -3,6 +3,7 @@ dist/
 .astro/
 .wrangler/
 .dev.vars*
+!.dev.vars.example
 .setup/
 .env
 .env.*
@@ -14,3 +15,5 @@ test-results/
 playwright-report/
 # Ảnh gốc chưa cắt, không đưa lên repo công khai
 image/
+*.sql.backup
+backup*.sql

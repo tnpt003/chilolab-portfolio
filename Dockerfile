@@ -7,6 +7,7 @@ COPY astro.config.mjs tsconfig.json ./
 COPY src ./src
 COPY public ./public
 COPY scripts ./scripts
+COPY worker ./worker
 RUN npm run verify
 ARG RELEASE_ID=local
 ENV RELEASE_ID=${RELEASE_ID}

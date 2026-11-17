@@ -5,6 +5,8 @@ export default defineConfig({
   site: 'https://chilolab.com',
   output: 'static',
   trailingSlash: 'never',
+  // Emit scripts as files: the CSP (public/_headers) blocks inline scripts.
+  vite: { build: { assetsInlineLimit: 0 } },
   integrations: [
     sitemap({ filter: (page) => !page.includes('/PageSpeed-Auth-Auditor') }),
   ],

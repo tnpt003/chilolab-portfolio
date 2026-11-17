@@ -612,3 +612,112 @@ nav a:hover {
     scroll-behavior: auto;
   }
 }
+.community {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+  gap: 3rem 4rem;
+  margin-top: 4rem;
+  padding-top: 3rem;
+  border-top: 1px solid var(--line);
+}
+.community h2 {
+  font-size: 1.6rem;
+}
+.community-intro,
+.field-hint {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin-top: 0.6rem;
+  max-width: 60ch;
+}
+.community-state:empty,
+.form-status:empty {
+  display: none;
+}
+.community-state {
+  margin-top: 1.2rem;
+  color: var(--muted);
+}
+.comment-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+}
+.comment-list li {
+  padding-block: 1rem;
+  border-top: 1px solid var(--line);
+}
+.comment-meta {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.comment-meta strong {
+  color: var(--ink);
+}
+.comment-body {
+  margin-top: 0.4rem;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+.community-form {
+  display: grid;
+  gap: 0.4rem;
+  margin-top: 1.8rem;
+  max-width: 34rem;
+}
+.community-form[hidden] {
+  display: none;
+}
+.community-form label {
+  margin-top: 0.8rem;
+  font-weight: 500;
+}
+.community-form input,
+.community-form select,
+.community-form textarea {
+  font: inherit;
+  color: var(--ink);
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  background: white;
+  border: 1px solid var(--muted);
+  border-radius: 0.5rem;
+}
+.community-form textarea {
+  resize: vertical;
+}
+.community-form input:focus-visible,
+.community-form select:focus-visible,
+.community-form textarea:focus-visible,
+.button:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+.community-form .field-hint {
+  margin-top: 0;
+  font-size: 0.85rem;
+}
+.community-form .turnstile {
+  margin-top: 1rem;
+}
+.community-form .turnstile:empty {
+  display: none;
+}
+.community-form .button {
+  justify-self: start;
+  margin-top: 1rem;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+}
+.community-form .button:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+.form-status {
+  margin-top: 0.6rem;
+  padding: 0.7rem 1rem;
+  background: var(--mint);
+  border-radius: 0.5rem;
+}

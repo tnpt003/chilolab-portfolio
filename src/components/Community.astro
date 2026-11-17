@@ -1,0 +1,261 @@
+---
+import { communityCopy } from '../lib/community';
+import type { Locale } from '../lib/content';
+interface Props {
+  locale: Locale;
+  project: string;
+}
+const { locale, project } = Astro.props;
+const t = communityCopy[locale];
+// The site key is public by design; the matching secret lives in the Worker.
+// Default: Cloudflare's always-pass test key for local development.
+const siteKey: string =
+  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
+const runtime = {
+  loading: t.loading,
+  empty: t.empty,
+  loadFailed: t.loadFailed,
+  commentSent: t.commentSent,
+  feedbackSent: t.feedbackSent,
+  sending: t.sending,
+  verifying: t.verifying,
+  failed: t.failed,
+};
+---
+
+<div
+  class="community"
+  data-community
+  data-project={project}
+  data-locale={locale}
+  data-sitekey={siteKey}
+  data-copy={JSON.stringify(runtime)}
+>
+  <section aria-labelledby="comments-heading">
+    <h2 id="comments-heading">{t.comments}</h2>
+    <p class="community-intro">{t.commentsIntro}</p>
+    <p class="community-state" data-comment-state role="status"></p>
+    <ol class="comment-list" data-comment-list></ol>
+    <form class="community-form" data-form="comment" hidden novalidate>
+      <label for="comment-author">{t.name}</label>
+      <input
+        id="comment-author"
+        name="author"
+        required
+        maxlength="60"
+        autocomplete="nickname"
+      />
+      <label for="comment-body">{t.comment}</label>
+      <textarea
+        id="comment-body"
+        name="body"
+        required
+        minlength="2"
+        maxlength="2000"
+        rows="4"
+      ></textarea>
+      <div class="turnstile" data-turnstile></div>
+      <button class="button" type="submit">
+        {t.sendComment}
+      </button>
+      <p class="form-status" data-status role="status"></p>
+    </form>
+  </section>
+  <section aria-labelledby="feedback-heading">
+    <h2 id="feedback-heading">{t.feedback}</h2>
+    <p class="community-intro">{t.feedbackIntro}</p>
+    <form class="community-form" data-form="feedback" hidden novalidate>
+      <label for="feedback-kind">{t.kind}</label>
+      <select id="feedback-kind" name="kind">
+        {Object.entries(t.kinds).map(([value, label]) => (
+          <option value={value}>{label}</option>
+        ))}
+      </select>
+      <label for="feedback-message">{t.message}</label>
+      <textarea
+        id="feedback-message"
+        name="message"
+        required
+        minlength="5"
+        maxlength="4000"
+        rows="6"
+      ></textarea>
+      <label for="feedback-version">{t.appVersion}</label>
+      <input
+        id="feedback-version"
+        name="appVersion"
+        maxlength="40"
+        autocomplete="off"
+      />
+      <label for="feedback-contact">{t.contact}</label>
+      <input
+        id="feedback-contact"
+        name="contact"
+        maxlength="200"
+        autocomplete="email"
+        aria-describedby="feedback-contact-hint"
+      />
+      <p class="field-hint" id="feedback-contact-hint">
+        {t.contactHint}
+      </p>
+      <div class="turnstile" data-turnstile></div>
+      <button class="button" type="submit">
+        {t.sendFeedback}
+      </button>
+      <p class="form-status" data-status role="status"></p>
+    </form>
+  </section>
+  <noscript>
+    <p class="community-intro">{t.noscript}</p>
+  </noscript>
+</div>
+
+<script>
+  type Turnstile = {
+    render: (
+      element: HTMLElement,
+      options: Record<string, unknown>,
+    ) => string | undefined;
+    reset: (id?: string) => void;
+  };
+  type Copy = Record<string, string>;
+
+  const TURNSTILE =
+    'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+  let loader: Promise<Turnstile> | undefined;
+
+  // Loaded only when someone starts filling a form, so plain visitors
+  // never contact a third party.
+  function loadTurnstile() {
+    loader ??= new Promise<Turnstile>((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = TURNSTILE;
+      script.async = true;
+      script.onload = () => {
+        const api = (window as unknown as { turnstile?: Turnstile }).turnstile;
+        if (api) resolve(api);
+        else reject(new Error('Turnstile unavailable'));
+      };
+      script.onerror = () => reject(new Error('Turnstile failed to load'));
+      document.head.append(script);
+    });
+    return loader;
+  }
+
+  async function loadComments(root: HTMLElement, copy: Copy) {
+    const state = root.querySelector<HTMLElement>('[data-comment-state]')!;
+    const list = root.querySelector<HTMLOListElement>('[data-comment-list]')!;
+    state.textContent = copy.loading;
+    try {
+      const response = await fetch(
+        `/api/comments?project=${encodeURIComponent(root.dataset.project!)}`,
+      );
+      if (!response.ok) throw new Error(String(response.status));
+      const { comments } = (await response.json()) as {
+        comments: { author: string; body: string; createdAt: string }[];
+      };
+      list.replaceChildren(
+        ...comments.map((comment) => {
+          const item = document.createElement('li');
+          const meta = document.createElement('p');
+          const author = document.createElement('strong');
+          const time = document.createElement('time');
+          const body = document.createElement('p');
+          author.textContent = comment.author;
+          time.dateTime = comment.createdAt;
+          time.textContent = new Date(comment.createdAt).toLocaleDateString(
+            root.dataset.locale === 'en' ? 'en-GB' : 'vi-VN',
+          );
+          meta.className = 'comment-meta';
+          meta.append(author, ' · ', time);
+          body.className = 'comment-body';
+          body.textContent = comment.body;
+          item.append(meta, body);
+          return item;
+        }),
+      );
+      state.textContent = comments.length ? '' : copy.empty;
+    } catch {
+      state.textContent = copy.loadFailed;
+    }
+  }
+
+  function setupForm(root: HTMLElement, form: HTMLFormElement, copy: Copy) {
+    const kind = form.dataset.form as 'comment' | 'feedback';
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const slot = form.querySelector<HTMLElement>('[data-turnstile]')!;
+    let token = '';
+    let widget: string | undefined;
+    let api: Turnstile | undefined;
+
+    const start = () => {
+      loadTurnstile()
+        .then((turnstile) => {
+          api = turnstile;
+          if (widget !== undefined) return;
+          widget = turnstile.render(slot, {
+            sitekey: root.dataset.sitekey,
+            language: root.dataset.locale,
+            callback: (value: string) => (token = value),
+            'expired-callback': () => (token = ''),
+            'error-callback': () => (token = ''),
+          });
+        })
+        .catch(() => (status.textContent = copy.failed));
+    };
+    form.addEventListener('focusin', start, { once: true });
+
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+      if (!token) {
+        start();
+        status.textContent = copy.verifying;
+        return;
+      }
+      const fields = Object.fromEntries(new FormData(form));
+      delete fields['cf-turnstile-response'];
+      const button = form.querySelector<HTMLButtonElement>('button')!;
+      button.disabled = true;
+      status.textContent = copy.sending;
+      try {
+        const response = await fetch(
+          `/api/${kind === 'comment' ? 'comments' : 'feedback'}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              ...fields,
+              project: root.dataset.project,
+              locale: root.dataset.locale,
+              token,
+            }),
+          },
+        );
+        if (!response.ok) throw new Error(String(response.status));
+        form.reset();
+        status.textContent =
+          kind === 'comment' ? copy.commentSent : copy.feedbackSent;
+      } catch {
+        status.textContent = copy.failed;
+      } finally {
+        token = '';
+        api?.reset(widget);
+        button.disabled = false;
+      }
+    });
+    form.hidden = false;
+  }
+
+  for (const root of document.querySelectorAll<HTMLElement>(
+    '[data-community]',
+  )) {
+    const copy = JSON.parse(root.dataset.copy ?? '{}') as Copy;
+    loadComments(root, copy);
+    for (const form of root.querySelectorAll<HTMLFormElement>('[data-form]'))
+      setupForm(root, form, copy);
+  }
+</script>

@@ -1,0 +1,21 @@
+---
+// Counts clicks on links marked data-download="project/version/kind".
+// The link itself stays a plain download link; counting never blocks it.
+---
+
+<script>
+  function count(event: MouseEvent) {
+    if (event.type === 'auxclick' && event.button !== 1) return;
+    const link = (event.target as Element | null)?.closest<HTMLAnchorElement>(
+      'a[data-download]',
+    );
+    if (!link) return;
+    const [project, version, kind] = link.dataset.download!.split('/');
+    navigator.sendBeacon?.(
+      '/api/downloads',
+      JSON.stringify({ project, version, kind }),
+    );
+  }
+  document.addEventListener('click', count);
+  document.addEventListener('auxclick', count);
+</script>

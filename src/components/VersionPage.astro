@@ -3,6 +3,7 @@ import { render, type CollectionEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { pathFor } from '../lib/content';
 import { versionCopy, versionPath } from '../lib/versions';
+import DownloadCounter from './DownloadCounter.astro';
 interface Props {
   entry: CollectionEntry<'versions'>;
   project: CollectionEntry<'projects'>;
@@ -39,11 +40,22 @@ const { Content } = await render(entry);
       {data.status !== 'released' && <p class="version-notice">{t.pending}</p>}
       <div class="actions">
         {data.downloadUrl && (
-          <a class="button" href={data.downloadUrl}>
+          <a
+            class="button"
+            href={data.downloadUrl}
+            data-download={`${data.project}/${data.version}/setup`}
+          >
             {t.download}
           </a>
         )}
-        {data.portableUrl && <a href={data.portableUrl}>{t.portable}</a>}
+        {data.portableUrl && (
+          <a
+            href={data.portableUrl}
+            data-download={`${data.project}/${data.version}/portable`}
+          >
+            {t.portable}
+          </a>
+        )}
       </div>
     </header>
     <article class="prose version-article">
@@ -54,4 +66,5 @@ const { Content } = await render(entry);
       <a href={pathFor(data.locale, data.project)}>{t.back}</a>
     </nav>
   </div>
+  <DownloadCounter />
 </Base>

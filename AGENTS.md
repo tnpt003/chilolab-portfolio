@@ -17,3 +17,4 @@
 - Free-first: Markdown is the active content source, public GitHub is acceptable, Cloudflare is the hosting choice. WordPress is deferred. Do not add paid services without an explicit decision.
 - Keep tokens and credentials out of source. No secrets in PUBLIC_* variables.
 - Version notes live in src/content/versions/{vi,en}/<project>/<version>.md. Read docs/VERSIONS.md; preserve translation metadata, distinguish public posts from actual product release status, and never invent release dates or downloads.
+- Visitor data (feedback, comments, download counts) lives in Cloudflare D1 via `worker/`; `/manage` is behind Cloudflare Access. Read docs/DATABASE.md. Never store IPs; keep the Worker failing closed when Access is not configured.

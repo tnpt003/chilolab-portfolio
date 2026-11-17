@@ -1,11 +1,29 @@
-// Cloudflare Worker serving the static Astro build. No Worker script runs;
-// requests are answered from ./dist, including _headers and _redirects.
+// Cloudflare Worker for ChiloLab. Pages are answered from ./dist (including
+// _headers and _redirects); worker/index.ts only runs for /api/* and /manage*.
+// Setup steps: docs/DATABASE.md.
 {
   "name": "chilolab-portfolio",
+  "main": "worker/index.ts",
   "compatibility_date": "2026-11-01",
   "assets": {
     "directory": "./dist",
+    "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "drop-trailing-slash",
+    "run_worker_first": ["/api/*", "/manage", "/manage/*"],
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "chilolab",
+      // Replace with the id printed by `npx wrangler d1 create chilolab`.
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations",
+    },
+  ],
+  // Public values only. TURNSTILE_SECRET is a secret: `wrangler secret put`.
+  "vars": {
+    "ACCESS_TEAM_DOMAIN": "",
+    "ACCESS_AUD": "",
   },
 }

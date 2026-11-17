@@ -10,6 +10,8 @@
 !public/**
 !scripts/
 !scripts/**
+!worker/
+!worker/**
 !infra/
 !infra/nginx.conf
 !Dockerfile

@@ -11,6 +11,8 @@ import {
   versionPath,
 } from '../lib/versions';
 import VersionList from './VersionList.astro';
+import Community from './Community.astro';
+import DownloadCounter from './DownloadCounter.astro';
 interface Props {
   project: CollectionEntry<'projects'>;
 }
@@ -55,10 +57,21 @@ const poster =
           </p>
         </div>
         <div class="actions">
-          <a class="button" href={latest.downloadUrl}>
+          <a
+            class="button"
+            href={latest.downloadUrl}
+            data-download={`${data.slug}/${latest.version}/setup`}
+          >
             {v.latestInstaller}
           </a>
-          {latest.portableUrl && <a href={latest.portableUrl}>{v.portable}</a>}
+          {latest.portableUrl && (
+            <a
+              href={latest.portableUrl}
+              data-download={`${data.slug}/${latest.version}/portable`}
+            >
+              {v.portable}
+            </a>
+          )}
           <a href={versionPath(data.locale, data.slug, latest.version)}>
             {v.latestNotes}
           </a>
@@ -119,5 +132,7 @@ const poster =
       </div>
       <VersionList entries={versions.slice(0, 3)} locale={data.locale} />
     </section>
+    <Community locale={data.locale} project={data.slug} />
   </div>
+  <DownloadCounter />
 </Base>
