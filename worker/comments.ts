@@ -1,0 +1,319 @@
+import { asLocale, json, readJson, text, underLimit, type Env } from './env';
+import { moderate } from './moderation';
+import { currentUser } from './session';
+
+// Threaded comments, one reply level (like YouTube). A project page shows the
+// comments of every version plus its own; a version page shows only its own.
+// 10 threads per page. Deleting a comment that still has replies keeps a
+// text-less placeholder so the thread stays readable; otherwise it is removed.
+
+export const PAGE_SIZE = 10;
+const MAX_REPLIES = 50;
+
+type Row = {
+  id: number;
+  project: string;
+  version: string | null;
+  parent_id: number | null;
+  user_id: number | null;
+  author: string | null;
+  display_name: string | null;
+  body: string;
+  status: 'published' | 'held' | 'deleted' | 'removed';
+  created_at: string;
+  edited_at: string | null;
+};
+
+export type Allowed = (
+  project: string,
+  version: string | null,
+) => Promise<boolean>;
+
+function serialize(row: Row, me: number) {
+  const visible = row.status === 'published' || row.status === 'held';
+  return {
+    id: row.id,
+    author: visible ? (row.display_name ?? row.author ?? null) : null,
+    mine: row.user_id !== null && row.user_id === me,
+    state: row.status,
+    body: visible ? row.body : null,
+    version: row.version,
+    createdAt: row.created_at,
+    editedAt: row.edited_at,
+  };
+}
+
+const placeholders = (count: number) => Array(count).fill('?').join(', ');
+
+/** Removes deleted/removed placeholders that no longer have any replies. */
+async function prune(env: Env, ids: number[]) {
+  if (!ids.length) return;
+  await env.DB.prepare(
+    `DELETE FROM comments WHERE id IN (${placeholders(ids.length)})
+     AND status IN ('deleted', 'removed')
+     AND NOT EXISTS (SELECT 1 FROM comments r WHERE r.parent_id = comments.id)`,
+  )
+    .bind(...ids)
+    .run();
+}
+
+/** Author delete ('deleted') or owner delete ('removed'). */
+export async function removeComment(
+  env: Env,
+  id: number,
+  status: 'deleted' | 'removed',
+) {
+  const row = await env.DB.prepare(
+    `SELECT id, parent_id, (SELECT COUNT(*) FROM comments r WHERE r.parent_id = c.id) AS replies
+     FROM comments c WHERE id = ?`,
+  )
+    .bind(id)
+    .first<{ id: number; parent_id: number | null; replies: number }>();
+  if (!row) return;
+  if (row.replies > 0)
+    await env.DB.prepare(
+      `UPDATE comments SET status = ?, body = '', moderation_reason = NULL, edited_at = NULL
+       WHERE id = ?`,
+    )
+      .bind(status, id)
+      .run();
+  else {
+    await env.DB.prepare('DELETE FROM comments WHERE id = ?').bind(id).run();
+    if (row.parent_id) await prune(env, [row.parent_id]);
+  }
+}
+
+/** Account deletion: drop the user's text everywhere, keep others' threads. */
+export async function deleteUserComments(env: Env, userId: number) {
+  const { results: replies } = await env.DB.prepare(
+    'SELECT DISTINCT parent_id FROM comments WHERE user_id = ? AND parent_id IS NOT NULL',
+  )
+    .bind(userId)
+    .all<{ parent_id: number }>();
+  await env.DB.batch([
+    env.DB.prepare(
+      'DELETE FROM comments WHERE user_id = ? AND parent_id IS NOT NULL',
+    ).bind(userId),
+    env.DB.prepare(
+      `UPDATE comments SET status = 'deleted', body = '', user_id = NULL, author = NULL,
+         moderation_reason = NULL, edited_at = NULL
+       WHERE user_id = ? AND parent_id IS NULL
+         AND EXISTS (SELECT 1 FROM comments r WHERE r.parent_id = comments.id)`,
+    ).bind(userId),
+    env.DB.prepare(
+      'DELETE FROM comments WHERE user_id = ? AND parent_id IS NULL',
+    ).bind(userId),
+  ]);
+  await prune(
+    env,
+    replies.map(({ parent_id }) => parent_id),
+  );
+}
+
+async function list(request: Request, env: Env, allowed: Allowed) {
+  const url = new URL(request.url);
+  const project = url.searchParams.get('project') ?? '';
+  const version = url.searchParams.get('version') || null;
+  if (!(await allowed(project, version)))
+    return json({ error: 'unknown_project' }, 404);
+  const page = Math.max(
+    1,
+    Math.min(1000, Number(url.searchParams.get('page')) || 1),
+  );
+  const me = (await currentUser(request, env))?.id ?? -1;
+
+  const scope = version ? 'c.project = ? AND c.version = ?' : 'c.project = ?';
+  const scopeArgs = version ? [project, version] : [project];
+  const visibleReply = `(r.status = 'published' OR (r.status = 'held' AND r.user_id = ?))`;
+  const visibleThread = `c.parent_id IS NULL AND (
+      c.status = 'published' OR (c.status = 'held' AND c.user_id = ?)
+      OR (c.status IN ('deleted', 'removed') AND EXISTS (
+        SELECT 1 FROM comments r WHERE r.parent_id = c.id AND ${visibleReply})))`;
+
+  const [threads, count, total] = await env.DB.batch<Record<string, unknown>>([
+    env.DB.prepare(
+      `SELECT c.*, u.display_name FROM comments c LEFT JOIN users u ON u.id = c.user_id
+       WHERE ${scope} AND ${visibleThread}
+       ORDER BY c.created_at DESC, c.id DESC LIMIT ? OFFSET ?`,
+    ).bind(...scopeArgs, me, me, PAGE_SIZE, (page - 1) * PAGE_SIZE),
+    env.DB.prepare(
+      `SELECT COUNT(*) AS n FROM comments c WHERE ${scope} AND ${visibleThread}`,
+    ).bind(...scopeArgs, me, me),
+    env.DB.prepare(
+      `SELECT COUNT(*) AS n FROM comments c WHERE ${scope} AND c.status = 'published'`,
+    ).bind(...scopeArgs),
+  ]);
+
+  const rows = threads.results as unknown as Row[];
+  const ids = rows.map((row) => row.id);
+  const replies = ids.length
+    ? (
+        await env.DB.prepare(
+          `SELECT r.*, u.display_name FROM comments r LEFT JOIN users u ON u.id = r.user_id
+           WHERE r.parent_id IN (${placeholders(ids.length)}) AND ${visibleReply}
+           ORDER BY r.created_at, r.id`,
+        )
+          .bind(...ids, me)
+          .all<Row>()
+      ).results
+    : [];
+
+  const threadCount = Number(count.results[0]?.n ?? 0);
+  return json({
+    page,
+    pages: Math.max(1, Math.ceil(threadCount / PAGE_SIZE)),
+    threads: threadCount,
+    total: Number(total.results[0]?.n ?? 0),
+    signedIn: me !== -1,
+    comments: rows.map((row) => ({
+      ...serialize(row, me),
+      replies: replies
+        .filter((reply) => reply.parent_id === row.id)
+        .slice(0, MAX_REPLIES)
+        .map((reply) => serialize(reply, me)),
+    })),
+  });
+}
+
+async function create(request: Request, env: Env, allowed: Allowed) {
+  const user = await currentUser(request, env);
+  if (!user) return json({ error: 'unauthenticated' }, 401);
+  if (!(await underLimit(env, `user:${user.id}`)))
+    return json({ error: 'rate_limited' }, 429);
+  const body = await readJson(request);
+  const message = text(body?.body, 1, 2000);
+  const locale = asLocale(body?.locale);
+  const project = String(body?.project ?? '');
+  let version =
+    typeof body?.version === 'string' && body.version ? body.version : null;
+  let parentId: number | null = null;
+  if (!message || !locale) return json({ error: 'invalid' }, 400);
+
+  if (body?.parentId !== undefined && body.parentId !== null) {
+    const parent = await env.DB.prepare(
+      'SELECT id, parent_id, project, version, status FROM comments WHERE id = ?',
+    )
+      .bind(Number(body.parentId))
+      .first<{
+        id: number;
+        parent_id: number | null;
+        project: string;
+        version: string | null;
+        status: string;
+      }>();
+    if (!parent || parent.project !== project)
+      return json({ error: 'invalid' }, 400);
+    const top = parent.parent_id
+      ? await env.DB.prepare(
+          'SELECT id, version, status FROM comments WHERE id = ?',
+        )
+          .bind(parent.parent_id)
+          .first<{ id: number; version: string | null; status: string }>()
+      : parent;
+    if (!top || top.status !== 'published' || parent.status !== 'published')
+      return json({ error: 'invalid' }, 400);
+    parentId = top.id;
+    version = top.version;
+  } else if (!(await allowed(project, version)))
+    return json({ error: 'invalid' }, 400);
+
+  const verdict = await moderate(env, message);
+  const row = await env.DB.prepare(
+    `INSERT INTO comments (project, version, parent_id, user_id, body, locale, status, moderation_reason)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`,
+  )
+    .bind(
+      project,
+      version,
+      parentId,
+      user.id,
+      message,
+      locale,
+      verdict.held ? 'held' : 'published',
+      verdict.reason,
+    )
+    .first<Row>();
+  return json(
+    {
+      comment: serialize({ ...row!, display_name: user.displayName }, user.id),
+    },
+    201,
+  );
+}
+
+async function edit(request: Request, env: Env, id: number) {
+  const user = await currentUser(request, env);
+  if (!user) return json({ error: 'unauthenticated' }, 401);
+  if (!(await underLimit(env, `user:${user.id}`)))
+    return json({ error: 'rate_limited' }, 429);
+  const message = text((await readJson(request))?.body, 1, 2000);
+  if (!message) return json({ error: 'invalid' }, 400);
+  const row = await env.DB.prepare(
+    'SELECT user_id, status FROM comments WHERE id = ?',
+  )
+    .bind(id)
+    .first<{ user_id: number | null; status: string }>();
+  if (
+    !row ||
+    row.user_id !== user.id ||
+    !['published', 'held'].includes(row.status)
+  )
+    return json({ error: 'not_found' }, 404);
+  const verdict = await moderate(env, message);
+  const updated = await env.DB.prepare(
+    `UPDATE comments SET body = ?, status = ?, moderation_reason = ?, edited_at = ?
+     WHERE id = ? RETURNING *`,
+  )
+    .bind(
+      message,
+      verdict.held ? 'held' : 'published',
+      verdict.reason,
+      new Date().toISOString().replace(/\.\d+Z$/, 'Z'),
+      id,
+    )
+    .first<Row>();
+  return json({
+    comment: serialize(
+      { ...updated!, display_name: user.displayName },
+      user.id,
+    ),
+  });
+}
+
+async function destroy(request: Request, env: Env, id: number) {
+  const user = await currentUser(request, env);
+  if (!user) return json({ error: 'unauthenticated' }, 401);
+  const row = await env.DB.prepare(
+    'SELECT user_id, status FROM comments WHERE id = ?',
+  )
+    .bind(id)
+    .first<{ user_id: number | null; status: string }>();
+  if (
+    !row ||
+    row.user_id !== user.id ||
+    !['published', 'held'].includes(row.status)
+  )
+    return json({ error: 'not_found' }, 404);
+  await removeComment(env, id, 'deleted');
+  return json({ status: 'deleted' });
+}
+
+/** Handles /api/comments and /api/comments/:id. Returns null otherwise. */
+export function comments(
+  request: Request,
+  env: Env,
+  path: string,
+  allowed: Allowed,
+) {
+  if (path === '/api/comments') {
+    if (request.method === 'GET') return list(request, env, allowed);
+    if (request.method === 'POST') return create(request, env, allowed);
+    return json({ error: 'method_not_allowed' }, 405);
+  }
+  const match = /^\/api\/comments\/(\d{1,12})$/.exec(path);
+  if (!match) return null;
+  const id = Number(match[1]);
+  if (request.method === 'PATCH') return edit(request, env, id);
+  if (request.method === 'DELETE') return destroy(request, env, id);
+  return json({ error: 'method_not_allowed' }, 405);
+}

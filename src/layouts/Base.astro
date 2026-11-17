@@ -3,7 +3,9 @@ import '@fontsource/be-vietnam-pro/400.css';
 import '@fontsource/be-vietnam-pro/500.css';
 import '@fontsource/be-vietnam-pro/700.css';
 import '../styles/global.css';
-import { copy, pathFor, type Locale } from '../lib/content';
+import { copy, listProjects, pathFor, type Locale } from '../lib/content';
+import { feedbackPath, privacyPath, userPath } from '../lib/community';
+import { versionPath } from '../lib/versions';
 interface Props {
   title: string;
   description: string;
@@ -15,6 +17,8 @@ const { title, description, locale, slug = '', noindex = false } = Astro.props;
 const t = copy[locale];
 const other = locale === 'vi' ? 'en' : 'vi';
 const canonical = new URL(pathFor(locale, slug), Astro.site);
+const projects = await listProjects(locale);
+const f = copy[locale].footerLinks;
 ---
 
 <!doctype html>
@@ -82,12 +86,61 @@ const canonical = new URL(pathFor(locale, slug), Astro.site);
     <main id="main">
       <slot />
     </main>
-    <footer class="footer wrap">
-      <a class="brand" href={pathFor(locale)}>
-        ChiloLab
-      </a>
-      <p>{t.footer}</p>
-      <span>© {new Date().getFullYear()}</span>
+    <footer class="footer">
+      <div class="wrap footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href={pathFor(locale)}>
+            <span class="brand-mark" aria-hidden="true">
+              c.
+            </span>
+            ChiloLab
+          </a>
+          <p>{t.footer}</p>
+        </div>
+        <nav aria-label={f.projects}>
+          <p class="footer-title">{f.projects}</p>
+          <ul>
+            {projects.map(({ data }) => (
+              <li>
+                <a href={pathFor(locale, data.slug)}>{data.title}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <nav aria-label="Pet Desktop">
+          <p class="footer-title">Pet Desktop</p>
+          <ul>
+            <li>
+              <a href={`${pathFor(locale, 'pet-desktop')}#download-heading`}>
+                {f.download}
+              </a>
+            </li>
+            <li>
+              <a href={versionPath(locale, 'pet-desktop')}>{f.versions}</a>
+            </li>
+            <li>
+              <a href={feedbackPath(locale, 'pet-desktop')}>{f.feedback}</a>
+            </li>
+          </ul>
+        </nav>
+        <nav aria-label="ChiloLab">
+          <p class="footer-title">ChiloLab</p>
+          <ul>
+            <li>
+              <a href={`${pathFor(locale)}#about`}>{t.about}</a>
+            </li>
+            <li>
+              <a href={privacyPath(locale)}>{f.privacy}</a>
+            </li>
+            <li>
+              <a href={userPath(locale, 'login')}>{f.account}</a>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <div class="wrap footer-bottom">
+        <span>© {new Date().getFullYear()} Nguyễn Tấn Phát · ChiloLab</span>
+      </div>
     </footer>
   </body>
 </html>

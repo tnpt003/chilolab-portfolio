@@ -16,6 +16,12 @@ const routes = [
   '/en/pagespeed-auth-auditor/versions',
   '/pagespeed-auth-auditor/versions/1.2.0',
   '/en/pagespeed-auth-auditor/versions/1.2.0',
+  '/pet-desktop/feedback',
+  '/en/pet-desktop/feedback',
+  '/user/login',
+  '/en/user/login',
+  '/privacy',
+  '/en/privacy',
 ];
 
 for (const route of routes) {
@@ -99,7 +105,7 @@ test('version history navigation preserves version and release status', async ({
   const panel = page.locator('.download-panel');
   await expect(panel.getByRole('heading', { name: 'Tải xuống' })).toBeVisible();
   await expect(
-    panel.getByRole('link', { name: 'Tải bộ cài cho Windows' }),
+    panel.getByRole('link', { name: 'Tải Pet Desktop 1.5.0 cho Windows' }),
   ).toHaveAttribute('href', /\/releases\/download\/v1\.5\.0\/[^/]+Setup\.exe$/);
   await page
     .locator('.version-section')

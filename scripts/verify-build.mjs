@@ -54,6 +54,8 @@ for (const [route, html] of routes) {
   if (route === '/PageSpeed-Auth-Auditor') continue;
   for (const [, href] of html.matchAll(/href="([^"\s]+)"/g)) {
     if (!href.startsWith('/') && !href.startsWith('#')) continue;
+    // /api/* is answered by the Worker (worker/index.ts), not a built page.
+    if (href.startsWith('/api/')) continue;
     if (
       href.startsWith('//') ||
       /\.(?:svg|png|webp|jpg|jpeg|ico|css|js|mp4|pdf)(?:[?#]|$)/i.test(href)
@@ -78,6 +80,14 @@ assert.ok(
 const sitemap = await readFile(new URL('sitemap-0.xml', root), 'utf8');
 for (const [route, html] of routes) {
   if (route === '/404') continue;
+  // Sign-in pages are noindex and stay out of the sitemap.
+  if (html.includes('name="robots" content="noindex"')) {
+    assert.ok(
+      !sitemap.includes(`https://chilolab.com${route}<`),
+      `Noindex page in sitemap: ${route}`,
+    );
+    continue;
+  }
   assert.ok(
     sitemap.includes(`https://chilolab.com${route === '/' ? '/' : route}`),
     `Missing sitemap route: ${route}`,

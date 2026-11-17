@@ -1,0 +1,390 @@
+---
+import { commentCopy, userPath } from '../lib/community';
+import { pathFor, type Locale } from '../lib/content';
+interface Props {
+  locale: Locale;
+  project: string;
+  /** Set on a version page; omitted on the project page (all versions). */
+  version?: string;
+}
+const { locale, project, version } = Astro.props;
+const t = commentCopy[locale];
+---
+
+<section
+  class="comments"
+  id="comments"
+  aria-labelledby="comments-heading"
+  data-comments
+  data-project={project}
+  data-version={version ?? ''}
+  data-locale={locale}
+  data-login={userPath(locale, 'login')}
+  data-version-base={pathFor(locale, `${project}/versions/`)}
+  data-copy={JSON.stringify(t)}
+>
+  <div class="comments-head">
+    <h2 id="comments-heading" tabindex="-1">
+      {t.heading}
+    </h2>
+    <span class="comments-count" data-count></span>
+  </div>
+  <p class="comments-intro">{version ? t.introVersion : t.introProject}</p>
+  <div data-composer></div>
+  <p class="comments-state" data-state role="status">
+    {t.loading}
+  </p>
+  <ol class="comment-list" data-list></ol>
+  <nav class="comment-pages" data-pages aria-label={t.pagination} hidden></nav>
+  <noscript>
+    <p class="comments-intro">{t.loadFailed}</p>
+  </noscript>
+</section>
+
+<script>
+  type Comment = {
+    id: number;
+    author: string | null;
+    mine: boolean;
+    state: 'published' | 'held' | 'deleted' | 'removed';
+    body: string | null;
+    version: string | null;
+    createdAt: string;
+    editedAt: string | null;
+    replies?: Comment[];
+  };
+  type Page = {
+    page: number;
+    pages: number;
+    total: number;
+    signedIn: boolean;
+    comments: Comment[];
+  };
+  type Copy = Record<string, string>;
+  const VISIBLE_REPLIES = 3;
+
+  function el<K extends keyof HTMLElementTagNameMap>(
+    tag: K,
+    className = '',
+    text = '',
+  ) {
+    const node = document.createElement(tag);
+    if (className) node.className = className;
+    if (text) node.textContent = text;
+    return node;
+  }
+  const fill = (template: string, values: Record<string, string | number>) =>
+    template.replace(/\{(\w+)\}/g, (_, key) => String(values[key] ?? ''));
+
+  async function api(path: string, init?: RequestInit) {
+    const response = await fetch(path, {
+      ...init,
+      headers: init?.body ? { 'Content-Type': 'application/json' } : undefined,
+    });
+    if (!response.ok) throw new Error(String(response.status));
+    return response.json();
+  }
+
+  function setup(root: HTMLElement) {
+    const copy = JSON.parse(root.dataset.copy ?? '{}') as Copy;
+    const project = root.dataset.project!;
+    const version = root.dataset.version || null;
+    const locale = root.dataset.locale!;
+    const list = root.querySelector<HTMLOListElement>('[data-list]')!;
+    const state = root.querySelector<HTMLElement>('[data-state]')!;
+    const count = root.querySelector<HTMLElement>('[data-count]')!;
+    const pages = root.querySelector<HTMLElement>('[data-pages]')!;
+    const composer = root.querySelector<HTMLElement>('[data-composer]')!;
+    const heading = root.querySelector<HTMLElement>('#comments-heading')!;
+    const dateFormat = new Intl.DateTimeFormat(
+      locale === 'en' ? 'en-GB' : 'vi-VN',
+      { dateStyle: 'medium' },
+    );
+    let page = 1;
+    let me: { displayName: string } | null = null;
+    const expanded = new Set<number>();
+
+    const errorText = (error: unknown) =>
+      String(error).includes('429') ? copy.rateLimited : copy.failed;
+
+    function editor(
+      initial: string,
+      placeholder: string,
+      submitLabel: string,
+      onSubmit: (body: string) => Promise<string | void>,
+      onCancel?: () => void,
+    ) {
+      const form = el('form', 'comment-form');
+      const label = el('label', 'sr-only', placeholder);
+      const area = el('textarea');
+      const id = `comment-input-${Math.random().toString(36).slice(2)}`;
+      label.htmlFor = id;
+      area.id = id;
+      area.required = true;
+      area.maxLength = 2000;
+      area.rows = 3;
+      area.placeholder = placeholder;
+      area.value = initial;
+      const row = el('div', 'comment-form-actions');
+      const status = el('p', 'form-status');
+      status.setAttribute('role', 'status');
+      const submit = el('button', 'button', submitLabel);
+      submit.type = 'submit';
+      row.append(submit);
+      if (onCancel) {
+        const cancel = el('button', 'text-button', copy.cancel);
+        cancel.type = 'button';
+        cancel.addEventListener('click', onCancel);
+        row.append(cancel);
+      }
+      form.append(label, area, row, status);
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!area.value.trim()) return area.focus();
+        submit.disabled = true;
+        status.textContent = copy.sending;
+        try {
+          const message = await onSubmit(area.value);
+          status.textContent = message ?? '';
+        } catch (error) {
+          status.textContent = errorText(error);
+        } finally {
+          submit.disabled = false;
+        }
+      });
+      return { form, area, status };
+    }
+
+    function renderComposer() {
+      composer.replaceChildren();
+      if (!me) {
+        const link = el('a', 'button', copy.signIn);
+        link.href = `${root.dataset.login}?return=${encodeURIComponent(`${location.pathname}#comments`)}`;
+        composer.append(link);
+        return;
+      }
+      const who = el('p', 'comment-as');
+      who.append(`${copy.signedInAs} `, el('strong', '', me.displayName));
+      const { form, area, status } = editor(
+        '',
+        copy.placeholder,
+        copy.post,
+        async (body) => {
+          const { comment } = await api('/api/comments', {
+            method: 'POST',
+            body: JSON.stringify({ project, version, body, locale }),
+          });
+          area.value = '';
+          page = 1;
+          await load();
+          if (comment.state === 'held') return copy.heldNotice;
+        },
+      );
+      composer.append(who, form);
+    }
+
+    function item(comment: Comment, thread: Comment): HTMLLIElement {
+      const li = el(
+        'li',
+        `comment${comment.state === 'held' ? ' is-held' : ''}`,
+      );
+      const article = el('article');
+      const meta = el('p', 'comment-meta');
+      if (comment.state === 'deleted' || comment.state === 'removed') {
+        article.append(
+          el(
+            'p',
+            'comment-placeholder',
+            comment.state === 'deleted' ? copy.deleted : copy.removed,
+          ),
+        );
+        li.append(article);
+        return li;
+      }
+      meta.append(el('strong', '', comment.author ?? copy.formerUser));
+      if (!version && comment === thread) {
+        const tag = comment.version
+          ? Object.assign(el('a', 'comment-tag', `v${comment.version}`), {
+              href: `${root.dataset.versionBase}${comment.version}#comments`,
+            })
+          : el('span', 'comment-tag is-project', copy.projectLabel);
+        meta.append(' ', tag);
+      }
+      const time = el(
+        'time',
+        '',
+        dateFormat.format(new Date(comment.createdAt)),
+      );
+      time.dateTime = comment.createdAt;
+      meta.append(' · ', time);
+      if (comment.editedAt) meta.append(` · ${copy.edited}`);
+      const body = el('p', 'comment-body', comment.body ?? '');
+      article.append(meta, body);
+      if (comment.state === 'held')
+        article.append(el('p', 'comment-held', copy.held));
+
+      const actions = el('div', 'comment-actions');
+      const button = (label: string, handler: () => void) => {
+        const node = el('button', 'text-button', label);
+        node.type = 'button';
+        node.addEventListener('click', handler);
+        actions.append(node);
+        return node;
+      };
+      if (me && thread.state === 'published' && comment.state === 'published')
+        button(copy.reply, () => openReply(li, thread, comment));
+      if (comment.mine) {
+        button(copy.edit, () => {
+          const { form, area } = editor(
+            comment.body ?? '',
+            copy.placeholder,
+            copy.save,
+            async (text) => {
+              await api(`/api/comments/${comment.id}`, {
+                method: 'PATCH',
+                body: JSON.stringify({ body: text }),
+              });
+              await load();
+            },
+            () => form.replaceWith(body, actions),
+          );
+          body.replaceWith(form);
+          actions.remove();
+          area.focus();
+        });
+        button(copy.remove, async () => {
+          if (!confirm(copy.confirmRemove)) return;
+          try {
+            await api(`/api/comments/${comment.id}`, { method: 'DELETE' });
+            await load();
+          } catch (error) {
+            state.textContent = errorText(error);
+          }
+        });
+      }
+      if (actions.childElementCount) article.append(actions);
+      li.append(article);
+      return li;
+    }
+
+    function openReply(target: HTMLLIElement, thread: Comment, to: Comment) {
+      root.querySelector('.reply-form')?.remove();
+      const mention = to !== thread && to.author ? `@${to.author} ` : '';
+      const { form, area } = editor(
+        mention,
+        copy.replyPlaceholder,
+        copy.post,
+        async (body) => {
+          const { comment } = await api('/api/comments', {
+            method: 'POST',
+            body: JSON.stringify({
+              project,
+              body,
+              locale,
+              parentId: thread.id,
+            }),
+          });
+          expanded.add(thread.id);
+          await load();
+          if (comment.state === 'held') state.textContent = copy.heldNotice;
+        },
+        () => form.remove(),
+      );
+      form.classList.add('reply-form');
+      target.append(form);
+      area.focus();
+      area.setSelectionRange(area.value.length, area.value.length);
+    }
+
+    function renderPages(data: Page) {
+      pages.replaceChildren();
+      pages.hidden = data.pages <= 1;
+      if (data.pages <= 1) return;
+      const go = (target: number) => async () => {
+        page = target;
+        await load();
+        heading.focus();
+        root.scrollIntoView({ block: 'start' });
+      };
+      const prev = el('button', 'text-button', `‹ ${copy.previous}`);
+      const next = el('button', 'text-button', `${copy.next} ›`);
+      prev.type = next.type = 'button';
+      prev.disabled = data.page <= 1;
+      next.disabled = data.page >= data.pages;
+      prev.addEventListener('click', go(data.page - 1));
+      next.addEventListener('click', go(data.page + 1));
+      const label = el(
+        'span',
+        '',
+        fill(copy.pageOf, { page: data.page, pages: data.pages }),
+      );
+      label.setAttribute('aria-current', 'page');
+      pages.append(prev, label, next);
+    }
+
+    async function load() {
+      const query = new URLSearchParams({ project, page: String(page) });
+      if (version) query.set('version', version);
+      try {
+        const data = (await api(`/api/comments?${query}`)) as Page;
+        if (data.page > data.pages && page > 1) {
+          page = data.pages;
+          return load();
+        }
+        count.textContent = data.total
+          ? fill(copy.count, { n: data.total })
+          : '';
+        list.replaceChildren(
+          ...data.comments.map((thread) => {
+            const li = item(thread, thread);
+            const replies = thread.replies ?? [];
+            if (replies.length) {
+              const ol = el('ol', 'comment-replies');
+              const open = expanded.has(thread.id);
+              replies.forEach((reply, index) => {
+                const child = item(reply, thread);
+                if (!open && index >= VISIBLE_REPLIES) child.hidden = true;
+                ol.append(child);
+              });
+              li.append(ol);
+              if (replies.length > VISIBLE_REPLIES) {
+                const toggle = el(
+                  'button',
+                  'text-button replies-toggle',
+                  open
+                    ? copy.hideReplies
+                    : fill(copy.showReplies, {
+                        n: replies.length - VISIBLE_REPLIES,
+                      }),
+                );
+                toggle.type = 'button';
+                toggle.setAttribute('aria-expanded', String(open));
+                toggle.addEventListener('click', () => {
+                  if (expanded.has(thread.id)) expanded.delete(thread.id);
+                  else expanded.add(thread.id);
+                  load();
+                });
+                li.append(toggle);
+              }
+            }
+            return li;
+          }),
+        );
+        state.textContent = data.comments.length ? '' : copy.empty;
+        renderPages(data);
+      } catch {
+        state.textContent = copy.loadFailed;
+      }
+    }
+
+    api('/api/me')
+      .then((data) => (me = data.user))
+      .catch(() => (me = null))
+      .finally(() => {
+        renderComposer();
+        load();
+      });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-comments]').forEach(setup);
+</script>

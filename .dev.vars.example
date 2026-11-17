@@ -3,3 +3,6 @@
 TURNSTILE_SECRET=1x0000000000000000000000000000000AA
 # Lets /manage open on localhost without Cloudflare Access. Local only.
 ADMIN_DEV_BYPASS=1
+
+# Google sign-in on localhost (optional)
+# GOOGLE_CLIENT_SECRET=

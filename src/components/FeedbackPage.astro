@@ -1,0 +1,236 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import { copy, pathFor } from '../lib/content';
+import { feedbackCopy } from '../lib/community';
+import { listVersions } from '../lib/versions';
+interface Props {
+  project: CollectionEntry<'projects'>;
+}
+const { data } = Astro.props.project;
+const locale = data.locale;
+const t = feedbackCopy[locale];
+const versions = (await listVersions(locale, data.slug)).map(
+  ({ data: entry }) => entry.version,
+);
+// Public by design; the matching secret lives in the Worker.
+const siteKey: string =
+  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
+const runtime = {
+  sending: t.sending,
+  sent: t.sent,
+  verifying: t.verifying,
+  failed: t.failed,
+  rateLimited: t.rateLimited,
+};
+---
+
+<Base
+  title={`${t.title} — ${data.title}`}
+  description={t.intro}
+  locale={locale}
+  slug={`${data.slug}/feedback`}
+>
+  <div class="wrap feedback-page">
+    <a class="back" href={pathFor(locale, data.slug)}>
+      ← {data.title}
+    </a>
+    <header class="detail-heading">
+      <h1>{t.title}</h1>
+      <p class="lead">{t.intro}</p>
+      <p class="feedback-public">
+        {t.publicNote}{' '}
+        <a href={`${pathFor(locale, data.slug)}#comments`}>{data.title}</a>.
+      </p>
+    </header>
+    <form
+      class="community-form feedback-form"
+      data-feedback
+      data-project={data.slug}
+      data-locale={locale}
+      data-sitekey={siteKey}
+      data-copy={JSON.stringify(runtime)}
+      hidden
+      novalidate
+    >
+      <fieldset>
+        <legend>{t.kind}</legend>
+        {Object.entries(t.kinds).map(([value, label], index) => (
+          <label class="choice">
+            <input
+              type="radio"
+              name="kind"
+              value={value}
+              checked={index === 0}
+            />
+            {label}
+          </label>
+        ))}
+      </fieldset>
+      <label for="feedback-summary">{t.summary}</label>
+      <input
+        id="feedback-summary"
+        name="summary"
+        required
+        minlength="3"
+        maxlength="120"
+        aria-describedby="feedback-summary-hint"
+      />
+      <p class="field-hint" id="feedback-summary-hint">
+        {t.summaryHint}
+      </p>
+      <label for="feedback-message">{t.message}</label>
+      <p class="field-hint" id="feedback-message-hint">
+        {t.messageHintBug}
+      </p>
+      <textarea
+        id="feedback-message"
+        name="message"
+        required
+        minlength="5"
+        maxlength="4000"
+        rows="8"
+        aria-describedby="feedback-message-hint"
+      ></textarea>
+      <div class="field-row">
+        <div>
+          <label for="feedback-version">{t.version}</label>
+          <select id="feedback-version" name="appVersion">
+            {versions.map((version) => (
+              <option value={version}>{version}</option>
+            ))}
+            <option value="">{t.versionUnknown}</option>
+          </select>
+        </div>
+        <div>
+          <label for="feedback-os">{t.os}</label>
+          <input
+            id="feedback-os"
+            name="os"
+            maxlength="60"
+            autocomplete="off"
+            placeholder={t.osHint}
+          />
+        </div>
+      </div>
+      <label for="feedback-contact">{t.contact}</label>
+      <input
+        id="feedback-contact"
+        name="contact"
+        maxlength="200"
+        autocomplete="email"
+        aria-describedby="feedback-contact-hint"
+      />
+      <p class="field-hint" id="feedback-contact-hint">
+        {t.contactHint}
+      </p>
+      <div class="turnstile" data-turnstile></div>
+      <button class="button" type="submit">
+        {t.send}
+      </button>
+      <p class="form-status" data-status role="status"></p>
+    </form>
+    <noscript>
+      <p>{t.noscript}</p>
+    </noscript>
+    <p class="feedback-back">
+      <a href={pathFor(locale)}>{copy[locale].back}</a>
+    </p>
+  </div>
+</Base>
+
+<script>
+  type Turnstile = {
+    render: (
+      el: HTMLElement,
+      options: Record<string, unknown>,
+    ) => string | undefined;
+    reset: (id?: string) => void;
+  };
+  const SCRIPT =
+    'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+  let loader: Promise<Turnstile> | undefined;
+  // Loaded only once someone starts filling the form.
+  const loadTurnstile = () =>
+    (loader ??= new Promise<Turnstile>((resolve, reject) => {
+      const script = document.createElement('script');
+      script.src = SCRIPT;
+      script.async = true;
+      script.onload = () => {
+        const api = (window as unknown as { turnstile?: Turnstile }).turnstile;
+        if (api) resolve(api);
+        else reject(new Error('Turnstile unavailable'));
+      };
+      script.onerror = () => reject(new Error('Turnstile failed'));
+      document.head.append(script);
+    }));
+
+  for (const form of document.querySelectorAll<HTMLFormElement>(
+    '[data-feedback]',
+  )) {
+    const copy = JSON.parse(form.dataset.copy ?? '{}') as Record<
+      string,
+      string
+    >;
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const slot = form.querySelector<HTMLElement>('[data-turnstile]')!;
+    let token = '';
+    let widget: string | undefined;
+    let api: Turnstile | undefined;
+    const start = () =>
+      loadTurnstile()
+        .then((turnstile) => {
+          api = turnstile;
+          if (widget !== undefined) return;
+          widget = turnstile.render(slot, {
+            sitekey: form.dataset.sitekey,
+            language: form.dataset.locale,
+            callback: (value: string) => (token = value),
+            'expired-callback': () => (token = ''),
+            'error-callback': () => (token = ''),
+          });
+        })
+        .catch(() => (status.textContent = copy.failed));
+    form.addEventListener('focusin', start, { once: true });
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      if (!form.checkValidity()) return form.reportValidity();
+      if (!token) {
+        start();
+        status.textContent = copy.verifying;
+        return;
+      }
+      const fields = Object.fromEntries(new FormData(form));
+      delete fields['cf-turnstile-response'];
+      const button = form.querySelector<HTMLButtonElement>(
+        'button[type=submit]',
+      )!;
+      button.disabled = true;
+      status.textContent = copy.sending;
+      try {
+        const response = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...fields,
+            project: form.dataset.project,
+            locale: form.dataset.locale,
+            token,
+          }),
+        });
+        if (!response.ok) throw new Error(String(response.status));
+        form.reset();
+        status.textContent = copy.sent;
+      } catch (error) {
+        status.textContent = String(error).includes('429')
+          ? copy.rateLimited
+          : copy.failed;
+      } finally {
+        token = '';
+        api?.reset(widget);
+        button.disabled = false;
+      }
+    });
+    form.hidden = false;
+  }
+</script>

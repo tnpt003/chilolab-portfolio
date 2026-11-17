@@ -31,6 +31,11 @@ const projects = defineCollection({
       demoUrl: z.url({ protocol: /^https?$/ }).optional(),
       repoUrl: z.url({ protocol: /^https?$/ }).optional(),
       downloadUrl: z.url({ protocol: /^https?$/ }).optional(),
+      // Version shown in the download panel; empty = newest release.
+      featuredVersion: z
+        .string()
+        .regex(/^\d+\.\d+\.\d+(?:-[a-z0-9.-]+)?$/)
+        .optional(),
     }),
 });
 

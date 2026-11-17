@@ -5,6 +5,7 @@ locale: en
 description: An animated Windows desktop cat, with companion interactions and optional adventures.
 kind: pet
 order: 1
+featuredVersion: '1.5.0'
 preview:
   image: ../../../assets/pet-battle-hub.png
   alt: Pet Desktop interface for choosing adventure and battle modes.

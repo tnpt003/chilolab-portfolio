@@ -4,6 +4,8 @@ import Base from '../layouts/Base.astro';
 import { pathFor } from '../lib/content';
 import { versionCopy, versionPath } from '../lib/versions';
 import DownloadCounter from './DownloadCounter.astro';
+import Comments from './Comments.astro';
+import { feedbackPath } from '../lib/community';
 interface Props {
   entry: CollectionEntry<'versions'>;
   project: CollectionEntry<'projects'>;
@@ -56,6 +58,8 @@ const { Content } = await render(entry);
             {t.portable}
           </a>
         )}
+        <a href="#comments">{t.discuss}</a>
+        <a href={feedbackPath(data.locale, data.project)}>{t.feedback}</a>
       </div>
     </header>
     <article class="prose version-article">
@@ -65,6 +69,11 @@ const { Content } = await render(entry);
       <a href={versionPath(data.locale, data.project)}>{t.all}</a>
       <a href={pathFor(data.locale, data.project)}>{t.back}</a>
     </nav>
+    <Comments
+      locale={data.locale}
+      project={data.project}
+      version={data.version}
+    />
   </div>
   <DownloadCounter />
 </Base>

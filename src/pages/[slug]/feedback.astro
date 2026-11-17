@@ -1,0 +1,12 @@
+---
+import FeedbackPage from '../../components/FeedbackPage.astro';
+import { listProjects } from '../../lib/content';
+export async function getStaticPaths() {
+  return (await listProjects('vi')).map((project) => ({
+    params: { slug: project.data.slug },
+    props: { project },
+  }));
+}
+---
+
+<FeedbackPage project={Astro.props.project} />

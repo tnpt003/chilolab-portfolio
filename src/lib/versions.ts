@@ -52,6 +52,26 @@ export async function latestDownload(locale: Locale, project: string) {
   );
 }
 
+/**
+ * Release shown in the project's download panel: the version chosen in the CMS
+ * (featuredVersion), otherwise the newest published release with a download.
+ */
+export async function featuredDownload(
+  locale: Locale,
+  project: string,
+  featured?: string,
+) {
+  if (!featured) return latestDownload(locale, project);
+  const entry = (await listVersions(locale, project)).find(
+    ({ data }) => data.version === featured,
+  );
+  if (!entry || entry.data.status !== 'released' || !entry.data.downloadUrl)
+    throw new Error(
+      `${project}: featuredVersion ${featured} must be a released version with a download link.`,
+    );
+  return entry;
+}
+
 export const versionCopy = {
   vi: {
     heading: 'Phiên bản',
@@ -64,7 +84,9 @@ export const versionCopy = {
     download: 'Tải phiên bản này',
     portable: 'Bản Portable (.zip)',
     latestHeading: 'Tải xuống',
-    latestInstaller: 'Tải bộ cài cho Windows',
+    latestInstaller: 'Tải {project} {version} cho Windows',
+    feedback: 'Báo lỗi / góp ý',
+    discuss: 'Bình luận về phiên bản này',
     latestNotes: 'Xem có gì mới',
     date: 'Ngày phát hành',
     pending:
@@ -84,7 +106,9 @@ export const versionCopy = {
     download: 'Download this version',
     portable: 'Portable build (.zip)',
     latestHeading: 'Download',
-    latestInstaller: 'Download the Windows installer',
+    latestInstaller: 'Download {project} {version} for Windows',
+    feedback: 'Report a bug / suggest',
+    discuss: 'Comment on this version',
     latestNotes: 'See what’s new',
     date: 'Release date',
     pending:

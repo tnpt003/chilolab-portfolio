@@ -1,0 +1,184 @@
+---
+import Base from '../layouts/Base.astro';
+import { pathFor, type Locale } from '../lib/content';
+import { privacyPath, userCopy, userPath } from '../lib/community';
+interface Props {
+  locale: Locale;
+  mode: 'login' | 'account';
+}
+const { locale, mode } = Astro.props;
+const t = userCopy[locale];
+const title = mode === 'login' ? t.loginTitle : t.accountTitle;
+---
+
+<Base
+  title={title}
+  description={t.loginIntro}
+  locale={locale}
+  slug={`user/${mode}`}
+  noindex
+>
+  <div
+    class="wrap user-page"
+    data-user-page={mode}
+    data-locale={locale}
+    data-login={userPath(locale, 'login')}
+    data-account={userPath(locale, 'account')}
+    data-home={pathFor(locale)}
+    data-copy={JSON.stringify(t)}
+  >
+    <h1>{title}</h1>
+    {mode === 'login' ? (
+      <section class="user-card">
+        <p class="lead">{t.loginIntro}</p>
+        <p class="form-status" data-error role="alert" />
+        <a class="button google-button" data-google href="/api/auth/google">
+          <svg aria-hidden="true" viewBox="0 0 48 48" width="20" height="20">
+            <path
+              fill="#FFC107"
+              d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"
+            />
+            <path
+              fill="#FF3D00"
+              d="m6.3 14.7 6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"
+            />
+            <path
+              fill="#4CAF50"
+              d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"
+            />
+            <path
+              fill="#1976D2"
+              d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"
+            />
+          </svg>
+          {t.google}
+        </a>
+        <p class="field-hint">{t.passwordSoon}</p>
+        <p class="field-hint">
+          {t.agree} <a href={privacyPath(locale)}>{t.privacy}</a>.
+        </p>
+      </section>
+    ) : (
+      <div class="user-account" data-account-body hidden>
+        <section class="user-card">
+          <p>
+            {t.signedInAs} <strong data-email />
+          </p>
+          <form class="community-form" data-name-form>
+            <label for="display-name">{t.displayName}</label>
+            <input
+              id="display-name"
+              name="displayName"
+              required
+              minlength="2"
+              maxlength="40"
+              autocomplete="nickname"
+              aria-describedby="display-name-hint"
+            />
+            <p class="field-hint" id="display-name-hint">
+              {t.displayNameHint}
+            </p>
+            <button class="button" type="submit">
+              {t.save}
+            </button>
+            <p class="form-status" data-status role="status" />
+          </form>
+          <button class="text-button" type="button" data-sign-out>
+            {t.signOut}
+          </button>
+        </section>
+        <section class="user-card danger-zone" aria-labelledby="delete-heading">
+          <h2 id="delete-heading">{t.deleteTitle}</h2>
+          <p>{t.deleteIntro}</p>
+          <button class="button danger-button" type="button" data-delete>
+            {t.deleteButton}
+          </button>
+          <p class="form-status" data-delete-status role="status" />
+        </section>
+      </div>
+    )}
+  </div>
+</Base>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-user-page]');
+  if (root) {
+    const copy = JSON.parse(root.dataset.copy ?? '{}') as Record<
+      string,
+      never
+    > & {
+      errors: Record<string, string>;
+    } & Record<string, string>;
+    const locale = root.dataset.locale!;
+    const params = new URLSearchParams(location.search);
+    const back = params.get('return');
+    const safeBack =
+      back && back.startsWith('/') && !back.startsWith('//') ? back : null;
+    const me = fetch('/api/me')
+      .then((response) => (response.ok ? response.json() : { user: null }))
+      .catch(() => ({ user: null, providers: {} }));
+
+    if (root.dataset.userPage === 'login') {
+      const error = root.querySelector<HTMLElement>('[data-error]')!;
+      const google = root.querySelector<HTMLAnchorElement>('[data-google]')!;
+      const code = params.get('error');
+      if (code) error.textContent = copy.errors[code] ?? copy.errors.google;
+      google.href = `/api/auth/google?${new URLSearchParams({
+        locale,
+        return: safeBack ?? root.dataset.account!,
+      })}`;
+      me.then((data) => {
+        if (data.user) location.replace(safeBack ?? root.dataset.account!);
+        else if (data.providers && !data.providers.google) {
+          error.textContent = copy.unavailable;
+          google.setAttribute('aria-disabled', 'true');
+          google.removeAttribute('href');
+        }
+      });
+    } else {
+      const body = root.querySelector<HTMLElement>('[data-account-body]')!;
+      const form = root.querySelector<HTMLFormElement>('[data-name-form]')!;
+      const input = form.querySelector<HTMLInputElement>('input')!;
+      const status = form.querySelector<HTMLElement>('[data-status]')!;
+      me.then((data) => {
+        if (!data.user) return location.replace(root.dataset.login!);
+        root.querySelector('[data-email]')!.textContent = data.user.email;
+        input.value = data.user.displayName;
+        body.hidden = false;
+      });
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        if (!form.checkValidity()) return form.reportValidity();
+        const response = await fetch('/api/me', {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ displayName: input.value }),
+        }).catch(() => null);
+        status.textContent = response?.ok ? copy.saved : copy.failed;
+      });
+      root
+        .querySelector('[data-sign-out]')!
+        .addEventListener('click', async () => {
+          await fetch('/api/auth/logout', { method: 'POST' }).catch(() => null);
+          location.replace(root.dataset.home!);
+        });
+      root
+        .querySelector('[data-delete]')!
+        .addEventListener('click', async () => {
+          if (!confirm(copy.deleteConfirm)) return;
+          const result = root.querySelector<HTMLElement>(
+            '[data-delete-status]',
+          )!;
+          const response = await fetch('/api/me', { method: 'DELETE' }).catch(
+            () => null,
+          );
+          if (!response?.ok) {
+            result.textContent = copy.failed;
+            return;
+          }
+          result.textContent = copy.deleted;
+          setTimeout(() => location.replace(root.dataset.home!), 1500);
+        });
+    }
+  }
+</script>

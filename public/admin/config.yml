@@ -315,6 +315,12 @@ collections:
         widget: string
         required: false
         hint: Nút tải trên trang dự án lấy từ phiên bản đã phát hành mới nhất; chỉ cần trường này khi dự án không có bài phiên bản.
+      - label: Phiên bản hiển thị ở khối Tải xuống
+        name: featuredVersion
+        widget: string
+        required: false
+        pattern: ['^\d+\.\d+\.\d+(-[a-z0-9.-]+)?$', 'Dạng 1.5.0']
+        hint: Bỏ trống để tự lấy bản đã phát hành mới nhất. Phải là phiên bản đã phát hành và có link tải. Đặt giống nhau ở bản VI và EN.
       - { label: Nội dung, name: body, widget: markdown }
 
   - name: projects_en
@@ -377,4 +383,10 @@ collections:
           widget: string,
           required: false,
         }
+      - label: Version shown in the Download panel
+        name: featuredVersion
+        widget: string
+        required: false
+        pattern: ['^\d+\.\d+\.\d+(-[a-z0-9.-]+)?$', 'Format 1.5.0']
+        hint: Empty = newest release with a download. Keep it identical to the Vietnamese entry.
       - { label: Body, name: body, widget: markdown }

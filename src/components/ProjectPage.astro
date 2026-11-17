@@ -5,13 +5,14 @@ import Base from '../layouts/Base.astro';
 import ProjectVisual from './ProjectVisual.astro';
 import { copy, pathFor } from '../lib/content';
 import {
-  latestDownload,
+  featuredDownload,
   listVersions,
   versionCopy,
   versionPath,
 } from '../lib/versions';
 import VersionList from './VersionList.astro';
-import Community from './Community.astro';
+import Comments from './Comments.astro';
+import { feedbackPath } from '../lib/community';
 import DownloadCounter from './DownloadCounter.astro';
 interface Props {
   project: CollectionEntry<'projects'>;
@@ -21,7 +22,9 @@ const { data } = project;
 const t = copy[data.locale];
 const versions = await listVersions(data.locale, data.slug);
 const v = versionCopy[data.locale];
-const latest = (await latestDownload(data.locale, data.slug))?.data;
+const latest = (
+  await featuredDownload(data.locale, data.slug, data.featuredVersion)
+)?.data;
 const { Content } = await render(project);
 const poster =
   data.video && data.preview
@@ -62,7 +65,9 @@ const poster =
             href={latest.downloadUrl}
             data-download={`${data.slug}/${latest.version}/setup`}
           >
-            {v.latestInstaller}
+            {v.latestInstaller
+              .replace('{project}', data.title)
+              .replace('{version}', latest.version)}
           </a>
           {latest.portableUrl && (
             <a
@@ -75,6 +80,7 @@ const poster =
           <a href={versionPath(data.locale, data.slug, latest.version)}>
             {v.latestNotes}
           </a>
+          <a href={feedbackPath(data.locale, data.slug)}>{v.feedback}</a>
         </div>
       </section>
     ) : (
@@ -132,7 +138,7 @@ const poster =
       </div>
       <VersionList entries={versions.slice(0, 3)} locale={data.locale} />
     </section>
-    <Community locale={data.locale} project={data.slug} />
+    <Comments locale={data.locale} project={data.slug} />
   </div>
   <DownloadCounter />
 </Base>
