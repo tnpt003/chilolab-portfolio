@@ -5,6 +5,12 @@
   "name": "chilolab-portfolio",
   "main": "worker/index.ts",
   "compatibility_date": "2026-11-01",
+  // Cloudflare creates the DNS records and certificates for these hostnames.
+  // www.chilolab.com is redirected to the apex by a zone Redirect Rule.
+  "routes": [
+    { "pattern": "chilolab.com", "custom_domain": true },
+    { "pattern": "www.chilolab.com", "custom_domain": true },
+  ],
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
