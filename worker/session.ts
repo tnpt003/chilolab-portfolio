@@ -5,7 +5,12 @@ import { randomToken, sha256, type Env } from './env';
 const COOKIE = '__Host-chilolab_session';
 const DAYS = 30;
 
-export type User = { id: number; email: string; displayName: string };
+export type User = {
+  id: number;
+  email: string;
+  displayName: string;
+  role: 'member' | 'owner';
+};
 
 export function readCookie(request: Request, name: string) {
   for (const part of (request.headers.get('Cookie') ?? '').split(';')) {
@@ -34,7 +39,7 @@ export async function currentUser(request: Request, env: Env) {
   const token = readCookie(request, COOKIE);
   if (!token || token.length > 100) return null;
   const row = await env.DB.prepare(
-    `SELECT users.id, users.email, users.display_name AS displayName
+    `SELECT users.id, users.email, users.display_name AS displayName, users.role
      FROM sessions JOIN users ON users.id = sessions.user_id
      WHERE sessions.token_hash = ? AND sessions.expires_at > ?`,
   )

@@ -20,6 +20,12 @@ Không lưu IP, user agent hay mật khẩu Google. Chính sách công khai: `/p
 - Kiểm duyệt (`worker/moderation.ts`): danh sách từ (khớp nguyên từ) rồi model `@cf/aisingapore/gemma-sea-lion-v4-27b-it` trên Workers AI. Bị gắn cờ → `held`: chỉ người viết thấy, chủ site duyệt ở `/manage`. Chê sản phẩm / báo lỗi không bị giữ. AI lỗi hoặc hết quota → vẫn hiện, gắn lý do `unchecked`.
 - Thông báo qua email về bình luận bị giữ **chưa có**: cần domain riêng (và có thể gói Workers Paid) để gửi mail. Hiện xem ở `/manage` (số đỏ cạnh "Bị giữ chờ duyệt").
 
+## Chủ site (owner)
+
+- Cột `users.role` (`member` | `owner`), chỉ đặt bằng SQL, không có API nào đổi được:
+  `npx wrangler d1 execute chilolab --remote --command "UPDATE users SET role = 'owner' WHERE email = '<email>'"` (đăng nhập Google một lần trước để có tài khoản).
+- Owner có nhãn "Tác giả", không qua AI kiểm duyệt, thấy bình luận đang bị giữ ngay trong danh sách và có nút Duyệt / Gỡ cho mọi bình luận. `/manage` vẫn là nơi xem góp ý và lượt tải.
+
 ## Bảo mật
 
 - Worker chỉ chạy cho `/api/*`, `/manage*`, `/user`, `/en/user`; trang khác là file tĩnh.

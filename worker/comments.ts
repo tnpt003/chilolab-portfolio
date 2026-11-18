@@ -18,7 +18,9 @@ type Row = {
   user_id: number | null;
   author: string | null;
   display_name: string | null;
+  author_role: 'member' | 'owner' | null;
   body: string;
+  moderation_reason: string | null;
   status: 'published' | 'held' | 'deleted' | 'removed';
   created_at: string;
   edited_at: string | null;
@@ -29,12 +31,14 @@ export type Allowed = (
   version: string | null,
 ) => Promise<boolean>;
 
-function serialize(row: Row, me: number) {
+function serialize(row: Row, me: number, moderator = false) {
   const visible = row.status === 'published' || row.status === 'held';
   return {
     id: row.id,
     author: visible ? (row.display_name ?? row.author ?? null) : null,
+    owner: visible && row.author_role === 'owner',
     mine: row.user_id !== null && row.user_id === me,
+    reason: moderator && row.status === 'held' ? row.moderation_reason : null,
     state: row.status,
     body: visible ? row.body : null,
     version: row.version,
@@ -120,25 +124,28 @@ async function list(request: Request, env: Env, allowed: Allowed) {
     1,
     Math.min(1000, Number(url.searchParams.get('page')) || 1),
   );
-  const me = (await currentUser(request, env))?.id ?? -1;
+  const user = await currentUser(request, env);
+  const me = user?.id ?? -1;
+  // The owner also sees held comments, to approve or remove them in place.
+  const mod = user?.role === 'owner' ? 1 : 0;
 
   const scope = version ? 'c.project = ? AND c.version = ?' : 'c.project = ?';
   const scopeArgs = version ? [project, version] : [project];
-  const visibleReply = `(r.status = 'published' OR (r.status = 'held' AND r.user_id = ?))`;
+  const visibleReply = `(r.status = 'published' OR (r.status = 'held' AND (r.user_id = ? OR ? = 1)))`;
   const visibleThread = `c.parent_id IS NULL AND (
-      c.status = 'published' OR (c.status = 'held' AND c.user_id = ?)
+      c.status = 'published' OR (c.status = 'held' AND (c.user_id = ? OR ? = 1))
       OR (c.status IN ('deleted', 'removed') AND EXISTS (
         SELECT 1 FROM comments r WHERE r.parent_id = c.id AND ${visibleReply})))`;
 
   const [threads, count, total] = await env.DB.batch<Record<string, unknown>>([
     env.DB.prepare(
-      `SELECT c.*, u.display_name FROM comments c LEFT JOIN users u ON u.id = c.user_id
+      `SELECT c.*, u.display_name, u.role AS author_role FROM comments c LEFT JOIN users u ON u.id = c.user_id
        WHERE ${scope} AND ${visibleThread}
        ORDER BY c.created_at DESC, c.id DESC LIMIT ? OFFSET ?`,
-    ).bind(...scopeArgs, me, me, PAGE_SIZE, (page - 1) * PAGE_SIZE),
+    ).bind(...scopeArgs, me, mod, me, mod, PAGE_SIZE, (page - 1) * PAGE_SIZE),
     env.DB.prepare(
       `SELECT COUNT(*) AS n FROM comments c WHERE ${scope} AND ${visibleThread}`,
-    ).bind(...scopeArgs, me, me),
+    ).bind(...scopeArgs, me, mod, me, mod),
     env.DB.prepare(
       `SELECT COUNT(*) AS n FROM comments c WHERE ${scope} AND c.status = 'published'`,
     ).bind(...scopeArgs),
@@ -149,11 +156,11 @@ async function list(request: Request, env: Env, allowed: Allowed) {
   const replies = ids.length
     ? (
         await env.DB.prepare(
-          `SELECT r.*, u.display_name FROM comments r LEFT JOIN users u ON u.id = r.user_id
+          `SELECT r.*, u.display_name, u.role AS author_role FROM comments r LEFT JOIN users u ON u.id = r.user_id
            WHERE r.parent_id IN (${placeholders(ids.length)}) AND ${visibleReply}
            ORDER BY r.created_at, r.id`,
         )
-          .bind(...ids, me)
+          .bind(...ids, me, mod)
           .all<Row>()
       ).results
     : [];
@@ -165,12 +172,13 @@ async function list(request: Request, env: Env, allowed: Allowed) {
     threads: threadCount,
     total: Number(total.results[0]?.n ?? 0),
     signedIn: me !== -1,
+    moderator: mod === 1,
     comments: rows.map((row) => ({
-      ...serialize(row, me),
+      ...serialize(row, me, mod === 1),
       replies: replies
         .filter((reply) => reply.parent_id === row.id)
         .slice(0, MAX_REPLIES)
-        .map((reply) => serialize(reply, me)),
+        .map((reply) => serialize(reply, me, mod === 1)),
     })),
   });
 }
@@ -217,7 +225,10 @@ async function create(request: Request, env: Env, allowed: Allowed) {
   } else if (!(await allowed(project, version)))
     return json({ error: 'invalid' }, 400);
 
-  const verdict = await moderate(env, message);
+  const verdict =
+    user.role === 'owner'
+      ? ({ held: false, reason: null } as const)
+      : await moderate(env, message);
   const row = await env.DB.prepare(
     `INSERT INTO comments (project, version, parent_id, user_id, body, locale, status, moderation_reason)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`,
@@ -235,7 +246,10 @@ async function create(request: Request, env: Env, allowed: Allowed) {
     .first<Row>();
   return json(
     {
-      comment: serialize({ ...row!, display_name: user.displayName }, user.id),
+      comment: serialize(
+        { ...row!, display_name: user.displayName, author_role: user.role },
+        user.id,
+      ),
     },
     201,
   );
@@ -259,7 +273,10 @@ async function edit(request: Request, env: Env, id: number) {
     !['published', 'held'].includes(row.status)
   )
     return json({ error: 'not_found' }, 404);
-  const verdict = await moderate(env, message);
+  const verdict =
+    user.role === 'owner'
+      ? ({ held: false, reason: null } as const)
+      : await moderate(env, message);
   const updated = await env.DB.prepare(
     `UPDATE comments SET body = ?, status = ?, moderation_reason = ?, edited_at = ?
      WHERE id = ? RETURNING *`,
@@ -274,7 +291,7 @@ async function edit(request: Request, env: Env, id: number) {
     .first<Row>();
   return json({
     comment: serialize(
-      { ...updated!, display_name: user.displayName },
+      { ...updated!, display_name: user.displayName, author_role: user.role },
       user.id,
     ),
   });
@@ -288,14 +305,28 @@ async function destroy(request: Request, env: Env, id: number) {
   )
     .bind(id)
     .first<{ user_id: number | null; status: string }>();
+  const own = row?.user_id === user.id;
   if (
     !row ||
-    row.user_id !== user.id ||
+    (!own && user.role !== 'owner') ||
     !['published', 'held'].includes(row.status)
   )
     return json({ error: 'not_found' }, 404);
-  await removeComment(env, id, 'deleted');
-  return json({ status: 'deleted' });
+  await removeComment(env, id, own ? 'deleted' : 'removed');
+  return json({ status: own ? 'deleted' : 'removed' });
+}
+
+/** Owner only: publish a comment that moderation held back. */
+async function approve(request: Request, env: Env, id: number) {
+  const user = await currentUser(request, env);
+  if (user?.role !== 'owner') return json({ error: 'not_found' }, 404);
+  await env.DB.prepare(
+    `UPDATE comments SET status = 'published', moderation_reason = NULL
+     WHERE id = ? AND status = 'held'`,
+  )
+    .bind(id)
+    .run();
+  return json({ status: 'published' });
 }
 
 /** Handles /api/comments and /api/comments/:id. Returns null otherwise. */
@@ -310,9 +341,13 @@ export function comments(
     if (request.method === 'POST') return create(request, env, allowed);
     return json({ error: 'method_not_allowed' }, 405);
   }
-  const match = /^\/api\/comments\/(\d{1,12})$/.exec(path);
+  const match = /^\/api\/comments\/(\d{1,12})(\/approve)?$/.exec(path);
   if (!match) return null;
   const id = Number(match[1]);
+  if (match[2])
+    return request.method === 'POST'
+      ? approve(request, env, id)
+      : json({ error: 'method_not_allowed' }, 405);
   if (request.method === 'PATCH') return edit(request, env, id);
   if (request.method === 'DELETE') return destroy(request, env, id);
   return json({ error: 'method_not_allowed' }, 405);

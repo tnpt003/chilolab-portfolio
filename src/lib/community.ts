@@ -41,6 +41,18 @@ export const commentCopy = {
       'Bình luận đang được giữ lại để xem xét và sẽ hiện sau khi được duyệt.',
     versionLabel: 'Phiên bản',
     projectLabel: 'Trang dự án',
+    authorBadge: 'Tác giả',
+    heldOther: 'Đang bị giữ chờ duyệt',
+    approve: 'Duyệt',
+    removeOther: 'Gỡ',
+    confirmRemoveOther: 'Gỡ bình luận này của người khác?',
+    reason_profanity: 'chửi thề',
+    reason_insult: 'xúc phạm',
+    reason_hate: 'thù ghét',
+    reason_sexual: 'tình dục',
+    reason_threat: 'đe dọa',
+    reason_spam: 'spam',
+    reason_link: 'có đường link',
   },
   en: {
     heading: 'Comments',
@@ -81,6 +93,18 @@ export const commentCopy = {
       'Your comment is being held for review and will appear once approved.',
     versionLabel: 'Version',
     projectLabel: 'Project page',
+    authorBadge: 'Author',
+    heldOther: 'Held for review',
+    approve: 'Approve',
+    removeOther: 'Remove',
+    confirmRemoveOther: "Remove this person's comment?",
+    reason_profanity: 'profanity',
+    reason_insult: 'insult',
+    reason_hate: 'hate',
+    reason_sexual: 'sexual content',
+    reason_threat: 'threat',
+    reason_spam: 'spam',
+    reason_link: 'contains a link',
   },
 } as const;
 
@@ -145,11 +169,10 @@ export const feedbackCopy = {
 export const userCopy = {
   vi: {
     loginTitle: 'Đăng nhập',
-    loginIntro:
-      'Đăng nhập hoặc tạo tài khoản để bình luận. Lần đầu đăng nhập bằng Google sẽ tự tạo tài khoản.',
+    loginHeading: 'Chào mừng đến ChiloLab',
+    loginIntro: 'Đăng nhập để bình luận và trả lời về các dự án, phiên bản.',
     google: 'Tiếp tục với Google',
-    passwordSoon:
-      'Đăng ký bằng email và mật khẩu sẽ có sau khi ChiloLab có tên miền riêng.',
+    newAccount: 'Chưa có tài khoản? Lần đầu tiếp tục với Google sẽ tự tạo.',
     agree: 'Khi tiếp tục, bạn đồng ý với',
     privacy: 'Chính sách quyền riêng tư',
     unavailable: 'Đăng nhập bằng Google chưa được bật. Vui lòng quay lại sau.',
@@ -176,11 +199,10 @@ export const userCopy = {
   },
   en: {
     loginTitle: 'Sign in',
-    loginIntro:
-      'Sign in or create an account to comment. Your first Google sign-in creates the account.',
+    loginHeading: 'Welcome to ChiloLab',
+    loginIntro: 'Sign in to comment on projects and versions and reply.',
     google: 'Continue with Google',
-    passwordSoon:
-      'Email and password sign-up will arrive once ChiloLab has its own domain.',
+    newAccount: 'No account yet? Continuing with Google creates one.',
     agree: 'By continuing you accept the',
     privacy: 'Privacy policy',
     unavailable: 'Google sign-in is not enabled yet. Please check back later.',

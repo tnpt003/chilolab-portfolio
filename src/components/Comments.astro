@@ -45,7 +45,9 @@ const t = commentCopy[locale];
   type Comment = {
     id: number;
     author: string | null;
+    owner: boolean;
     mine: boolean;
+    reason: string | null;
     state: 'published' | 'held' | 'deleted' | 'removed';
     body: string | null;
     version: string | null;
@@ -58,6 +60,7 @@ const t = commentCopy[locale];
     pages: number;
     total: number;
     signedIn: boolean;
+    moderator: boolean;
     comments: Comment[];
   };
   type Copy = Record<string, string>;
@@ -102,6 +105,8 @@ const t = commentCopy[locale];
     );
     let page = 1;
     let me: { displayName: string } | null = null;
+    // Set by the API when the signed-in account is the site owner.
+    let moderator = false;
     const expanded = new Set<number>();
 
     const errorText = (error: unknown) =>
@@ -202,6 +207,8 @@ const t = commentCopy[locale];
         return li;
       }
       meta.append(el('strong', '', comment.author ?? copy.formerUser));
+      if (comment.owner)
+        meta.append(' ', el('span', 'comment-badge', copy.authorBadge));
       if (!version && comment === thread) {
         const tag = comment.version
           ? Object.assign(el('a', 'comment-tag', `v${comment.version}`), {
@@ -221,7 +228,15 @@ const t = commentCopy[locale];
       const body = el('p', 'comment-body', comment.body ?? '');
       article.append(meta, body);
       if (comment.state === 'held')
-        article.append(el('p', 'comment-held', copy.held));
+        article.append(
+          el(
+            'p',
+            'comment-held',
+            comment.mine
+              ? copy.held
+              : `${copy.heldOther}${comment.reason ? ` (${copy[`reason_${comment.reason}`] ?? comment.reason})` : ''}`,
+          ),
+        );
 
       const actions = el('div', 'comment-actions');
       const button = (label: string, handler: () => void) => {
@@ -254,6 +269,27 @@ const t = commentCopy[locale];
         });
         button(copy.remove, async () => {
           if (!confirm(copy.confirmRemove)) return;
+          try {
+            await api(`/api/comments/${comment.id}`, { method: 'DELETE' });
+            await load();
+          } catch (error) {
+            state.textContent = errorText(error);
+          }
+        });
+      } else if (moderator) {
+        if (comment.state === 'held')
+          button(copy.approve, async () => {
+            try {
+              await api(`/api/comments/${comment.id}/approve`, {
+                method: 'POST',
+              });
+              await load();
+            } catch (error) {
+              state.textContent = errorText(error);
+            }
+          });
+        button(copy.removeOther, async () => {
+          if (!confirm(copy.confirmRemoveOther)) return;
           try {
             await api(`/api/comments/${comment.id}`, { method: 'DELETE' });
             await load();
@@ -327,6 +363,7 @@ const t = commentCopy[locale];
       if (version) query.set('version', version);
       try {
         const data = (await api(`/api/comments?${query}`)) as Page;
+        moderator = data.moderator;
         if (data.page > data.pages && page > 1) {
           page = data.pages;
           return load();
