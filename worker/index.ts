@@ -12,6 +12,7 @@ import {
   type Env,
 } from './env';
 import { manage } from './manage';
+import { human } from './turnstile';
 import { currentUser } from './session';
 
 type Allowlist = {
@@ -31,23 +32,6 @@ async function allowed(request: Request, env: Env) {
   const data = (await response.json()) as Allowlist;
   allowlist = { at: Date.now(), data };
   return data;
-}
-
-async function human(request: Request, env: Env, token: unknown) {
-  if (!env.TURNSTILE_SECRET || typeof token !== 'string') return false;
-  if (!token || token.length > 2048) return false;
-  const form = new FormData();
-  form.append('secret', env.TURNSTILE_SECRET);
-  form.append('response', token);
-  const ip = request.headers.get('CF-Connecting-IP');
-  if (ip) form.append('remoteip', ip);
-  const response = await fetch(
-    'https://challenges.cloudflare.com/turnstile/v0/siteverify',
-    { method: 'POST', body: form },
-  );
-  if (!response.ok) return false;
-  const result = (await response.json()) as { success?: boolean };
-  return result.success === true;
 }
 
 async function addFeedback(request: Request, env: Env) {
@@ -117,7 +101,7 @@ async function countDownload(request: Request, env: Env) {
 }
 
 export default {
-  async fetch(request, env): Promise<Response> {
+  async fetch(request, env, ctx): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, '') || '/';
 
@@ -144,7 +128,7 @@ export default {
       };
       const response =
         (await auth(request, env, path)) ??
-        (await comments(request, env, path, isAllowed));
+        (await comments(request, env, ctx, path, isAllowed));
       if (response) return response;
       if (path === '/api/feedback' && request.method === 'POST')
         return await addFeedback(request, env);

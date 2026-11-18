@@ -1,4 +1,6 @@
 import { deleteUserComments } from './comments';
+import { emailLogin } from './email-login';
+import { mailEnabled } from './mail';
 import {
   json,
   randomToken,
@@ -160,7 +162,10 @@ async function me(request: Request, env: Env) {
   if (request.method === 'GET')
     return json({
       user: user && { displayName: user.displayName, email: user.email },
-      providers: { google: Boolean(env.GOOGLE_CLIENT_ID) },
+      providers: {
+        google: Boolean(env.GOOGLE_CLIENT_ID),
+        email: mailEnabled(env),
+      },
     });
   if (!user) return json({ error: 'unauthenticated' }, 401);
 
@@ -199,5 +204,5 @@ export async function auth(request: Request, env: Env, path: string) {
       'Set-Cookie': await endSession(request, env),
     });
   if (path === '/api/me') return me(request, env);
-  return null;
+  return emailLogin(request, env, path);
 }

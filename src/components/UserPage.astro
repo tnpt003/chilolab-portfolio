@@ -9,6 +9,9 @@ interface Props {
 const { locale, mode } = Astro.props;
 const t = userCopy[locale];
 const title = mode === 'login' ? t.loginTitle : t.accountTitle;
+// Public by design; the matching secret lives in the Worker.
+const siteKey: string =
+  import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
 ---
 
 <Base
@@ -25,6 +28,7 @@ const title = mode === 'login' ? t.loginTitle : t.accountTitle;
     data-login={userPath(locale, 'login')}
     data-account={userPath(locale, 'account')}
     data-home={pathFor(locale)}
+    data-sitekey={siteKey}
     data-copy={JSON.stringify(t)}
   >
     {mode === 'account' && <h1>{title}</h1>}
@@ -57,6 +61,52 @@ const title = mode === 'login' ? t.loginTitle : t.accountTitle;
           </svg>
           {t.google}
         </a>
+        <div class="login-email" data-email-block hidden>
+          <p class="login-divider">
+            <span>{t.or}</span>
+          </p>
+          <form class="login-form" data-email-form novalidate>
+            <label for="login-email">{t.emailLabel}</label>
+            <input
+              id="login-email"
+              type="email"
+              name="email"
+              required
+              maxlength="254"
+              autocomplete="email"
+              placeholder={t.emailPlaceholder}
+            />
+            <div class="turnstile" data-turnstile />
+            <button class="button" type="submit">
+              {t.sendCode}
+            </button>
+          </form>
+          <form class="login-form" data-code-form hidden novalidate>
+            <p class="login-note" data-code-sent />
+            <label for="login-code">{t.codeLabel}</label>
+            <input
+              id="login-code"
+              name="code"
+              required
+              inputmode="numeric"
+              autocomplete="one-time-code"
+              pattern="[0-9]{6}"
+              maxlength="6"
+            />
+            <button class="button" type="submit">
+              {t.verify}
+            </button>
+            <p class="login-links">
+              <button class="text-button" type="button" data-resend>
+                {t.resend}
+              </button>
+              <button class="text-button" type="button" data-change>
+                {t.changeEmail}
+              </button>
+            </p>
+          </form>
+          <p class="form-status" data-email-status role="status" />
+        </div>
         <p class="login-note">{t.newAccount}</p>
         <p class="login-legal">
           {t.agree} <a href={privacyPath(locale)}>{t.privacy}</a>.
@@ -107,12 +157,11 @@ const title = mode === 'login' ? t.loginTitle : t.accountTitle;
 <script>
   const root = document.querySelector<HTMLElement>('[data-user-page]');
   if (root) {
-    const copy = JSON.parse(root.dataset.copy ?? '{}') as Record<
-      string,
-      never
-    > & {
+    type Copy = { [key: string]: string } & {
       errors: Record<string, string>;
-    } & Record<string, string>;
+      emailErrors: Record<string, string>;
+    };
+    const copy = JSON.parse(root.dataset.copy ?? '{}') as Copy;
     const locale = root.dataset.locale!;
     const params = new URLSearchParams(location.search);
     const back = params.get('return');
@@ -138,7 +187,142 @@ const title = mode === 'login' ? t.loginTitle : t.accountTitle;
           google.setAttribute('aria-disabled', 'true');
           google.removeAttribute('href');
         }
+        if (data.providers?.email) setupEmail();
       });
+
+      // Email + 6-digit code. Turnstile loads only once the email field is used.
+      function setupEmail() {
+        type Turnstile = {
+          render: (
+            el: HTMLElement,
+            options: Record<string, unknown>,
+          ) => string | undefined;
+          reset: (id?: string) => void;
+        };
+        const block = root!.querySelector<HTMLElement>('[data-email-block]')!;
+        const emailForm =
+          block.querySelector<HTMLFormElement>('[data-email-form]')!;
+        const codeForm =
+          block.querySelector<HTMLFormElement>('[data-code-form]')!;
+        const status = block.querySelector<HTMLElement>('[data-email-status]')!;
+        const emailInput = emailForm.querySelector<HTMLInputElement>('input')!;
+        const codeInput = codeForm.querySelector<HTMLInputElement>('input')!;
+        const slot = emailForm.querySelector<HTMLElement>('[data-turnstile]')!;
+        const errors = copy.emailErrors;
+        let token = '';
+        let widget: string | undefined;
+        let api: Turnstile | undefined;
+        let loader: Promise<Turnstile> | undefined;
+        const loadTurnstile = () =>
+          (loader ??= new Promise<Turnstile>((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src =
+              'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+            script.async = true;
+            script.onload = () => {
+              const value = (window as unknown as { turnstile?: Turnstile })
+                .turnstile;
+              if (value) resolve(value);
+              else reject(new Error('Turnstile unavailable'));
+            };
+            script.onerror = () => reject(new Error('Turnstile failed'));
+            document.head.append(script);
+          }));
+        const start = () =>
+          loadTurnstile()
+            .then((turnstile) => {
+              api = turnstile;
+              if (widget !== undefined) return;
+              widget = turnstile.render(slot, {
+                sitekey: root!.dataset.sitekey,
+                language: locale,
+                callback: (value: string) => (token = value),
+                'expired-callback': () => (token = ''),
+                'error-callback': () => (token = ''),
+              });
+            })
+            .catch(() => (status.textContent = errors.verification_failed));
+        const post = async (path: string, body: Record<string, unknown>) => {
+          const response = await fetch(path, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok) throw new Error(data.error ?? 'failed');
+          return data;
+        };
+        const showEmailStep = (clear: boolean) => {
+          codeForm.hidden = true;
+          emailForm.hidden = false;
+          if (clear) emailInput.value = '';
+          token = '';
+          api?.reset(widget);
+          emailInput.focus();
+        };
+
+        emailForm.addEventListener('focusin', start, { once: true });
+        emailForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          if (!emailForm.checkValidity()) return emailForm.reportValidity();
+          if (!token) {
+            start();
+            status.textContent = copy.verifying;
+            return;
+          }
+          const button = emailForm.querySelector('button')!;
+          button.disabled = true;
+          status.textContent = copy.sending;
+          try {
+            await post('/api/auth/email/start', {
+              email: emailInput.value,
+              locale,
+              token,
+            });
+            status.textContent = '';
+            codeForm.querySelector('[data-code-sent]')!.textContent =
+              copy.codeSent.replace('{email}', emailInput.value.trim());
+            emailForm.hidden = true;
+            codeForm.hidden = false;
+            codeInput.value = '';
+            codeInput.focus();
+          } catch (error) {
+            status.textContent =
+              errors[(error as Error).message] ?? errors.mail_failed;
+            token = '';
+            api?.reset(widget);
+          } finally {
+            button.disabled = false;
+          }
+        });
+        codeForm.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          if (!codeForm.checkValidity()) return codeForm.reportValidity();
+          const button = codeForm.querySelector<HTMLButtonElement>(
+            'button[type=submit]',
+          )!;
+          button.disabled = true;
+          try {
+            const data = await post('/api/auth/email/verify', {
+              email: emailInput.value,
+              code: codeInput.value,
+              return: safeBack ?? root!.dataset.account,
+            });
+            location.replace(data.return);
+          } catch (error) {
+            status.textContent =
+              errors[(error as Error).message] ?? errors.invalid_code;
+            button.disabled = false;
+          }
+        });
+        codeForm
+          .querySelector('[data-resend]')!
+          .addEventListener('click', () => showEmailStep(false));
+        codeForm
+          .querySelector('[data-change]')!
+          .addEventListener('click', () => showEmailStep(true));
+        block.hidden = false;
+      }
     } else {
       const body = root.querySelector<HTMLElement>('[data-account-body]')!;
       const form = root.querySelector<HTMLFormElement>('[data-name-form]')!;

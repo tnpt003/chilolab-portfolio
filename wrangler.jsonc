@@ -38,11 +38,13 @@
   ],
   // Workers Logs: errors and console output in the dashboard.
   "observability": { "enabled": true },
-  // Public values only. Secrets (TURNSTILE_SECRET, GOOGLE_CLIENT_SECRET) are
+  // Public values only. Secrets (TURNSTILE_SECRET, GOOGLE_CLIENT_SECRET,
+  // RESEND_API_KEY) are
   // set with `wrangler secret put` or in the dashboard.
   "vars": {
     "ACCESS_TEAM_DOMAIN": "bold-night-e762.cloudflareaccess.com",
     "ACCESS_AUD": "6c22982b14601e675f0981e5ac990f1feaeec85103cfaca0ac173f5c22b3a337",
     "GOOGLE_CLIENT_ID": "354598476641-kjo3ve152771g4boncv5rooshqd7bmqt.apps.googleusercontent.com",
+    "MAIL_FROM": "ChiloLab <no-reply@chilolab.com>",
   },
 }

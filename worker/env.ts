@@ -15,6 +15,10 @@ export interface Env {
   /** Google OAuth client (public id in vars, secret via `wrangler secret`). */
   GOOGLE_CLIENT_ID?: string;
   GOOGLE_CLIENT_SECRET?: string;
+  /** Secret: Resend API key for sign-in codes and owner notifications. */
+  RESEND_API_KEY?: string;
+  /** Sender, e.g. "ChiloLab <no-reply@chilolab.com>" (domain verified in Resend). */
+  MAIL_FROM: string;
 }
 
 export const baseHeaders = {

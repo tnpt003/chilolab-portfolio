@@ -1,4 +1,5 @@
 import { asLocale, json, readJson, text, underLimit, type Env } from './env';
+import { notifyHeld } from './mail';
 import { moderate } from './moderation';
 import { currentUser } from './session';
 
@@ -183,7 +184,12 @@ async function list(request: Request, env: Env, allowed: Allowed) {
   });
 }
 
-async function create(request: Request, env: Env, allowed: Allowed) {
+async function create(
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext,
+  allowed: Allowed,
+) {
   const user = await currentUser(request, env);
   if (!user) return json({ error: 'unauthenticated' }, 401);
   if (!(await underLimit(env, `user:${user.id}`)))
@@ -244,6 +250,16 @@ async function create(request: Request, env: Env, allowed: Allowed) {
       verdict.reason,
     )
     .first<Row>();
+  if (verdict.held)
+    ctx.waitUntil(
+      notifyHeld(env, new URL(request.url).origin, {
+        project,
+        version,
+        author: user.displayName,
+        body: message,
+        reason: verdict.reason,
+      }).catch((error) => console.error('notify failed', error)),
+    );
   return json(
     {
       comment: serialize(
@@ -255,7 +271,12 @@ async function create(request: Request, env: Env, allowed: Allowed) {
   );
 }
 
-async function edit(request: Request, env: Env, id: number) {
+async function edit(
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext,
+  id: number,
+) {
   const user = await currentUser(request, env);
   if (!user) return json({ error: 'unauthenticated' }, 401);
   if (!(await underLimit(env, `user:${user.id}`)))
@@ -289,6 +310,16 @@ async function edit(request: Request, env: Env, id: number) {
       id,
     )
     .first<Row>();
+  if (verdict.held && updated)
+    ctx.waitUntil(
+      notifyHeld(env, new URL(request.url).origin, {
+        project: updated.project,
+        version: updated.version,
+        author: user.displayName,
+        body: message,
+        reason: verdict.reason,
+      }).catch((error) => console.error('notify failed', error)),
+    );
   return json({
     comment: serialize(
       { ...updated!, display_name: user.displayName, author_role: user.role },
@@ -333,12 +364,13 @@ async function approve(request: Request, env: Env, id: number) {
 export function comments(
   request: Request,
   env: Env,
+  ctx: ExecutionContext,
   path: string,
   allowed: Allowed,
 ) {
   if (path === '/api/comments') {
     if (request.method === 'GET') return list(request, env, allowed);
-    if (request.method === 'POST') return create(request, env, allowed);
+    if (request.method === 'POST') return create(request, env, ctx, allowed);
     return json({ error: 'method_not_allowed' }, 405);
   }
   const match = /^\/api\/comments\/(\d{1,12})(\/approve)?$/.exec(path);
@@ -348,7 +380,7 @@ export function comments(
     return request.method === 'POST'
       ? approve(request, env, id)
       : json({ error: 'method_not_allowed' }, 405);
-  if (request.method === 'PATCH') return edit(request, env, id);
+  if (request.method === 'PATCH') return edit(request, env, ctx, id);
   if (request.method === 'DELETE') return destroy(request, env, id);
   return json({ error: 'method_not_allowed' }, 405);
 }

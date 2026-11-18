@@ -41,7 +41,9 @@ const account = userPath(locale, 'account');
           <li>
             <strong>Tài khoản:</strong> khi đăng nhập bằng Google, website nhận
             mã tài khoản Google, email và tên của bạn. Tên hiển thị có thể đổi
-            trong trang tài khoản. Website không nhận mật khẩu Google.
+            trong trang tài khoản. Website không nhận mật khẩu Google. Khi đăng
+            nhập bằng email, website lưu email của bạn; mã 6 số chỉ được lưu
+            dạng mã băm và hết hạn sau 10 phút. Website không dùng mật khẩu.
           </li>
           <li>
             <strong>Bình luận:</strong> nội dung, thời gian, trang hoặc phiên
@@ -82,6 +84,10 @@ const account = userPath(locale, 'account');
             <strong>Google:</strong> xác minh đăng nhập khi bạn chọn “Tiếp tục
             với Google”.
           </li>
+          <li>
+            <strong>Resend:</strong> gửi email chứa mã đăng nhập tới địa chỉ bạn
+            nhập.
+          </li>
         </ul>
         <p>
           Địa chỉ IP được dùng tạm thời để giới hạn số lần gửi và chống spam;
@@ -108,7 +114,9 @@ const account = userPath(locale, 'account');
             <strong>Account:</strong> when you sign in with Google, the website
             receives your Google account ID, email and name. You can change your
             display name on the account page. The website never sees your Google
-            password.
+            password. When you sign in by email, the website stores your email;
+            the 6-digit code is stored only as a hash and expires after 10
+            minutes. There are no passwords.
           </li>
           <li>
             <strong>Comments:</strong> the text, time, and the page or version
@@ -148,6 +156,10 @@ const account = userPath(locale, 'account');
           <li>
             <strong>Google:</strong> confirms your identity when you choose
             “Continue with Google”.
+          </li>
+          <li>
+            <strong>Resend:</strong> delivers the email with your sign-in code
+            to the address you enter.
           </li>
         </ul>
         <p>

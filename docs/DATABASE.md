@@ -18,7 +18,7 @@ Không lưu IP, user agent hay mật khẩu Google. Chính sách công khai: `/p
 - Sửa: hiện nhãn "đã sửa", kiểm duyệt lại. Xóa: không có phản hồi → xóa hẳn; có phản hồi → còn dòng "đã bị xóa", nội dung bị xóa khỏi D1. Gỡ từ `/manage` → "đã bị quản trị viên gỡ".
 - Xóa tài khoản: xóa phiên, tài khoản, mọi phản hồi và nội dung bình luận của người đó (theo quy tắc trên).
 - Kiểm duyệt (`worker/moderation.ts`): danh sách từ (khớp nguyên từ) rồi model `@cf/aisingapore/gemma-sea-lion-v4-27b-it` trên Workers AI. Bị gắn cờ → `held`: chỉ người viết thấy, chủ site duyệt ở `/manage`. Chê sản phẩm / báo lỗi không bị giữ. AI lỗi hoặc hết quota → vẫn hiện, gắn lý do `unchecked`.
-- Thông báo qua email về bình luận bị giữ **chưa có**: cần domain riêng (và có thể gói Workers Paid) để gửi mail. Hiện xem ở `/manage` (số đỏ cạnh "Bị giữ chờ duyệt").
+- Bình luận bị giữ được báo qua email cho chủ site (xem mục Email), và hiện ở `/manage`.
 
 ## Chủ site (owner)
 
@@ -34,7 +34,7 @@ Không lưu IP, user agent hay mật khẩu Google. Chính sách công khai: `/p
 - Google: OAuth code flow + PKCE + `state`; kiểm `iss`, `aud`, `exp`, `email_verified`.
 - `WRITE_LIMIT`: 10 lần ghi/phút mỗi tài khoản hoặc IP (bộ lọc thô). Góp ý ẩn danh còn có Turnstile.
 - `/manage` sau Cloudflare Access + Worker tự kiểm JWT; thiếu cấu hình thì từ chối hết.
-- Email + mật khẩu **chưa làm**: gói Free giới hạn 10 ms CPU/request, không đủ để băm mật khẩu đủ mạnh (PBKDF2 100k vòng ≈ 12,7 ms trên máy dev); quên mật khẩu cần gửi email. Làm khi có domain + Workers Paid. Cột `users.password_hash` đã có sẵn.
+- Không có mật khẩu: khách đăng nhập bằng Google hoặc mã 6 số qua email. (Băm mật khẩu đủ mạnh vượt giới hạn 10 ms CPU của gói Free.) Cột `users.password_hash` để trống.
 
 ## Chạy trên máy
 
@@ -70,6 +70,21 @@ npm run db:migrate:remote
    - `http://localhost:8787/api/auth/google/callback`
 5. Client ID → `GOOGLE_CLIENT_ID` trong `wrangler.jsonc` (công khai). Client secret → Worker secret `GOOGLE_CLIENT_SECRET` (Dashboard → Variables and Secrets → Secret). Không commit secret.
 6. Khi có `chilolab.com`: thêm redirect URI và authorized domain mới.
+
+## Email (Resend + Cloudflare Email Routing)
+
+- **Gửi mail** qua Resend (`worker/mail.ts`): mã đăng nhập 6 số cho khách và thông báo cho chủ site khi có bình luận bị giữ (gửi tới email của tài khoản có `role = 'owner'`, không ghi email vào code). Gói free của Resend: 100 mail/ngày, 3.000 mail/tháng.
+- **Đăng nhập bằng email** (`worker/email-login.ts`): không mật khẩu. Gửi mã cần Turnstile, tối đa 1 mã/phút và 5 mã/giờ cho mỗi địa chỉ; mã lưu dạng SHA-256, hết hạn 10 phút, 5 lần nhập sai thì khóa. Cùng email với tài khoản Google → cùng một tài khoản.
+- Thiếu secret `RESEND_API_KEY` → tùy chọn email tự ẩn, thông báo không gửi; mọi thứ khác vẫn chạy.
+- Người gửi: biến `MAIL_FROM` trong `wrangler.jsonc` (`ChiloLab <no-reply@chilolab.com>`).
+
+Thiết lập Resend (một lần):
+
+1. Tạo tài khoản tại https://resend.com → **Domains → Add Domain** → `chilolab.com`.
+2. Thêm các bản ghi DNS Resend đưa ra (DKIM `resend._domainkey`, MX + TXT cho `send`) vào Cloudflare DNS, để **DNS only** (mây xám). Chờ Resend báo **Verified**.
+3. **API Keys → Create** (quyền _Sending access_, domain `chilolab.com`), rồi `npx wrangler secret put RESEND_API_KEY`.
+
+Email liên hệ `contact@chilolab.com` dùng **Cloudflare Email Routing** (miễn phí, chỉ chuyển tiếp thư đến): Dashboard → `chilolab.com` → **Email → Email Routing** → bật, xác minh địa chỉ đích, thêm quy tắc `contact@` → địa chỉ đích. Email Routing dùng MX ở apex; Resend dùng subdomain `send`, nên hai bên không đụng nhau.
 
 ## Sao lưu
 

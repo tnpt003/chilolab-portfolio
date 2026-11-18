@@ -1044,3 +1044,69 @@ nav a:hover {
   font-size: 0.75rem;
   font-weight: 700;
 }
+/* Email sign-in */
+.login-email {
+  width: 100%;
+  display: grid;
+  gap: 0.8rem;
+}
+.login-email[hidden],
+.login-form[hidden] {
+  display: none;
+}
+.login-divider {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.login-divider::before,
+.login-divider::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--line);
+}
+.login-form {
+  display: grid;
+  gap: 0.5rem;
+  text-align: left;
+}
+.login-form label {
+  font-weight: 500;
+}
+.login-form input {
+  font: inherit;
+  color: var(--ink);
+  width: 100%;
+  padding: 0.7rem 0.85rem;
+  background: white;
+  border: 1px solid var(--muted);
+  border-radius: 0.6rem;
+}
+.login-form input:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+.login-form #login-code {
+  font-size: 1.4rem;
+  letter-spacing: 0.4em;
+  text-align: center;
+}
+.login-form .button {
+  width: 100%;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 500;
+  margin-top: 0.3rem;
+}
+.login-form .turnstile:empty {
+  display: none;
+}
+.login-links {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
