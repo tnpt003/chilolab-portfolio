@@ -41,7 +41,6 @@ export const copy = {
     back: 'Tất cả dự án',
     aboutText:
       'Tôi là Nguyễn Tấn Phát. ChiloLab là không gian để tôi ghi lại quá trình làm sản phẩm, chia sẻ những gì đã xây và tiếp tục thử nghiệm.',
-    note: 'Thông tin bản phát hành và đường dẫn chính thức được ghi trong phần giới thiệu bên cạnh.',
     preview: 'Minh họa ý tưởng, không phải ảnh sản phẩm',
     footer: 'Được xây từ những ý tưởng nhỏ.',
     footerLinks: {
@@ -72,7 +71,6 @@ export const copy = {
     back: 'All projects',
     aboutText:
       'I’m Nguyễn Tấn Phát. ChiloLab is my space to document making products, share what I build, and keep experimenting.',
-    note: 'Release information and official links are listed in the project introduction alongside this panel.',
     preview: 'Concept illustration, not a product screenshot',
     footer: 'Built from small ideas.',
     footerLinks: {

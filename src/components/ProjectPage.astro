@@ -26,6 +26,7 @@ const latest = (
   await featuredDownload(data.locale, data.slug, data.featuredVersion)
 )?.data;
 const { Content } = await render(project);
+const hasLinks = Boolean(data.demoUrl || data.downloadUrl);
 const poster =
   data.video && data.preview
     ? (await getImage({ src: data.preview.image, width: 800, format: 'webp' }))
@@ -83,12 +84,15 @@ const poster =
           <a href={feedbackPath(data.locale, data.slug)}>{v.feedback}</a>
         </div>
       </section>
-    ) : (
-      <p class="project-version-link">
-        <a href={versionPath(data.locale, data.slug)}>{v.heading}</a>
-      </p>
+    ) : null}
+    {/* The video poster is the same screenshot; show it only once. */}
+    {!data.video && (
+      <ProjectVisual
+        kind={data.kind}
+        label={t.preview}
+        preview={data.preview}
+      />
     )}
-    <ProjectVisual kind={data.kind} label={t.preview} preview={data.preview} />
     {data.video && (
       <figure class="project-video">
         <video
@@ -115,18 +119,19 @@ const poster =
         </figcaption>
       </figure>
     )}
-    <div class="detail-body">
-      <aside class="notice">
-        {t.note}
-        <div class="actions">
-          {data.demoUrl && (
-            <a class="button" href={data.demoUrl}>
-              {t.demo}
-            </a>
-          )}
-          {data.downloadUrl && <a href={data.downloadUrl}>{t.download}</a>}
-        </div>
-      </aside>
+    <div class:list={['detail-body', { single: !hasLinks }]}>
+      {hasLinks && (
+        <aside class="notice">
+          <div class="actions">
+            {data.demoUrl && (
+              <a class="button" href={data.demoUrl}>
+                {t.demo}
+              </a>
+            )}
+            {data.downloadUrl && <a href={data.downloadUrl}>{t.download}</a>}
+          </div>
+        </aside>
+      )}
       <article class="prose">
         <Content />
       </article>

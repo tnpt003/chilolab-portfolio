@@ -6,6 +6,8 @@ import '../styles/global.css';
 import { copy, listProjects, pathFor, type Locale } from '../lib/content';
 import { feedbackPath, privacyPath, userPath } from '../lib/community';
 import { versionPath } from '../lib/versions';
+import { getImage } from 'astro:assets';
+import shareImage from '../assets/pet-battle-hub.png';
 interface Props {
   title: string;
   description: string;
@@ -19,6 +21,14 @@ const other = locale === 'vi' ? 'en' : 'vi';
 const canonical = new URL(pathFor(locale, slug), Astro.site);
 const projects = await listProjects(locale);
 const f = copy[locale].footerLinks;
+// Link previews (Facebook, Zalo, Discord…). JPEG because some crawlers
+// still skip WebP; only crawlers fetch it, visitors never download it.
+const og = await getImage({ src: shareImage, width: 1200, format: 'jpeg' });
+const ogImage = new URL(og.src, Astro.site);
+const ogAlt =
+  locale === 'vi'
+    ? 'Giao diện Pet Desktop trên desktop Windows'
+    : 'Pet Desktop on a Windows desktop';
 ---
 
 <!doctype html>
@@ -55,6 +65,12 @@ const f = copy[locale].footerLinks;
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content={locale === 'vi' ? 'vi_VN' : 'en_US'} />
+    <meta property="og:site_name" content="ChiloLab" />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content={String(og.attributes.width)} />
+    <meta property="og:image:height" content={String(og.attributes.height)} />
+    <meta property="og:image:alt" content={ogAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#184b58" />
   </head>
   <body>
@@ -62,7 +78,7 @@ const f = copy[locale].footerLinks;
       {locale === 'vi' ? 'Đến nội dung' : 'Skip to content'}
     </a>
     <header class="header wrap">
-      <a class="brand" href={pathFor(locale)} aria-label="ChiloLab">
+      <a class="brand" href={pathFor(locale)}>
         <span class="brand-mark" aria-hidden="true">
           c.
         </span>

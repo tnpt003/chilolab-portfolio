@@ -66,9 +66,6 @@
   padding-top: 2rem;
   border-top: 1px solid var(--line);
 }
-.project-version-link {
-  margin-bottom: 1.5rem;
-}
 .download-panel {
   display: flex;
   flex-wrap: wrap;
@@ -544,6 +541,9 @@ nav a:hover {
   grid-template-columns: 1fr 1.6fr;
   gap: 4rem;
   margin-top: 3rem;
+}
+.detail-body.single {
+  grid-template-columns: 1fr;
 }
 .notice {
   font-size: 0.95rem;

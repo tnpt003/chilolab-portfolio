@@ -49,14 +49,11 @@ for (const route of routes) {
       .analyze();
     expect(results.violations).toEqual([]);
     if (route.endsWith('/pet-desktop')) {
-      const image = page.locator('.product-screenshot');
-      await image.scrollIntoViewIfNeeded();
-      await expect(image).toBeVisible();
-      expect(
-        await image.evaluate(
-          (el: HTMLImageElement) => el.complete && el.naturalWidth > 0,
-        ),
-      ).toBe(true);
+      // The screenshot is shown once, as the video poster.
+      await expect(page.locator('.product-screenshot')).toHaveCount(0);
+      const poster = await page.locator('video').getAttribute('poster');
+      expect(poster).toMatch(/\.webp$/);
+      expect((await page.request.get(poster!)).status()).toBe(200);
       await expect(page.locator('video')).toHaveAttribute('controls', '');
       await expect(page.locator('video')).not.toHaveAttribute('autoplay');
       const media = await page.request.get('/media/pet-intro.mp4', {

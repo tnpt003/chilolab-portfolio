@@ -1,10 +1,9 @@
 # Pet Desktop media
 
-Source: https://github.com/tnpt003/Pet-Computer
-Source commit: bfc05d6fe85d8e2d3602638e24f3edcc40bc32e5
+The image in src/assets/pet-battle-hub.png and the video pet-intro.mp4 are captures of Desktop Pet by tnpt003 (Nguyễn Tấn Phát), the owner of this website. They are actual app captures of the development preview for 1.5, not a guarantee of features in the current published release.
 
-The image in src/assets/pet-battle-hub.png and video pet-intro.mp4 come from docs/media in the owner's repository. These are actual app captures of the development preview for 1.5, not a guarantee of features in the current published release.
+Desktop Pet, including its artwork, is copyright (c) 2026 tnpt003, all rights reserved; see PET-LICENSE.txt. These captures are shown here by the owner to present the app. They may not be copied, modified or redistributed without written permission from tnpt003.
 
-Original project code/artwork uses the upstream MIT license, copied as PET-LICENSE.txt. Windows wallpaper visible in the captures belongs to its respective rights holder and is not covered by that MIT license. The media is included here as a demonstration of the owner's application.
+The Windows wallpaper visible in the captures belongs to its respective rights holder.
 
 The 32-second video has no audio. It contains screenshot introductions followed by a real preparation/battle recording. It does not demonstrate drag/throw interaction.
