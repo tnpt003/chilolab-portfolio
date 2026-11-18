@@ -137,6 +137,11 @@ const siteKey: string =
             </button>
             <p class="form-status" data-status role="status" />
           </form>
+          <p data-admin hidden>
+            <a class="button" href="/manage">
+              {t.adminLink}
+            </a>
+          </p>
           <button class="text-button" type="button" data-sign-out>
             {t.signOut}
           </button>
@@ -332,6 +337,8 @@ const siteKey: string =
         if (!data.user) return location.replace(root.dataset.login!);
         root.querySelector('[data-email]')!.textContent = data.user.email;
         input.value = data.user.displayName;
+        if (data.user.owner)
+          root.querySelector<HTMLElement>('[data-admin]')!.hidden = false;
         body.hidden = false;
       });
       form.addEventListener('submit', async (event) => {

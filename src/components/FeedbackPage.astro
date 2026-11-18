@@ -202,6 +202,7 @@ const runtime = {
       }
       const fields = Object.fromEntries(new FormData(form));
       delete fields['cf-turnstile-response'];
+      let closed = false;
       const button = form.querySelector<HTMLButtonElement>(
         'button[type=submit]',
       )!;
@@ -218,13 +219,19 @@ const runtime = {
             token,
           }),
         });
-        if (!response.ok) throw new Error(String(response.status));
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          closed = data.error === 'closed';
+          throw new Error(String(response.status));
+        }
         form.reset();
         status.textContent = copy.sent;
       } catch (error) {
         status.textContent = String(error).includes('429')
           ? copy.rateLimited
-          : copy.failed;
+          : String(error).includes('403') && closed
+            ? copy.closed
+            : copy.failed;
       } finally {
         token = '';
         api?.reset(widget);

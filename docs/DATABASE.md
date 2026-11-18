@@ -8,8 +8,9 @@ Nội dung do chủ site viết (dự án, phiên bản) vẫn là Markdown và 
 | ------------------------ | ------------------- | -------------------------------------------------------- |
 | Tài khoản khách (Google) | `users`, `sessions` | `/user/login`, `/user/account` (`/user` → `/user/login`) |
 | Bình luận theo luồng     | `comments`          | Mỗi trang phiên bản; trang dự án gộp tất cả              |
-| Góp ý / báo lỗi          | `feedback`          | `/<dự-án>/feedback`; chỉ đọc ở `/manage`                 |
-| Lượt bấm tải             | `downloads`         | Chỉ ở `/manage`; một bộ đếm mỗi file mỗi ngày            |
+| Góp ý / báo lỗi          | `feedback`          | `/<dự-án>/feedback`; đọc ở `/manage/feedback`            |
+| Lượt bấm tải             | `downloads`         | Chỉ ở `/manage/downloads`; một bộ đếm mỗi file mỗi ngày  |
+| Cài đặt site             | `settings`          | `/manage/settings` (chỉ chủ site)                        |
 
 Không lưu IP, user agent hay mật khẩu Google. Chính sách công khai: `/privacy`.
 
@@ -26,16 +27,34 @@ Không lưu IP, user agent hay mật khẩu Google. Chính sách công khai: `/p
 
 - Cột `users.role` (`member` | `owner`), chỉ đặt bằng SQL, không có API nào đổi được:
   `npx wrangler d1 execute chilolab --remote --command "UPDATE users SET role = 'owner' WHERE email = '<email>'"` (đăng nhập Google một lần trước để có tài khoản).
-- Owner có nhãn "Tác giả", không qua AI kiểm duyệt, thấy bình luận đang bị giữ ngay trong danh sách và có nút Duyệt / Gỡ cho mọi bình luận. `/manage` vẫn là nơi xem góp ý và lượt tải.
+- Owner có nhãn "Tác giả", không qua AI kiểm duyệt, thấy bình luận đang bị giữ ngay trong danh sách và có nút Duyệt / Gỡ cho mọi bình luận.
+
+## Trang quản trị (`/manage`)
+
+Kiểu WordPress/Drupal: đăng nhập ở `/user/login` bằng tài khoản owner (Google hoặc mã email) rồi mở `/manage` (trang tài khoản có nút "Vào trang quản trị"). Chưa đăng nhập → chuyển tới `/user/login?return=/manage`; đăng nhập bằng tài khoản thường → 403.
+
+| Trang               | Làm gì                                                                                                                                  |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `/manage`           | Bảng tin: số tài khoản, bình luận, góp ý, lượt tải; bình luận chờ duyệt; cảnh báo cài đặt                                               |
+| `/manage/comments`  | Chờ duyệt / Đang hiện / Tất cả, tìm trong nội dung, Cho hiện / Gỡ                                                                       |
+| `/manage/feedback`  | Chưa xử lý / Đã xử lý, đánh dấu, mở lại, xóa                                                                                            |
+| `/manage/downloads` | Tổng theo phiên bản và 30 ngày gần nhất                                                                                                 |
+| `/manage/users`     | Danh sách tài khoản, tìm kiếm, đăng xuất mọi thiết bị, xóa tài khoản (không xóa được owner)                                             |
+| `/manage/settings`  | Bật/tắt bình luận, cách kiểm duyệt, từ bị chặn thêm, email báo, form góp ý, đăng nhập email, tài khoản mới; xem dịch vụ nào đã cấu hình |
+
+Cài đặt (`worker/settings.ts`, bảng `settings`): thiếu dòng hoặc chưa chạy migration → dùng mặc định (mọi thứ bật, kiểm duyệt AI), tức là như trước khi có cài đặt. Kiểm duyệt "Giữ tất cả" gắn lý do `manual`; từ bị chặn thêm gắn lý do `blocked`. Tắt "tài khoản mới" thì Google và mã email đều từ chối email chưa có tài khoản (`registration_closed`); owner đã có tài khoản nên vẫn vào được. Nội dung dự án/phiên bản vẫn sửa ở `/admin` (Sveltia CMS), không ở đây.
+
+Quyền owner không đổi được từ trang quản trị: chỉ đặt bằng lệnh SQL ở trên.
 
 ## Bảo mật
 
 - Worker chỉ chạy cho `/api/*`, `/manage*`, `/user`, `/en/user`; trang khác là file tĩnh.
+- `/manage` mở khi: phiên đăng nhập của tài khoản `role = 'owner'`, **hoặc** JWT Cloudflare Access hợp lệ, **hoặc** `ADMIN_DEV_BYPASS=1` trên localhost. Ngoài ra luôn từ chối. Mọi thao tác ghi là form POST cùng origin; trang không có JavaScript.
+- Ai chiếm được hộp thư hoặc tài khoản Google của owner sẽ vào được `/manage`: bật xác minh 2 bước cho cả hai. Muốn thêm một lớp khóa, giữ application Cloudflare Access cho `/manage`.
 - Mọi request ghi phải cùng origin; body ≤ 16 KB; nội dung luôn hiển thị dạng text.
 - Phiên: cookie `__Host-chilolab_session` (HttpOnly, Secure, SameSite=Lax, 30 ngày); D1 chỉ giữ SHA-256 của token.
 - Google: OAuth code flow + PKCE + `state`; kiểm `iss`, `aud`, `exp`, `email_verified`.
 - `WRITE_LIMIT`: 10 lần ghi/phút mỗi tài khoản hoặc IP (bộ lọc thô). Góp ý ẩn danh còn có Turnstile.
-- `/manage` sau Cloudflare Access + Worker tự kiểm JWT; thiếu cấu hình thì từ chối hết.
 - Không có mật khẩu: khách đăng nhập bằng Google hoặc mã 6 số qua email. (Băm mật khẩu đủ mạnh vượt giới hạn 10 ms CPU của gói Free.) Cột `users.password_hash` để trống.
 
 ## Chạy trên máy
@@ -59,7 +78,7 @@ npm run db:migrate:remote
 ## Cấu hình Cloudflare đã làm
 
 - D1 `chilolab`, `TURNSTILE_SECRET`, Turnstile site key trong `.env.production`.
-- Access cho `/manage` (team `bold-night-e762.cloudflareaccess.com`).
+- Access cho `/manage` (team `bold-night-e762.cloudflareaccess.com`): giờ là tùy chọn; xóa application đó nếu muốn chỉ đăng nhập qua `/user/login`.
 - Workers AI, rate limit `WRITE_LIMIT`, Workers Logs (`observability`) trong `wrangler.jsonc`.
 
 ## Google sign-in (làm một lần)

@@ -61,6 +61,8 @@ const t = commentCopy[locale];
     total: number;
     signedIn: boolean;
     moderator: boolean;
+    /** False when the owner has closed new comments (/manage/settings). */
+    open?: boolean;
     comments: Comment[];
   };
   type Copy = Record<string, string>;
@@ -107,10 +109,15 @@ const t = commentCopy[locale];
     let me: { displayName: string } | null = null;
     // Set by the API when the signed-in account is the site owner.
     let moderator = false;
+    let open = true;
     const expanded = new Set<number>();
 
     const errorText = (error: unknown) =>
-      String(error).includes('429') ? copy.rateLimited : copy.failed;
+      String(error).includes('429')
+        ? copy.rateLimited
+        : String(error).includes('403')
+          ? copy.closed
+          : copy.failed;
 
     function editor(
       initial: string,
@@ -162,6 +169,10 @@ const t = commentCopy[locale];
 
     function renderComposer() {
       composer.replaceChildren();
+      if (!open) {
+        composer.append(el('p', 'comment-as', copy.closed));
+        return;
+      }
       if (!me) {
         const link = el('a', 'button', copy.signIn);
         link.href = `${root.dataset.login}?return=${encodeURIComponent(`${location.pathname}#comments`)}`;
@@ -246,7 +257,12 @@ const t = commentCopy[locale];
         actions.append(node);
         return node;
       };
-      if (me && thread.state === 'published' && comment.state === 'published')
+      if (
+        me &&
+        open &&
+        thread.state === 'published' &&
+        comment.state === 'published'
+      )
         button(copy.reply, () => openReply(li, thread, comment));
       if (comment.mine) {
         button(copy.edit, () => {
@@ -364,6 +380,10 @@ const t = commentCopy[locale];
       try {
         const data = (await api(`/api/comments?${query}`)) as Page;
         moderator = data.moderator;
+        if (open !== (data.open !== false)) {
+          open = data.open !== false;
+          renderComposer();
+        }
         if (data.page > data.pages && page > 1) {
           page = data.pages;
           return load();

@@ -8,7 +8,7 @@ Website chạy trên https://chilolab.com (Worker `chilolab-portfolio`, repo Git
 
 Chọn Worker thay vì Pages: site là static nên chi phí và tính năng tương đương; Cloudflare ưu tiên Workers cho project mới, và sau này có thể thêm API nhỏ (ví dụ OAuth cho Sveltia CMS) trong cùng Worker. Không cần WordPress hoặc dịch vụ trả phí.
 
-Cấu hình nằm trong `wrangler.jsonc`: phục vụ `./dist`, trả `404.html` cho đường dẫn không tồn tại, bỏ dấu `/` cuối (khớp `trailingSlash: 'never'` của Astro). Worker script (`worker/`) chỉ chạy cho `/api/*` và `/manage*` với D1, xem [DATABASE.md](DATABASE.md); `public/_redirects` và `public/_headers` áp dụng cho static assets.
+Cấu hình nằm trong `wrangler.jsonc`: phục vụ `./dist`, trả `404.html` cho đường dẫn không tồn tại, bỏ dấu `/` cuối (khớp `trailingSlash: 'never'` của Astro). Worker script (`worker/`) chỉ chạy cho `/api/*`, `/manage*` và `/user` với D1, xem [DATABASE.md](DATABASE.md); `public/_redirects` và `public/_headers` áp dụng cho static assets.
 
 Workers Builds (dashboard → chilolab-portfolio → Settings → Build):
 

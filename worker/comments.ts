@@ -2,6 +2,7 @@ import { asLocale, json, readJson, text, underLimit, type Env } from './env';
 import { notifyHeld } from './mail';
 import { moderate } from './moderation';
 import { currentUser } from './session';
+import { getSettings } from './settings';
 
 // Threaded comments, one reply level (like YouTube). A project page shows the
 // comments of every version plus its own; a version page shows only its own.
@@ -125,7 +126,10 @@ async function list(request: Request, env: Env, allowed: Allowed) {
     1,
     Math.min(1000, Number(url.searchParams.get('page')) || 1),
   );
-  const user = await currentUser(request, env);
+  const [user, settings] = await Promise.all([
+    currentUser(request, env),
+    getSettings(env),
+  ]);
   const me = user?.id ?? -1;
   // The owner also sees held comments, to approve or remove them in place.
   const mod = user?.role === 'owner' ? 1 : 0;
@@ -174,6 +178,7 @@ async function list(request: Request, env: Env, allowed: Allowed) {
     total: Number(total.results[0]?.n ?? 0),
     signedIn: me !== -1,
     moderator: mod === 1,
+    open: settings.commentsOpen || mod === 1,
     comments: rows.map((row) => ({
       ...serialize(row, me, mod === 1),
       replies: replies
@@ -192,6 +197,9 @@ async function create(
 ) {
   const user = await currentUser(request, env);
   if (!user) return json({ error: 'unauthenticated' }, 401);
+  const settings = await getSettings(env);
+  if (!settings.commentsOpen && user.role !== 'owner')
+    return json({ error: 'closed' }, 403);
   if (!(await underLimit(env, `user:${user.id}`)))
     return json({ error: 'rate_limited' }, 429);
   const body = await readJson(request);
@@ -234,7 +242,7 @@ async function create(
   const verdict =
     user.role === 'owner'
       ? ({ held: false, reason: null } as const)
-      : await moderate(env, message);
+      : await moderate(env, message, settings);
   const row = await env.DB.prepare(
     `INSERT INTO comments (project, version, parent_id, user_id, body, locale, status, moderation_reason)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?) RETURNING *`,
@@ -250,7 +258,7 @@ async function create(
       verdict.reason,
     )
     .first<Row>();
-  if (verdict.held)
+  if (verdict.held && settings.notifyHeld)
     ctx.waitUntil(
       notifyHeld(env, new URL(request.url).origin, {
         project,
@@ -283,6 +291,9 @@ async function edit(
     return json({ error: 'rate_limited' }, 429);
   const message = text((await readJson(request))?.body, 1, 2000);
   if (!message) return json({ error: 'invalid' }, 400);
+  const settings = await getSettings(env);
+  if (!settings.commentsOpen && user.role !== 'owner')
+    return json({ error: 'closed' }, 403);
   const row = await env.DB.prepare(
     'SELECT user_id, status FROM comments WHERE id = ?',
   )
@@ -297,7 +308,7 @@ async function edit(
   const verdict =
     user.role === 'owner'
       ? ({ held: false, reason: null } as const)
-      : await moderate(env, message);
+      : await moderate(env, message, settings);
   const updated = await env.DB.prepare(
     `UPDATE comments SET body = ?, status = ?, moderation_reason = ?, edited_at = ?
      WHERE id = ? RETURNING *`,
@@ -310,7 +321,7 @@ async function edit(
       id,
     )
     .first<Row>();
-  if (verdict.held && updated)
+  if (verdict.held && updated && settings.notifyHeld)
     ctx.waitUntil(
       notifyHeld(env, new URL(request.url).origin, {
         project: updated.project,

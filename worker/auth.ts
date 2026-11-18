@@ -1,6 +1,7 @@
 import { deleteUserComments } from './comments';
 import { emailLogin } from './email-login';
 import { mailEnabled } from './mail';
+import { getSettings } from './settings';
 import {
   json,
   randomToken,
@@ -141,6 +142,8 @@ async function finishGoogle(request: Request, env: Env) {
     )
       .bind(claims.sub, email, now, user.id)
       .run();
+  else if (!(await getSettings(env)).signups)
+    return fail('registration_closed');
   else
     user = await env.DB.prepare(
       `INSERT INTO users (google_sub, email, display_name, last_login_at)
@@ -159,14 +162,20 @@ async function finishGoogle(request: Request, env: Env) {
 
 async function me(request: Request, env: Env) {
   const user = await currentUser(request, env);
-  if (request.method === 'GET')
+  if (request.method === 'GET') {
+    const settings = await getSettings(env);
     return json({
-      user: user && { displayName: user.displayName, email: user.email },
+      user: user && {
+        displayName: user.displayName,
+        email: user.email,
+        owner: user.role === 'owner',
+      },
       providers: {
         google: Boolean(env.GOOGLE_CLIENT_ID),
-        email: mailEnabled(env),
+        email: mailEnabled(env) && settings.emailLogin,
       },
     });
+  }
   if (!user) return json({ error: 'unauthenticated' }, 401);
 
   if (request.method === 'PATCH') {

@@ -3,9 +3,11 @@ import { auth } from './auth';
 import { comments } from './comments';
 import {
   asLocale,
+  baseHeaders,
   json,
   optional,
   readJson,
+  redirect,
   sameOrigin,
   text,
   underLimit,
@@ -14,6 +16,7 @@ import {
 import { manage } from './manage';
 import { human } from './turnstile';
 import { currentUser } from './session';
+import { getSettings } from './settings';
 
 type Allowlist = {
   projects: string[];
@@ -35,6 +38,8 @@ async function allowed(request: Request, env: Env) {
 }
 
 async function addFeedback(request: Request, env: Env) {
+  if (!(await getSettings(env)).feedbackOpen)
+    return json({ error: 'closed' }, 403);
   const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
   if (!(await underLimit(env, `ip:${ip}`)))
     return json({ error: 'rate_limited' }, 429);
@@ -106,9 +111,29 @@ export default {
     const path = url.pathname.replace(/\/+$/, '') || '/';
 
     if (path === '/manage' || path.startsWith('/manage/')) {
-      const admin = await adminIdentity(request, env);
-      if (!admin) return new Response('Forbidden', { status: 403 });
-      return manage(request, env, admin);
+      // Owner account (users.role = 'owner') signed in at /user/login, or,
+      // as a fallback, Cloudflare Access / the localhost dev bypass.
+      // Anything else is refused: the panel fails closed.
+      const user = await currentUser(request, env);
+      if (user?.role === 'owner')
+        return manage(request, env, {
+          name: user.displayName,
+          userId: user.id,
+        });
+      const identity = await adminIdentity(request, env);
+      if (identity)
+        return manage(request, env, { name: identity, userId: null });
+      if (user || request.method !== 'GET')
+        return new Response('Forbidden', {
+          status: 403,
+          headers: {
+            ...baseHeaders,
+            'Content-Type': 'text/plain; charset=utf-8',
+          },
+        });
+      return redirect(
+        `/user/login?${new URLSearchParams({ return: url.pathname + url.search })}`,
+      );
     }
 
     if (

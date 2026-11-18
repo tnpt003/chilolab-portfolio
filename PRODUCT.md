@@ -28,4 +28,4 @@ Biography and contact email are still unconfirmed. Pet media are real app captur
 
 ## Scope
 
-Static Astro site plus a Cloudflare Worker (`worker/`) for visitor features: Google or email-code sign-in, threaded comments with AI moderation, feedback and download counts, stored in Cloudflare D1 (docs/DATABASE.md). `/manage` is behind Cloudflare Access. Cloudflare Web Analytics and Turnstile are the only third-party scripts.
+Static Astro site plus a Cloudflare Worker (`worker/`) for visitor features: Google or email-code sign-in, threaded comments with AI moderation, feedback and download counts, stored in Cloudflare D1 (docs/DATABASE.md). `/manage` is the owner admin panel, opened by signing in at `/user/login` with the owner account (Cloudflare Access is an optional fallback). Cloudflare Web Analytics and Turnstile are the only third-party scripts.

@@ -37,6 +37,7 @@ export const commentCopy = {
     sending: 'Đang gửi…',
     failed: 'Chưa gửi được. Vui lòng thử lại.',
     rateLimited: 'Bạn gửi hơi nhanh, đợi một phút rồi thử lại.',
+    closed: 'Bình luận mới đang tạm đóng.',
     heldNotice:
       'Bình luận đang được giữ lại để xem xét và sẽ hiện sau khi được duyệt.',
     versionLabel: 'Phiên bản',
@@ -89,6 +90,7 @@ export const commentCopy = {
     sending: 'Sending…',
     failed: 'Could not send. Please try again.',
     rateLimited: 'You are posting quickly; wait a minute and try again.',
+    closed: 'New comments are closed for now.',
     heldNotice:
       'Your comment is being held for review and will appear once approved.',
     versionLabel: 'Version',
@@ -135,6 +137,7 @@ export const feedbackCopy = {
       'Đang xác minh chống spam, vui lòng đợi vài giây rồi bấm gửi lại.',
     failed: 'Gửi chưa được. Kiểm tra nội dung rồi thử lại.',
     rateLimited: 'Bạn gửi hơi nhanh, đợi một phút rồi thử lại.',
+    closed: 'Form góp ý đang tạm đóng. Vui lòng quay lại sau.',
     noscript: 'Cần bật JavaScript để gửi góp ý.',
   },
   en: {
@@ -162,6 +165,7 @@ export const feedbackCopy = {
     verifying: 'Checking for spam, please wait a few seconds and send again.',
     failed: 'Could not send. Check your message and try again.',
     rateLimited: 'You are sending quickly; wait a minute and try again.',
+    closed: 'The feedback form is closed for now. Please check back later.',
     noscript: 'JavaScript is needed to send feedback.',
   },
 } as const;
@@ -191,6 +195,8 @@ export const userCopy = {
       verification_failed: 'Không xác minh được chống spam, vui lòng thử lại.',
       unavailable: 'Đăng nhập bằng email chưa được bật.',
       mail_failed: 'Chưa gửi được email, vui lòng thử lại sau.',
+      registration_closed:
+        'Hiện không nhận tài khoản mới; chỉ tài khoản đã có đăng nhập được.',
     },
     newAccount: 'Chưa có tài khoản? Lần đầu đăng nhập sẽ tự tạo tài khoản.',
     agree: 'Khi tiếp tục, bạn đồng ý với',
@@ -201,6 +207,8 @@ export const userCopy = {
       expired: 'Phiên đăng nhập đã hết hạn, vui lòng thử lại.',
       google: 'Google không xác nhận được tài khoản, vui lòng thử lại.',
       unavailable: 'Đăng nhập bằng Google chưa được bật.',
+      registration_closed:
+        'Hiện không nhận tài khoản mới; chỉ tài khoản đã có đăng nhập được.',
     },
     accountTitle: 'Tài khoản',
     signedInAs: 'Đăng nhập với',
@@ -209,6 +217,7 @@ export const userCopy = {
     save: 'Lưu',
     saved: 'Đã lưu.',
     signOut: 'Đăng xuất',
+    adminLink: 'Vào trang quản trị',
     deleteTitle: 'Xóa tài khoản',
     deleteIntro:
       'Xóa tài khoản sẽ xóa vĩnh viễn tên, email và nội dung mọi bình luận của bạn. Bình luận có người trả lời sẽ chỉ còn dòng "đã bị xóa".',
@@ -242,6 +251,8 @@ export const userCopy = {
       verification_failed: 'Spam check failed, please try again.',
       unavailable: 'Email sign-in is not enabled yet.',
       mail_failed: 'The email could not be sent, please try again later.',
+      registration_closed:
+        'New accounts are not accepted right now; only existing accounts can sign in.',
     },
     newAccount: 'No account yet? Your first sign-in creates one.',
     agree: 'By continuing you accept the',
@@ -252,6 +263,8 @@ export const userCopy = {
       expired: 'The sign-in expired, please try again.',
       google: 'Google could not confirm the account, please try again.',
       unavailable: 'Google sign-in is not enabled yet.',
+      registration_closed:
+        'New accounts are not accepted right now; only existing accounts can sign in.',
     },
     accountTitle: 'Account',
     signedInAs: 'Signed in as',
@@ -260,6 +273,7 @@ export const userCopy = {
     save: 'Save',
     saved: 'Saved.',
     signOut: 'Sign out',
+    adminLink: 'Open the admin panel',
     deleteTitle: 'Delete account',
     deleteIntro:
       'Deleting your account permanently removes your name, email and the text of all your comments. Comments with replies keep only a "deleted" line.',

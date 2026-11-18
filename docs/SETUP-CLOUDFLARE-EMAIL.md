@@ -15,7 +15,7 @@ Cloudflare (gói Free)
    ├─ D1 "chilolab": tài khoản, bình luận, góp ý, lượt tải, mã đăng nhập
    ├─ Workers AI: kiểm duyệt bình luận
    ├─ Turnstile: chống spam
-   ├─ Zero Trust Access: khóa /manage
+   ├─ Zero Trust Access: (tùy chọn) lớp khóa thêm cho /manage
    └─ Email Routing: nhận thư contact@chilolab.com → Gmail
 Google Cloud ── "Tiếp tục với Google"
 Resend ── GỬI mail: mã đăng nhập 6 số, báo bình luận bị giữ
@@ -104,7 +104,9 @@ Quy tắc: thay đổi schema = **thêm** file `migrations/000N_*.sql` (không s
 3. Site key → `.env.production` (`PUBLIC_TURNSTILE_SITE_KEY=...`, được commit). Secret key → `npx wrangler secret put TURNSTILE_SECRET`.
 4. Quên secret? Widget → **Settings → Rotate Secret Key**, rồi `secret put` lại.
 
-## 8. Cloudflare Access cho `/manage`
+## 8. Cloudflare Access cho `/manage` (tùy chọn)
+
+Từ khi có trang quản trị, `/manage` mở bằng tài khoản chủ site đăng nhập ở `/user/login` (xem [DATABASE.md](DATABASE.md#trang-quản-trị-manage)). Access chỉ còn là lớp khóa thêm: nếu application Access cho `/manage` còn bật, bạn sẽ phải qua màn hình Access (mã PIN) **trước**, rồi mới tới trang quản trị. Muốn đăng nhập kiểu WordPress (chỉ `/user/login`), xóa application đó: **Zero Trust → Access controls → Applications → … → Delete**. Có thể để nguyên `ACCESS_*` trong `wrangler.jsonc`.
 
 1. Cloudflare → **Zero Trust** (lần đầu: đặt team name, chọn gói Free).
 2. **Access controls → Applications → Add → Self-hosted**.
@@ -116,7 +118,7 @@ Quy tắc: thay đổi schema = **thêm** file `migrations/000N_*.sql` (không s
    curl -s -o /dev/null -D - https://chilolab.com/manage | grep -i location
    # → https://<team>.cloudflareaccess.com/cdn-cgi/access/login/...?kid=<AUD>
    ```
-7. Worker tự kiểm chữ ký Access; thiếu cấu hình → `/manage` trả 403 cho mọi người (an toàn).
+7. Worker tự kiểm chữ ký Access; Access thiếu hoặc sai → chỉ tài khoản chủ site vào được `/manage`.
 
 ## 9. Đăng nhập Google
 
@@ -197,7 +199,7 @@ B=https://chilolab.com
 curl -s -o /dev/null -w '%{http_code}\n' $B/                          # 200
 curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' http://chilolab.com/        # 301 → https
 curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://www.chilolab.com/x?a=1  # 301 → apex, giữ ?a=1
-curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' $B/manage    # 302 → cloudflareaccess.com
+curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' $B/manage    # 302 → /user/login?return=%2Fmanage (hoặc cloudflareaccess.com nếu còn Access)
 curl -s $B/api/me                                                     # providers google/email = true
 curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' $B/user      # 301 → /user/login
 npx wrangler secret list                                              # đủ 3 secret
@@ -211,17 +213,17 @@ curl -s -H 'accept: application/dns-json' 'https://cloudflare-dns.com/dns-query?
 
 ## 15. Sự cố đã gặp và cách xử lý
 
-| Triệu chứng                       | Nguyên nhân                                       | Cách sửa                                                        |
-| --------------------------------- | ------------------------------------------------- | --------------------------------------------------------------- |
-| Form góp ý luôn báo lỗi xác minh  | Secret đặt ở mục _Build_                          | Đặt lại bằng `wrangler secret put` (mục 5)                      |
-| `/admin` (CMS) trắng trang        | CSP chặn unpkg; `/admin/` bị đổi thành `/admin`   | `public/_headers` có rule cho cả `/admin` và `/admin/*`         |
-| Script trang bị chặn              | Astro nhúng script inline, CSP chặn               | `astro.config.mjs`: `vite.build.assetsInlineLimit: 0`           |
-| `/manage` trả 403 cho cả chủ site | Destination Access sai (subdomain thừa)           | Mục 8 bước 3                                                    |
-| Google `redirect_uri_mismatch`    | Thiếu URI hoặc chưa có hiệu lực                   | Mục 9 bước 5, chờ vài phút                                      |
-| Ô đăng nhập email không hiện      | Thiếu `RESEND_API_KEY`                            | Mục 10 bước 6                                                   |
-| Mã đăng nhập không tới            | Spam, hoặc Resend lỗi                             | Xem Spam; Resend → **Logs**; Workers Logs có dòng `mail failed` |
-| `contact@` không nhận             | Chưa xác minh Gmail, hoặc gửi từ chính Gmail đích | Mục 11 bước 2 và 5                                              |
-| Test local chạy bản cũ            | Còn tiến trình `wrangler dev` cũ giữ cổng         | Dừng terminal cũ hoặc dùng `--port` khác                        |
+| Triệu chứng                       | Nguyên nhân                                                     | Cách sửa                                                        |
+| --------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- |
+| Form góp ý luôn báo lỗi xác minh  | Secret đặt ở mục _Build_                                        | Đặt lại bằng `wrangler secret put` (mục 5)                      |
+| `/admin` (CMS) trắng trang        | CSP chặn unpkg; `/admin/` bị đổi thành `/admin`                 | `public/_headers` có rule cho cả `/admin` và `/admin/*`         |
+| Script trang bị chặn              | Astro nhúng script inline, CSP chặn                             | `astro.config.mjs`: `vite.build.assetsInlineLimit: 0`           |
+| `/manage` trả 403 cho cả chủ site | Tài khoản chưa có `role = 'owner'`, hoặc Destination Access sai | DATABASE.md → Chủ site; mục 8 bước 3                            |
+| Google `redirect_uri_mismatch`    | Thiếu URI hoặc chưa có hiệu lực                                 | Mục 9 bước 5, chờ vài phút                                      |
+| Ô đăng nhập email không hiện      | Thiếu `RESEND_API_KEY`                                          | Mục 10 bước 6                                                   |
+| Mã đăng nhập không tới            | Spam, hoặc Resend lỗi                                           | Xem Spam; Resend → **Logs**; Workers Logs có dòng `mail failed` |
+| `contact@` không nhận             | Chưa xác minh Gmail, hoặc gửi từ chính Gmail đích               | Mục 11 bước 2 và 5                                              |
+| Test local chạy bản cũ            | Còn tiến trình `wrangler dev` cũ giữ cổng                       | Dừng terminal cũ hoặc dùng `--port` khác                        |
 
 ## 16. Chi phí
 

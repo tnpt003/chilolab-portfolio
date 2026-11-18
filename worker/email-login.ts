@@ -10,6 +10,7 @@ import {
 } from './env';
 import { mailEnabled, sendMail } from './mail';
 import { createSession } from './session';
+import { getSettings } from './settings';
 import { human } from './turnstile';
 
 // Passwordless sign-in / sign-up: a 6-digit code sent by email.
@@ -60,12 +61,22 @@ const mail = {
 };
 
 async function start(request: Request, env: Env) {
-  if (!mailEnabled(env)) return json({ error: 'unavailable' }, 503);
+  const settings = await getSettings(env);
+  if (!mailEnabled(env) || !settings.emailLogin)
+    return json({ error: 'unavailable' }, 503);
   const body = await readJson(request);
   const email = readEmail(body?.email);
   const locale = asLocale(body?.locale) ?? 'vi';
   if (email.length > 254 || !EMAIL.test(email))
     return json({ error: 'invalid_email' }, 400);
+  // With sign-ups closed, no code is sent to an address without an account.
+  if (
+    !settings.signups &&
+    !(await env.DB.prepare('SELECT 1 FROM users WHERE email = ?')
+      .bind(email)
+      .first())
+  )
+    return json({ error: 'registration_closed' }, 403);
   const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
   if (
     !(await underLimit(env, `ip:${ip}`)) ||
@@ -108,6 +119,9 @@ async function start(request: Request, env: Env) {
 }
 
 async function verify(request: Request, env: Env) {
+  const settings = await getSettings(env);
+  if (!mailEnabled(env) || !settings.emailLogin)
+    return json({ error: 'unavailable' }, 503);
   const body = await readJson(request);
   const email = readEmail(body?.email);
   const code = String(body?.code ?? '').replace(/\D/g, '');
@@ -146,6 +160,8 @@ async function verify(request: Request, env: Env) {
     await env.DB.prepare('UPDATE users SET last_login_at = ? WHERE id = ?')
       .bind(now, user.id)
       .run();
+  else if (!settings.signups)
+    return json({ error: 'registration_closed' }, 403);
   else
     user = await env.DB.prepare(
       `INSERT INTO users (email, display_name, last_login_at) VALUES (?, ?, ?) RETURNING id`,
