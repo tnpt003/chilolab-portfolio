@@ -2,7 +2,7 @@
 
 ## Trạng thái
 
-Website chạy trên Cloudflare dưới dạng Worker `chilolab-portfolio` (static assets), gắn repo GitHub `tnpt003/chilolab-portfolio`. URL tạm: https://chilolab-portfolio.tnpt003.workers.dev. Chưa mua domain hoặc thay DNS.
+Website chạy trên https://chilolab.com (Worker `chilolab-portfolio`, repo GitHub `tnpt003/chilolab-portfolio`). Domain mua ở Porkbun, DNS do Cloudflare quản lý; địa chỉ `workers.dev` đã tắt. Hướng dẫn dựng lại từng bước: [SETUP-CLOUDFLARE-EMAIL.md](SETUP-CLOUDFLARE-EMAIL.md).
 
 ## Cloudflare Worker
 

@@ -1,5 +1,7 @@
 # Dữ liệu người dùng (Cloudflare D1)
 
+Thiết lập Cloudflare, Google, Resend, Email Routing từng bước: [SETUP-CLOUDFLARE-EMAIL.md](SETUP-CLOUDFLARE-EMAIL.md).
+
 Nội dung do chủ site viết (dự án, phiên bản) vẫn là Markdown và sửa qua CMS ([CMS.md](CMS.md)). D1 chỉ chứa dữ liệu **khách truy cập** tạo ra:
 
 | Tính năng                | Bảng                | Ở đâu                                                    |
