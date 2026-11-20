@@ -2,7 +2,12 @@
 import { render, type CollectionEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { pathFor } from '../lib/content';
-import { versionCopy, versionPath } from '../lib/versions';
+import {
+  alwaysLatest,
+  featuredDownload,
+  versionCopy,
+  versionPath,
+} from '../lib/versions';
 import DownloadCounter from './DownloadCounter.astro';
 import Comments from './Comments.astro';
 import { feedbackPath } from '../lib/community';
@@ -14,6 +19,13 @@ const { entry, project } = Astro.props;
 const { data } = entry;
 const t = versionCopy[data.locale];
 const { Content } = await render(entry);
+const latest = (
+  await featuredDownload(
+    data.locale,
+    data.project,
+    project.data.featuredVersion,
+  )
+)?.data;
 ---
 
 <Base
@@ -41,21 +53,14 @@ const { Content } = await render(entry);
       <p class="lead">{data.summary}</p>
       {data.status !== 'released' && <p class="version-notice">{t.pending}</p>}
       <div class="actions">
-        {data.downloadUrl && (
+        {/* Version pages never link to old builds, only to the newest one. */}
+        {latest && (
           <a
             class="button"
-            href={data.downloadUrl}
-            data-download={`${data.project}/${data.version}/setup`}
+            href={alwaysLatest(latest.downloadUrl!)}
+            data-download={`${data.project}/${latest.version}/setup`}
           >
-            {t.download}
-          </a>
-        )}
-        {data.portableUrl && (
-          <a
-            href={data.portableUrl}
-            data-download={`${data.project}/${data.version}/portable`}
-          >
-            {t.portable}
+            {t.downloadLatest}
           </a>
         )}
         <a href="#comments">{t.discuss}</a>

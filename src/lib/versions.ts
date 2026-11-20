@@ -72,6 +72,19 @@ export async function featuredDownload(
   return entry;
 }
 
+/**
+ * Turn a pinned GitHub release asset link into the always-latest form, so the
+ * download buttons follow new releases without a site rebuild. Version posts
+ * keep their pinned links; only the buttons use this. Requires the asset name
+ * to stay the same across releases (PetComputer-win-Setup.exe, ...).
+ */
+export function alwaysLatest(url: string) {
+  return url.replace(
+    /^(https:\/\/github\.com\/[^/]+\/[^/]+\/releases\/)download\/[^/]+\//,
+    '$1latest/download/',
+  );
+}
+
 export const versionCopy = {
   vi: {
     heading: 'Phiên bản',
@@ -81,10 +94,10 @@ export const versionCopy = {
     empty: 'Chưa có bài viết phiên bản. Các bản cập nhật sẽ xuất hiện tại đây.',
     back: 'Về trang sản phẩm',
     source: 'Tài liệu nguồn',
-    download: 'Tải phiên bản này',
+    downloadLatest: 'Tải bản mới nhất',
     portable: 'Bản Portable (.zip)',
     latestHeading: 'Tải xuống',
-    latestInstaller: 'Tải {project} {version} cho Windows',
+    latestInstaller: 'Tải {project} bản mới nhất cho Windows',
     feedback: 'Báo lỗi / góp ý',
     discuss: 'Bình luận về phiên bản này',
     latestNotes: 'Xem có gì mới',
@@ -103,10 +116,10 @@ export const versionCopy = {
     empty: 'No version posts yet. Future updates will appear here.',
     back: 'Back to product',
     source: 'Source documentation',
-    download: 'Download this version',
+    downloadLatest: 'Download the latest version',
     portable: 'Portable build (.zip)',
     latestHeading: 'Download',
-    latestInstaller: 'Download {project} {version} for Windows',
+    latestInstaller: 'Download the latest {project} for Windows',
     feedback: 'Report a bug / suggest',
     discuss: 'Comment on this version',
     latestNotes: 'See what’s new',

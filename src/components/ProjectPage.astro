@@ -5,6 +5,7 @@ import Base from '../layouts/Base.astro';
 import ProjectVisual from './ProjectVisual.astro';
 import { copy, pathFor } from '../lib/content';
 import {
+  alwaysLatest,
   featuredDownload,
   listVersions,
   versionCopy,
@@ -63,16 +64,14 @@ const poster =
         <div class="actions">
           <a
             class="button"
-            href={latest.downloadUrl}
+            href={alwaysLatest(latest.downloadUrl!)}
             data-download={`${data.slug}/${latest.version}/setup`}
           >
-            {v.latestInstaller
-              .replace('{project}', data.title)
-              .replace('{version}', latest.version)}
+            {v.latestInstaller.replace('{project}', data.title)}
           </a>
           {latest.portableUrl && (
             <a
-              href={latest.portableUrl}
+              href={alwaysLatest(latest.portableUrl)}
               data-download={`${data.slug}/${latest.version}/portable`}
             >
               {v.portable}

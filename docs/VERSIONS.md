@@ -32,7 +32,7 @@ draft: true
 - `released`: đã xác minh phát hành; có thể thêm `releasedAt: "2026-11-05"` (ví dụ định dạng, không phải ngày phát hành thật), `downloadUrl` (bộ cài) và `portableUrl` (bản .zip, tùy chọn) trỏ đúng bản này. Bản `released` mới nhất có `downloadUrl` được hiển thị ở khối Tải xuống của trang sản phẩm.
 - `draft: true`: ẩn bài khỏi trang và sitemap. Để `false` hoặc bỏ trường khi muốn công khai bài. Trạng thái sản phẩm khác trạng thái bài viết: bài preview có thể công khai dù phần mềm chưa phát hành.
 
-Chỉ bản `released` được khai báo ngày phát hành và link tải. Không dùng URL `releases/latest` cho bài cũ vì link đó thay đổi theo thời gian. `sourceUrl` là tùy chọn, trỏ tới changelog/tài liệu công khai.
+Chỉ bản `released` được khai báo ngày phát hành và link tải. Trong bài, `downloadUrl`/`portableUrl` luôn là link cố định theo phiên bản (`releases/download/v1.5.2/...`); không ghi `releases/latest` vào bài. Trang không hiện link tải riêng của từng bài: nút tải ở trang sản phẩm và ở mọi bài phiên bản lấy link của bản đang nổi bật (`featuredVersion`, hoặc bản `released` mới nhất) rồi đổi sang dạng `releases/latest/download/<tên file>` (`alwaysLatest` trong `src/lib/versions.ts`). Vì vậy khi phát hành bản mới, nút tải tự trỏ tới bản đó mà không cần build lại, với điều kiện tên file giữ nguyên (`PetComputer-win-Setup.exe`, `PetComputer-win-Portable.zip`). Lượt tải vẫn được đếm theo phiên bản của bài đang nổi bật. `sourceUrl` là tùy chọn, trỏ tới changelog/tài liệu công khai.
 
 `order` lớn hơn xuất hiện trước. Giữ project, version, status, order và releasedAt giống nhau giữa hai bản dịch. Build báo lỗi nếu thiếu bản dịch công khai hoặc project không tồn tại. Không dùng ngày ước đoán.
 
