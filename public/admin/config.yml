@@ -75,7 +75,7 @@ collections:
         name: downloadUrl
         widget: string
         required: false
-        hint: Link cố định theo phiên bản, ví dụ https://github.com/tnpt003/Pet-Computer/releases/download/v1.5.0/PetComputer-win-Setup.exe. Không dùng releases/latest.
+        hint: Link cố định theo phiên bản, ví dụ https://github.com/tnpt003/Pet-desktop-share/releases/download/v1.5.2/PetComputer-win-Setup.exe. Không dùng releases/latest.
         pattern: ['^https?://', 'Cần là URL http(s)']
       - label: Link bản Portable (.zip)
         name: portableUrl

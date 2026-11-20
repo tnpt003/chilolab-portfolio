@@ -51,7 +51,7 @@ WordPress truyền thống cần PHP và MySQL/MariaDB. Không đưa WordPress a
 
 Giữ Markdown có schema và các cặp ngôn ngữ. Thêm media thật, thông tin phát hành, kiểm tra mobile/accessibility và triển khai thử trên pages.dev trước khi mua domain.
 
-Pet repo: https://github.com/tnpt003/Pet-Computer. README/media có preview 1.5, cần đối chiếu release notes khi mô tả bản tải xuống. Auditor ở C:/Project VS/PageSpeed-Auth-Auditor, chưa lên GitHub theo chủ sở hữu. Không công khai .env, báo cáo QA hoặc dữ liệu phiên đăng nhập.
+Pet: bản phát hành ở https://github.com/tnpt003/Pet-desktop-share (source private từ 21/11/2026). Preview 1.5, cần đối chiếu release notes khi mô tả bản tải xuống. Auditor ở C:/Project VS/PageSpeed-Auth-Auditor, chưa lên GitHub theo chủ sở hữu. Không công khai .env, báo cáo QA hoặc dữ liệu phiên đăng nhập.
 
 ### Đợt 2: thử WordPress
 

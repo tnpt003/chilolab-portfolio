@@ -5,7 +5,7 @@ locale: vi
 description: Một chú mèo hoạt hình trên desktop Windows, với tương tác chăm sóc và những chuyến phiêu lưu tùy chọn.
 kind: pet
 order: 1
-featuredVersion: '1.5.0'
+featuredVersion: '1.5.2'
 preview:
   image: ../../../assets/pet-battle-hub.png
   alt: Giao diện chọn chế độ phiêu lưu và chiến đấu trong Pet Desktop.
