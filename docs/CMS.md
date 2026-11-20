@@ -23,8 +23,8 @@ Sau khi đổi `config.yml` hoặc pull thay đổi mới, tải lại trang CMS
 1. Mở **Pet Desktop — Phiên bản (VI)** → New. Điền phiên bản (ví dụ `1.5.1`), tiêu đề, tóm tắt, trạng thái, thứ tự (`151`) và nội dung.
 2. Mở **Pet Desktop — Versions (EN)** và tạo bản dịch cùng phiên bản. Giữ trạng thái, thứ tự và ngày phát hành giống hệt bản tiếng Việt. Build sẽ báo lỗi nếu thiếu bản dịch hoặc dữ liệu lệch nhau.
 3. Khi bản đã thật sự lên GitHub Releases: chọn **Đã phát hành**, nhập ngày phát hành thật, link Setup.exe và Portable theo đúng tag, ví dụ:
-   - `https://github.com/tnpt003/Pet-desktop-share/releases/download/v1.5.2/PetComputer-win-Setup.exe`
-   - `https://github.com/tnpt003/Pet-desktop-share/releases/download/v1.5.2/PetComputer-win-Portable.zip`
+   - `https://github.com/tnpt003/Pet-Computer/releases/download/v1.5.2/PetComputer-win-Setup.exe`
+   - `https://github.com/tnpt003/Pet-Computer/releases/download/v1.5.2/PetComputer-win-Portable.zip`
 4. Khối **Tải xuống** trên `/pet-desktop` tự lấy bản đã phát hành mới nhất có link tải; không cần sửa trang dự án.
 
 Chưa muốn công khai thì bật **Nháp**. Muốn viết trước về bản đang làm thì chọn **Đang phát triển** hoặc **Xem trước** và để trống ngày/link tải. Chi tiết quy tắc ở [VERSIONS.md](VERSIONS.md).
