@@ -1,0 +1,339 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-25T13:02:26.382Z",
+  "title": "Design System: ChiloLab",
+  "extensions": {
+    "colorMeta": {
+      "ink": {
+        "role": "primary",
+        "displayName": "Desk Ink",
+        "canonical": "#184B58",
+        "tonalRamp": [
+          "#0A2B33",
+          "#154551",
+          "#405D67",
+          "#6E7E84",
+          "#98A1A5",
+          "#C0C5C7",
+          "#DFE1E2",
+          "#F3F4F4"
+        ]
+      },
+      "ink-deep": {
+        "role": "primary",
+        "displayName": "Night Ink",
+        "canonical": "#113843",
+        "tonalRamp": [
+          "#0B2A33",
+          "#29434C",
+          "#4D5B62",
+          "#757D81",
+          "#9CA1A3",
+          "#C2C4C5",
+          "#E0E1E1",
+          "#F3F4F4"
+        ]
+      },
+      "mint": {
+        "role": "secondary",
+        "displayName": "Pet Mint",
+        "canonical": "#C6E8DE",
+        "tonalRamp": [
+          "#212826",
+          "#37423E",
+          "#4E5C58",
+          "#6C807A",
+          "#8CA59E",
+          "#ACCAC1",
+          "#C6E8DE",
+          "#EAF6F3"
+        ]
+      },
+      "lavender": {
+        "role": "secondary",
+        "displayName": "Auditor Lavender",
+        "canonical": "#E3DFF3",
+        "tonalRamp": [
+          "#27262B",
+          "#403E45",
+          "#5A5861",
+          "#7C7A86",
+          "#A19EAC",
+          "#C5C2D3",
+          "#E2DEF2",
+          "#F4F3FA"
+        ]
+      },
+      "apricot": {
+        "role": "tertiary",
+        "displayName": "Apricot Glow",
+        "canonical": "#FFBD8D",
+        "tonalRamp": [
+          "#332318",
+          "#523A29",
+          "#72523C",
+          "#9D7354",
+          "#CA956E",
+          "#F6B688",
+          "#FFD9C3",
+          "#FFF1E9"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Cool Paper",
+        "canonical": "#F5F8F7",
+        "tonalRamp": [
+          "#262727",
+          "#3F3F3F",
+          "#585959",
+          "#7A7C7B",
+          "#9EA09F",
+          "#C2C4C3",
+          "#DFE1E0",
+          "#F1F4F3"
+        ]
+      },
+      "window": {
+        "role": "neutral",
+        "displayName": "Window White",
+        "canonical": "#FFFFFF",
+        "tonalRamp": [
+          "#272727",
+          "#3F3F3F",
+          "#595959",
+          "#7C7C7C",
+          "#A0A0A0",
+          "#C4C4C4",
+          "#E1E1E1",
+          "#F3F3F3"
+        ]
+      },
+      "desk": {
+        "role": "neutral",
+        "displayName": "Desk Surface",
+        "canonical": "#DBE7E4",
+        "tonalRamp": [
+          "#252727",
+          "#3C403F",
+          "#555A59",
+          "#767D7B",
+          "#99A29F",
+          "#BCC6C3",
+          "#D7E3E0",
+          "#F0F5F3"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Slate Muted",
+        "canonical": "#496570",
+        "tonalRamp": [
+          "#1B292E",
+          "#2F424A",
+          "#435D67",
+          "#6D7E86",
+          "#97A1A6",
+          "#BFC5C7",
+          "#DFE1E2",
+          "#F3F4F4"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#CDDBDC",
+        "tonalRamp": [
+          "#242728",
+          "#3B4040",
+          "#545A5B",
+          "#757D7E",
+          "#97A2A3",
+          "#B9C6C7",
+          "#D8E3E4",
+          "#F0F4F4"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Display",
+        "purpose": "Home headline and page titles."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "Section headings and home project titles."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "Article subheads and version titles."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Running text, 65–70ch."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Window titles, status lines, captions, facts."
+      }
+    },
+    "shadows": [
+      {
+        "name": "window-lift",
+        "value": "0 1px 2px rgb(17 56 67 / 0.12), 0 14px 32px -12px rgb(17 56 67 / 0.32)",
+        "purpose": "App windows and the download panel only."
+      },
+      {
+        "name": "polaroid",
+        "value": "0 12px 28px rgb(24 75 88 / 0.16)",
+        "purpose": "The tilted Pet Desktop capture on the About hero."
+      }
+    ],
+    "motion": [
+      {
+        "name": "logo-blink",
+        "value": "7s infinite, scaleY 1 to 0.1 at 97%",
+        "purpose": "Brand mark eyes."
+      },
+      {
+        "name": "ear-up",
+        "value": "0.7s cubic-bezier(0.3, 1.5, 0.5, 1)",
+        "purpose": "Brand frame ears rise once on load."
+      },
+      {
+        "name": "stroll",
+        "value": "7s linear, once",
+        "purpose": "The cat walks along the taskbar, then rests."
+      },
+      {
+        "name": "button-hover",
+        "value": "background-color 0.15s ease",
+        "purpose": "Button state change."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow",
+        "value": "720px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one filled action per group: see projects, download, sign in.",
+      "html": "<a class=\"ds-btn-primary\" href=\"#\">Xem dự án</a>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; min-height: 48px; padding: 0.8rem 1.4rem; background: var(--ink, #184b58); color: #fff; border-radius: 0.5rem; font: 600 1rem 'Be Vietnam Pro', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; text-decoration: none; transition: background-color 0.15s ease; } .ds-btn-primary:hover { background: var(--ink-deep, #113843); } .ds-btn-primary:focus-visible { outline: 3px solid var(--ink, #184b58); outline-offset: 2px; }"
+    },
+    {
+      "name": "Quiet Button",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Secondary action beside a primary button.",
+      "html": "<a class=\"ds-btn-quiet\" href=\"#\">Về tôi</a>",
+      "css": ".ds-btn-quiet { display: inline-flex; align-items: center; min-height: 48px; padding: 0.8rem 1.4rem; background: transparent; color: var(--ink, #184b58); border: 1.5px solid var(--ink, #184b58); border-radius: 0.5rem; font: 600 1rem 'Be Vietnam Pro', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; text-decoration: none; } .ds-btn-quiet:hover { background: #fff; } .ds-btn-quiet:focus-visible { outline: 3px solid var(--ink, #184b58); outline-offset: 2px; }"
+    },
+    {
+      "name": "App Window",
+      "kind": "custom",
+      "refersTo": "window",
+      "description": "Frame for every real product screenshot or video: ink title bar, Windows controls on the right.",
+      "html": "<div class=\"ds-window\"><div class=\"ds-window-bar\"><svg class=\"ds-mark\" viewBox=\"0 0 40 40\"><path d=\"M5 15 9.5 3 17 10h6l7.5-7L35 15v14a8 8 0 0 1-8 8H13a8 8 0 0 1-8-8Z\" fill=\"currentColor\"/><rect x=\"10\" y=\"16\" width=\"20\" height=\"14\" rx=\"3\" fill=\"#184b58\"/><rect x=\"14\" y=\"20\" width=\"3\" height=\"6\" rx=\"1.5\" fill=\"currentColor\"/><rect x=\"23\" y=\"20\" width=\"3\" height=\"6\" rx=\"1.5\" fill=\"currentColor\"/></svg><span>Pet Desktop</span><span class=\"ds-window-meta\">v1.5.2</span><svg class=\"ds-window-controls\" viewBox=\"0 0 84 12\"><path d=\"M2 6h10M37 1h10v10H37ZM73 1l10 10M83 1 73 11\"/></svg></div><div class=\"ds-window-body\"></div></div>",
+      "css": ".ds-window { width: 320px; overflow: hidden; border: 1.5px solid #184b58; border-radius: 12px; background: #c6e8de; box-shadow: 0 1px 2px rgb(17 56 67 / 0.12), 0 14px 32px -12px rgb(17 56 67 / 0.32); } .ds-window-bar { display: flex; align-items: center; gap: 0.55rem; min-height: 2.4rem; padding: 0.35rem 0.9rem; background: #184b58; color: #f5f8f7; font: 600 0.85rem 'Be Vietnam Pro', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; } .ds-mark { width: 1.3rem; height: 1.3rem; color: #c6e8de; } .ds-window-meta { font-weight: 500; color: #c4d1d1; } .ds-window-controls { width: 4.6rem; height: 0.7rem; margin-left: auto; fill: none; stroke: currentColor; stroke-width: 1.3; } .ds-window-body { aspect-ratio: 16 / 9; }"
+    },
+    {
+      "name": "Taskbar",
+      "kind": "nav",
+      "refersTo": "taskbar",
+      "description": "Closes the home desk; centred project links with a mint open-app bar, the cat walks on its top edge.",
+      "html": "<nav class=\"ds-taskbar\"><a href=\"#\">Pet Desktop</a><a href=\"#\">PageSpeed-Auth-Auditor</a></nav>",
+      "css": ".ds-taskbar { display: flex; justify-content: center; gap: 0.25rem; padding: 0.4rem 1rem; background: #184b58; font: 500 0.85rem 'Be Vietnam Pro', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; } .ds-taskbar a { position: relative; padding: 0.55rem 0.9rem; border-radius: 0.4rem; color: #f5f8f7; text-decoration: none; } .ds-taskbar a:hover { background: rgb(255 255 255 / 0.1); } .ds-taskbar a:focus-visible { outline: 3px solid #c6e8de; outline-offset: -2px; } .ds-taskbar a::after { content: ''; position: absolute; bottom: 2px; left: 50%; width: 1rem; height: 3px; translate: -50% 0; border-radius: 2px; background: #c6e8de; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Feedback, comment and sign-in fields.",
+      "html": "<input class=\"ds-input\" placeholder=\"Email\" />",
+      "css": ".ds-input { width: 280px; padding: 0.65rem 0.8rem; background: #fff; color: #184b58; border: 1px solid #496570; border-radius: 0.5rem; font: 400 1rem 'Be Vietnam Pro', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; } .ds-input:focus-visible { outline: 3px solid #184b58; outline-offset: 2px; }"
+    },
+    {
+      "name": "Version Status",
+      "kind": "chip",
+      "refersTo": "status-badge",
+      "description": "Release status beside a version number.",
+      "html": "<span class=\"ds-status\">Đã phát hành</span>",
+      "css": ".ds-status { display: inline-block; padding: 0.2rem 0.7rem; background: #e3dff3; color: #184b58; border-radius: 0.4rem; font: 400 0.9rem 'Be Vietnam Pro', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Cat's Desktop",
+    "overview": "ChiloLab is the owner's Windows desktop, and the ChiloLab cat lives on it. Both products are Windows apps and the brand mark is a window with cat ears, so the site borrows the vocabulary of a real desktop: products open as app windows with a title bar and minimise/maximise/close glyphs, the home hero is a desk surface, and a centred Windows 11-style taskbar closes it with the cat walking along its top edge, exactly as Pet Desktop sits on a real taskbar. That taskbar moment is the one bold element. Everything around it stays quiet, so the real screenshots carry the page.\n\nComponents are clear and firm, like a real desktop app: a confident ink outline, heavy headings, shadows only where a window lifts off the desk. The system was chosen on 2026-11-25 after the owner found the earlier scaffold looked generated; the anti-reference is that generic kit (icon tiles, tag chips, an icon beside every line, identical left/right section headings, decorative gradients).\n\nDistinctiveness comes from real product assets, never from invented visuals: screenshots stay uncropped, development captures carry a visible preview caption, and the Auditor never shows invented performance scores. The concept drawings in `ProjectVisual.astro` are fallbacks and must never be presented as the actual app artwork. All body text is left aligned, and all content stays usable with JavaScript disabled.",
+    "keyCharacteristics": [
+      "Real product media always sits inside an app window.",
+      "One signature moment: the desk, the taskbar and the walking cat.",
+      "Heavy, tight headings; plain, readable body; no decoration standing in for content.",
+      "Cool teal-ink palette with three soft tints reserved for product surfaces and labels.",
+      "Personality from the cat and the owner's first-person voice."
+    ],
+    "rules": [
+      {
+        "name": "The One Ink Rule",
+        "body": "Text, actions and chrome all use Desk Ink. There is no second accent colour for links or buttons.",
+        "section": "colors"
+      },
+      {
+        "name": "The Tints Belong to Products Rule",
+        "body": "Mint, lavender and apricot mark a product surface, a status or a kind of entry. They are never used as decorative tiles behind icons.",
+        "section": "colors"
+      },
+      {
+        "name": "The Browser Surfaces Rule",
+        "body": "Selection, caret, scrollbar and accent colour take their colours from the palette (mint selection, ink caret and accent).",
+        "section": "colors"
+      },
+      {
+        "name": "The No Eyebrow Rule",
+        "body": "Headings have no labels above them, no all-caps kickers and no single highlighted word.",
+        "section": "typography"
+      },
+      {
+        "name": "The Stacked Heading Rule",
+        "body": "A section heading sits above its short muted note, never split left and right.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tight Tracking Rule",
+        "body": "Headings track at -0.03em; nothing goes tighter than -0.04em.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lift Means Window Rule",
+        "body": "Only windows (and the polaroid that sits on one) cast a shadow. Rows, lists and sections do not.",
+        "section": "elevation"
+      },
+      {
+        "name": "The No Hard Shadow Rule",
+        "body": "No zero-blur offset shadows, no coloured halos.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do put every real product screenshot or video inside an app window with its title bar.",
+      "Do keep screenshots uncropped, served as responsive WebP through Astro, with a visible development-preview caption where it applies.",
+      "Do keep motion to the logo blink, the brand-frame ear reveal and the walking cat, all stopped under reduced motion.",
+      "Do keep visible keyboard focus, the skip link, default cursors and native scrolling.",
+      "Do write stacks and skills as plain text and facts as plain text separated by thin rules."
+    ],
+    "donts": [
+      "Don't add tinted icon tiles, tag chips, or icons beside facts, headings, general buttons or footer links.",
+      "Don't add eyebrow labels, arrow glyphs on links, or middle-dot meta strings.",
+      "Don't add invented performance scores to Auditor visuals or imply the concept pet is the real app artwork.",
+      "Don't draw macOS window dots; these are Windows apps.",
+      "Don't add a shadow to anything that is not a window.",
+      "Don't use the admin palette (dark surfaces, amber) on visitor pages, except the owner bar."
+    ]
+  }
+}
