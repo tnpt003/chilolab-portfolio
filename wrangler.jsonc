@@ -43,9 +43,8 @@
   // Daily upkeep at 19:00 UTC (02:00 Vietnam): cleanup, and on Sundays UTC a
   // D1 backup to R2 (worker/maintenance.ts).
   "triggers": { "crons": ["0 19 * * *"] },
-  // Weekly D1 backups. Enable after creating the private bucket
-  // (docs/DATABASE.md, "Backup tự động"); until then backups are skipped.
-  // "r2_buckets": [{ "binding": "BACKUPS", "bucket_name": "chilolab-backups" }],
+  // Weekly D1 backups: private bucket, created 2026-11-26 (docs/DATABASE.md).
+  "r2_buckets": [{ "binding": "BACKUPS", "bucket_name": "chilolab-backups" }],
   // Workers AI: comment moderation (worker/moderation.ts). Free daily quota.
   "ai": { "binding": "AI" },
   // Loose per-user / per-IP write limit for comments and feedback.

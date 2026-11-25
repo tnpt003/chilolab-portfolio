@@ -129,7 +129,7 @@ Worker chạy `worker/maintenance.ts` mỗi ngày lúc 19:00 UTC (02:00 giờ Vi
 - **Dọn dữ liệu (mỗi ngày):** xóa phiên đăng nhập hết hạn, phiên owner quá 7 ngày, mã email hết hạn và nhật ký quản trị quá một năm.
 - **Backup (mỗi Chủ nhật UTC, tức sáng thứ Hai giờ Việt Nam):** chép mọi bảng trừ `sessions` và `email_codes` thành một file JSON nén `d1/chilolab-YYYY-MM-DD.json.gz` trong bucket R2 riêng tư `chilolab-backups`, giữ 12 bản gần nhất (khoảng 3 tháng). Chưa gắn bucket thì bước này tự bỏ qua.
 
-### Bật backup tự động (một lần)
+### Bật backup tự động (một lần; đã làm 2026-11-26)
 
 1. Cloudflare dashboard → **R2** → bật R2. Gói miễn phí: 10 GB lưu trữ; Cloudflare có thể yêu cầu thêm phương thức thanh toán khi bật R2, dù không vượt mức miễn phí thì không bị tính tiền.
 2. Tạo bucket riêng tư: `npx wrangler r2 bucket create chilolab-backups`. Không bật public access cho bucket này.
