@@ -7,6 +7,7 @@ kind: pet
 order: 1
 stack: ['C#', 'WPF', '.NET 10', 'Python']
 featuredVersion: '1.5.2'
+downloadNote: Lần đầu chạy bộ cài, Windows có thể báo "Windows protected your PC" vì bộ cài chưa được ký số. Bấm More info → Run anyway là cài được. Không cần quyền admin.
 preview:
   image: ../../../assets/pet-battle-hub.png
   alt: Giao diện chọn chế độ phiêu lưu và chiến đấu trong Pet Desktop.
@@ -33,10 +34,6 @@ Pet Desktop đưa chú mèo Chilo lên desktop Windows của bạn. Mèo tự đ
 
 Chế độ chiến đấu là phần thêm, chơi hay không tùy bạn: desktop biến thành nơi phiêu lưu với slime, kỹ năng và trang bị. Không đánh nhau thì mèo vẫn ở đó làm bạn với bạn trên desktop.
 
-## Công nghệ
-
-Mình viết Pet Desktop bằng C# / WPF trên .NET 10, kèm một dịch vụ hành vi bằng Python (không bắt buộc). Chuyển động, tương tác, hoạt ảnh và chiến đấu đều chạy bằng C#, nên dịch vụ Python có tắt thì mèo vẫn hoạt động bình thường.
-
 ## Cài đặt
 
 1. Tải bộ cài `PetComputer-win-Setup.exe` ở nút phía trên rồi chạy; không cần quyền admin.
@@ -44,3 +41,7 @@ Mình viết Pet Desktop bằng C# / WPF trên .NET 10, kèm một dịch vụ h
 3. Mèo tự mở ra. Bản đã cài tự cập nhật, nên không cần tải lại khi có bản mới.
 
 Bản Portable (.zip) dành cho người muốn chạy từ thư mục mà không cài đặt.
+
+## Công nghệ
+
+Mình viết Pet Desktop bằng C# / WPF trên .NET 10, kèm một dịch vụ hành vi bằng Python (không bắt buộc). Chuyển động, tương tác, hoạt ảnh và chiến đấu đều chạy bằng C#, nên dịch vụ Python có tắt thì mèo vẫn hoạt động bình thường.

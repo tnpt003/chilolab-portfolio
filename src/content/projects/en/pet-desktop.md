@@ -7,6 +7,7 @@ kind: pet
 order: 1
 stack: ['C#', 'WPF', '.NET 10', 'Python']
 featuredVersion: '1.5.2'
+downloadNote: The first time you run the installer, Windows may say "Windows protected your PC" because it is not code-signed yet. Click More info → Run anyway to install. No admin rights needed.
 preview:
   image: ../../../assets/pet-battle-hub.png
   alt: Pet Desktop interface for choosing adventure and battle modes.
@@ -33,10 +34,6 @@ Pet Desktop puts Chilo the cat on your Windows desktop. It wanders around, goes 
 
 Battle Mode is an extra you can take or leave: your desktop turns into an adventure with slimes, skills and gear. Outside battles, the cat simply keeps you company.
 
-## Technology
-
-I built Pet Desktop with C# / WPF on .NET 10, plus an optional Python behavior service. Movement, input, animation and battles all run in C#, so the cat works just fine without the Python service.
-
 ## Installing
 
 1. Download `PetComputer-win-Setup.exe` with the button above and run it; no admin rights needed.
@@ -44,3 +41,7 @@ I built Pet Desktop with C# / WPF on .NET 10, plus an optional Python behavior s
 3. The cat opens by itself. Installed copies update themselves, so there's no need to download again for new versions.
 
 The Portable build (.zip) is for running from a folder without installing.
+
+## Technology
+
+I built Pet Desktop with C# / WPF on .NET 10, plus an optional Python behavior service. Movement, input, animation and battles all run in C#, so the cat works just fine without the Python service.

@@ -85,6 +85,13 @@
 .download-panel .actions {
   margin-top: 0;
 }
+.download-note {
+  flex-basis: 100%;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.9rem;
+  color: var(--muted);
+}
 .download-release {
   display: flex;
   flex-wrap: wrap;

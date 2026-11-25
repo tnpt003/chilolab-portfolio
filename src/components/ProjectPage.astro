@@ -88,6 +88,7 @@ const poster =
           </a>
           <a href={feedbackPath(data.locale, data.slug)}>{v.feedback}</a>
         </div>
+        {data.downloadNote && <p class="download-note">{data.downloadNote}</p>}
       </section>
     ) : null}
     {/* The video poster is the same screenshot; show it only once. */}

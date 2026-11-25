@@ -117,9 +117,15 @@ test('version history navigation preserves version and release status', async ({
   await page.goto('/pet-desktop');
   const panel = page.locator('.download-panel');
   await expect(panel.getByRole('heading', { name: 'Tải xuống' })).toBeVisible();
+  // The button always fetches the newest GitHub release.
   await expect(
-    panel.getByRole('link', { name: 'Tải Pet Desktop 1.5.0 cho Windows' }),
-  ).toHaveAttribute('href', /\/releases\/download\/v1\.5\.0\/[^/]+Setup\.exe$/);
+    panel.getByRole('link', {
+      name: 'Tải Pet Desktop bản mới nhất cho Windows',
+    }),
+  ).toHaveAttribute(
+    'href',
+    /\/releases\/latest\/download\/PetComputer-win-Setup\.exe$/,
+  );
   await page
     .locator('.version-section')
     .getByRole('link', { name: 'Tất cả phiên bản' })
@@ -131,9 +137,10 @@ test('version history navigation preserves version and release status', async ({
   await expect(page).toHaveURL(/\/versions\/1\.5\.0$/);
   await expect(page.locator('.version-status')).toHaveText('Đã phát hành');
   await expect(page.locator('.version-notice')).toHaveCount(0);
+  // Binaries before 1.5.2 are no longer published, so no download here.
   await expect(
     page.getByRole('link', { name: 'Tải phiên bản này', exact: true }),
-  ).toHaveAttribute('href', /\/download\/v1\.5\.0\//);
+  ).toHaveCount(0);
   await page.getByRole('link', { name: 'English', exact: true }).click();
   await expect(page).toHaveURL(/\/en\/pet-desktop\/versions\/1\.5\.0$/);
   await expect(page.locator('.version-status')).toHaveText('Released');

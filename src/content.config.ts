@@ -30,6 +30,8 @@ const projects = defineCollection({
         .string()
         .regex(/^\/media\/[a-z0-9-]+\.mp4$/)
         .optional(),
+      // One short line under the Download button (e.g. SmartScreen).
+      downloadNote: z.string().min(1).optional(),
       // What the video is: length, sound, which build. Shown under it.
       videoCaption: z.string().min(1).optional(),
       // Real app captures, shown as a grid under the video.
