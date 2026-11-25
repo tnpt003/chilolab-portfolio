@@ -1178,7 +1178,40 @@ ${formStart(safeBack)}<input type="hidden" name="confirmed" value="1">${
       done.length === 1 ? done[0]! : `${done.length} mục`,
       done.length === 1 ? '' : done.join('; '),
     );
-  return redirect(backTo(back, done.length ? opName : 'unchanged'), 303);
+  return redirect(
+    backTo(
+      await landing(env, back, opName, ids),
+      done.length ? opName : 'unchanged',
+    ),
+    303,
+  );
+}
+
+/** Which detail page an operation can make disappear. */
+const removes: Record<string, 'comments' | 'users'> = {
+  remove: 'comments',
+  'user-delete': 'users',
+};
+
+/**
+ * After an operation, return to the page it came from, unless that page was
+ * the detail of a record that is now gone: then go to its list, not a 404.
+ */
+async function landing(env: Env, back: unknown, opName: string, ids: number[]) {
+  const raw = typeof back === 'string' ? back : '';
+  const detail = /^\/admin\/manage\/(comments|users)\/(\d{1,12})(?:\?|$)/.exec(
+    raw,
+  );
+  if (!detail) return back;
+  const kind = detail[1] as 'comments' | 'users';
+  const id = Number(detail[2]);
+  const list = `/admin/manage/${kind}`;
+  if (removes[opName] === kind && ids.includes(id)) return list;
+  // Removing a reply can also prune the thread being viewed.
+  const still = await env.DB.prepare(`SELECT 1 FROM ${kind} WHERE id = ?`)
+    .bind(id)
+    .first();
+  return still ? back : list;
 }
 
 // ---------- routing ----------
@@ -1274,7 +1307,15 @@ export async function manage(
     console.error('manage page', path, error);
     content = `<h1>${escape(entry[0])}</h1><div class="notice danger"><p>Không tải được trang này. Nếu vừa cập nhật code, có thể database chưa chạy migration mới: <code>npm run db:migrate:remote</code>. Xem <a href="/admin/manage/status">Tình trạng dịch vụ</a>.</p></div>`;
   }
-  if (content === null) return notFound();
+  if (content === null) {
+    if (!detail) return notFound();
+    // A stale link to a removed comment or a deleted account.
+    const page = await render(
+      entry[0],
+      `<h1>Không tìm thấy</h1><p class="intro">Mục này không còn: đã bị gỡ hoặc xóa.</p><p><a class="button-link" href="/admin/manage/${detail[1]}">← Về danh sách</a></p>`,
+    );
+    return new Response(page.body, { status: 404, headers: page.headers });
+  }
 
   const code = url.searchParams.get('notice') ?? '';
   const notice = notices[code]
