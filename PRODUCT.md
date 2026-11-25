@@ -1,6 +1,57 @@
 # ChiloLab
 
+<!-- impeccable:product-schema 1 -->
+
 A personal portfolio and product showcase, owned by Nguyễn Tấn Phát.
+
+## Platform
+
+web
+
+## Users
+
+Two audiences of equal weight (owner's answer, 2026-11-25):
+
+- Recruiters and QA/BA leads assessing the owner as a candidate: they read the role-first homepage, the About page and the projects as proof of work.
+- Windows users of Pet Desktop: they come to download the app, read version notes and leave comments or feedback.
+
+Neither audience is secondary; a page that serves one must not get in the way of the other.
+
+## Product Purpose
+
+ChiloLab is where the owner, a BA/QC by trade, publishes software the owner builds. It doubles as the owner's CV portfolio and as the release home for those apps. Success: a recruiter leaves understanding what the owner does and that the projects are real, and a Pet Desktop user finds the current download, its notes and a place to report problems.
+
+## Positioning
+
+What a neighbouring IT portfolio cannot truthfully copy (owner's answer, 2026-11-25):
+
+- Real products with real users: released Windows apps, versioned notes and a live public download count, not coursework.
+- A QA's view of building: quality, release notes and fixes driven by feedback are part of the product.
+- Transparent, never inflated: previews are labelled as previews, status comes from the version notes, and no scores, features or testimonials are invented.
+- A small, friendly lab with personality: the ChiloLab cat is the mascot.
+
+## Operating Context
+
+Visitors arrive from links (CV, GitHub, social previews) and from Pet Desktop itself, whose EULA links to /privacy. The site is bilingual; Vietnamese is the default. Signing in (Google or a 6-digit email code) is needed only to comment or send feedback. The owner moderates from `/admin/manage`.
+
+## Evidence on Hand
+
+- Pet Desktop: real 1.5 development-preview captures (`src/assets/pet-battle-hub.png`, `src/assets/pet-on-desktop.png`) and a silent 32-second intro video (`public/media/pet-intro.mp4`); version notes in `src/content/versions/`; live GitHub download counts.
+- PageSpeed-Auth-Auditor: one real main-screen capture from its user guide (`src/assets/auditor-main-screen.png`). No public downloads or source.
+- Owner: real portrait (`src/assets/phat-portrait.jpg`) and the biography in `src/lib/profile.ts`.
+- Absent, never to be fabricated: testimonials, client names (NDA), TOEIC score (pending from the owner), Auditor performance scores, any download or repository URL not listed under Content integrity.
+
+## Product Principles
+
+1. Show the real thing: real screenshots, real status, real counts; label anything provisional.
+2. Serve both audiences on every page: the candidate story and the product release story stay findable within seconds.
+3. Releases are honest records: a version post never promises a feature or a download that does not exist.
+4. Friendly, not flashy: personality comes from the cat and the owner's own voice, not from decoration.
+5. Free-first and owner-controlled: no paid services or account-dependent integrations without an explicit decision.
+
+## Accessibility & Inclusion
+
+WCAG 2.1 AA (owner's choice, 2026-11-25), checked by axe in the browser tests: keyboard focus, a skip link, reduced-motion support, and all content available without JavaScript. Vietnamese diacritics must render correctly in every typeface used.
 
 ## Confirmed
 

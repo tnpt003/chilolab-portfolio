@@ -21,7 +21,7 @@ Source of truth: `src/styles/tokens.css`.
 - Mint `#C6E8DE`: pet illustration surface.
 - Lavender `#E3DFF3`: auditor illustration surface.
 - Apricot `#FFBD8D`: a small accent in the homepage illustration.
-- Type: Be Vietnam Pro (SIL OFL, self-hosted through `@fontsource/be-vietnam-pro`, weights 400/500/700) with the system stack as fallback. Chosen because it was designed for Vietnamese diacritics. No external font requests. Heading tracking stays at -0.03em. Weights 400/500/700/800; h1, h2 and project titles use 800. Body is 1.0625rem.
+- Type: Be Vietnam Pro (SIL OFL, self-hosted through the Fontsource npm package for Be Vietnam Pro, weights 400/500/700) with the system stack as fallback. Chosen because it was designed for Vietnamese diacritics. No external font requests. Heading tracking stays at -0.03em. Weights 400/500/700/800; h1, h2 and project titles use 800. Body is 1.0625rem.
 - Brand mark: a desktop window with cat ears and two eyes (small Windows software; the cat that lives on the screen). Ink on paper, drawn in `src/components/Logo.astro` and mirrored in `public/favicon.svg`; keep both in sync. Its eyes carry `class="eye"` and blink every few seconds (CSS only).
 - Icons: inline stroke SVGs in `src/components/Icon.astro` (24px grid, 1.8 stroke, currentColor, aria-hidden). No icon library. Icons sit beside text, never replace it. Use them sparingly: the taskbar, the primary download button, comments and account UI. Not in facts, section headings, buttons generally or footer links.
 - No tinted icon tiles and no tag chips: stacks and skills are plain comma-separated text.
