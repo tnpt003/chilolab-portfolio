@@ -344,6 +344,31 @@ collections:
         widget: string
         required: false
         hint: Một câu ngắn, ví dụ cách vượt cảnh báo SmartScreen.
+      - label: Các bước cài đặt
+        name: install
+        widget: list
+        required: false
+        hint: Hiện thành thẻ có icon. Dùng **chữ đậm** cho tên nút, `chữ code` cho tên file.
+        fields:
+          - label: Icon
+            name: icon
+            widget: select
+            options:
+              [
+                download,
+                archive,
+                shield,
+                cat,
+                folder,
+                sparkle,
+                history,
+                message,
+                user,
+                login,
+                image,
+              ]
+          - { label: Tiêu đề, name: title, widget: string }
+          - { label: Nội dung, name: text, widget: text }
       - { label: Nội dung, name: body, widget: markdown }
 
   - name: projects_en
@@ -435,4 +460,29 @@ collections:
         widget: string
         required: false
         hint: One short sentence, for example how to get past SmartScreen.
+      - label: Install steps
+        name: install
+        widget: list
+        required: false
+        hint: Shown as icon cards. Use **bold** for button names and `code` for file names.
+        fields:
+          - label: Icon
+            name: icon
+            widget: select
+            options:
+              [
+                download,
+                archive,
+                shield,
+                cat,
+                folder,
+                sparkle,
+                history,
+                message,
+                user,
+                login,
+                image,
+              ]
+          - { label: Title, name: title, widget: string }
+          - { label: Text, name: text, widget: text }
       - { label: Body, name: body, widget: markdown }

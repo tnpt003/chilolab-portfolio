@@ -86,6 +86,9 @@
   margin-top: 0;
 }
 .download-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
   flex-basis: 100%;
   padding-top: 0.9rem;
   border-top: 1px solid var(--line);
@@ -2220,4 +2223,42 @@ a:has(> .icon),
 }
 .detail-body.with-versions .version-section h2 {
   font-size: 2rem;
+}
+
+/* Install guide on project pages: the About pipeline, with icons. */
+.install {
+  margin-top: 3.5rem;
+}
+.install h2 {
+  margin-bottom: 1.5rem;
+  font-size: 2rem;
+}
+.install-icon {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  background: var(--mint);
+  color: var(--ink);
+}
+.install-steps li:nth-child(2) .install-icon {
+  background: var(--lavender);
+}
+.install-steps li:nth-child(3) .install-icon {
+  background: var(--apricot);
+}
+.install-steps li:nth-child(4) .install-icon {
+  background: var(--ink);
+  color: var(--paper);
+}
+.install-number {
+  color: var(--muted);
+}
+.install-steps p strong {
+  color: var(--ink);
+}
+.install-steps code {
+  font-size: 0.85em;
+  overflow-wrap: anywhere;
 }

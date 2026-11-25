@@ -32,6 +32,28 @@ const projects = defineCollection({
         .optional(),
       // One short line under the Download button (e.g. SmartScreen).
       downloadNote: z.string().min(1).optional(),
+      // Install guide shown as icon cards; **bold** marks button names.
+      install: z
+        .array(
+          z.object({
+            icon: z.enum([
+              'download',
+              'archive',
+              'shield',
+              'cat',
+              'folder',
+              'sparkle',
+              'history',
+              'message',
+              'user',
+              'login',
+              'image',
+            ]),
+            title: z.string().min(1),
+            text: z.string().min(1),
+          }),
+        )
+        .default([]),
       // What the video is: length, sound, which build. Shown under it.
       videoCaption: z.string().min(1).optional(),
       // Real app captures, shown as a grid under the video.

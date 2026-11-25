@@ -6,6 +6,7 @@ import ProjectVisual from './ProjectVisual.astro';
 import Icon from './Icon.astro';
 import WindowBar from './WindowBar.astro';
 import Gallery from './Gallery.astro';
+import InstallSteps from './InstallSteps.astro';
 import { copy, pathFor } from '../lib/content';
 import {
   alwaysLatest,
@@ -80,15 +81,32 @@ const poster =
               href={alwaysLatest(latest.portableUrl)}
               data-download={`${data.slug}/${latest.version}/portable`}
             >
+              <Icon name="archive" />
               {v.portable}
             </a>
           )}
           <a href={versionPath(data.locale, data.slug, latest.version)}>
+            <Icon name="history" />
             {v.latestNotes}
           </a>
-          <a href={feedbackPath(data.locale, data.slug)}>{v.feedback}</a>
+          <a href={feedbackPath(data.locale, data.slug)}>
+            <Icon name="message" />
+            {v.feedback}
+          </a>
         </div>
-        {data.downloadNote && <p class="download-note">{data.downloadNote}</p>}
+        {data.downloadNote && (
+          <p class="download-note">
+            <Icon name="shield" />
+            <span>
+              {data.downloadNote}{' '}
+              {data.install.length > 0 && (
+                <a href="#install-heading">
+                  {data.locale === 'vi' ? 'Xem từng bước' : 'See each step'}
+                </a>
+              )}
+            </span>
+          </p>
+        )}
       </section>
     ) : null}
     {/* The video poster is the same screenshot; show it only once. */}
@@ -128,6 +146,9 @@ const poster =
     )}
     {data.gallery.length > 0 && (
       <Gallery shots={data.gallery} locale={data.locale} />
+    )}
+    {data.install.length > 0 && (
+      <InstallSteps steps={data.install} locale={data.locale} />
     )}
     {/* Without side links, the versions sit beside the text so the
         readable column does not leave the right side empty. */}

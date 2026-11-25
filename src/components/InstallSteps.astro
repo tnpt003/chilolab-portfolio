@@ -1,0 +1,43 @@
+---
+import Icon, { type IconName } from './Icon.astro';
+
+interface Props {
+  steps: { icon: IconName; title: string; text: string }[];
+  locale: 'vi' | 'en';
+}
+const { steps, locale } = Astro.props;
+const vi = locale === 'vi';
+
+// Step text is plain, with **bold** for button names and `code` for files.
+const escape = (value: string) =>
+  value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;');
+const format = (value: string) =>
+  escape(value)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/`(.+?)`/g, '<code>$1</code>');
+---
+
+<section class="install" aria-labelledby="install-heading">
+  <h2 id="install-heading">
+    {vi
+      ? `Cài đặt trong ${steps.length} bước`
+      : `Install in ${steps.length} steps`}
+  </h2>
+  <ol class="steps install-steps">
+    {steps.map((step, index) => (
+      <li>
+        <span class="install-icon">
+          <Icon name={step.icon} size={26} />
+        </span>
+        <h3>
+          <span class="install-number">{index + 1}.</span> {step.title}
+        </h3>
+        <p set:html={format(step.text)} />
+      </li>
+    ))}
+  </ol>
+</section>
