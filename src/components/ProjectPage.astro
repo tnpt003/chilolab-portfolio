@@ -128,7 +128,9 @@ const poster =
     {data.gallery.length > 0 && (
       <Gallery shots={data.gallery} locale={data.locale} />
     )}
-    <div class:list={['detail-body', { single: !hasLinks }]}>
+    {/* Without side links, the versions sit beside the text so the
+        readable column does not leave the right side empty. */}
+    <div class:list={['detail-body', { 'with-versions': !hasLinks }]}>
       {hasLinks && (
         <aside class="notice">
           <div class="actions">
@@ -144,14 +146,25 @@ const poster =
       <article class="prose">
         <Content />
       </article>
+      {!hasLinks && (
+        <section class="version-section" aria-labelledby="version-heading">
+          <div class="section-heading">
+            <h2 id="version-heading">{v.heading}</h2>
+            <a href={versionPath(data.locale, data.slug)}>{v.all}</a>
+          </div>
+          <VersionList entries={versions.slice(0, 3)} locale={data.locale} />
+        </section>
+      )}
     </div>
-    <section class="version-section" aria-labelledby="version-heading">
-      <div class="section-heading">
-        <h2 id="version-heading">{v.heading}</h2>
-        <a href={versionPath(data.locale, data.slug)}>{v.all}</a>
-      </div>
-      <VersionList entries={versions.slice(0, 3)} locale={data.locale} />
-    </section>
+    {hasLinks && (
+      <section class="version-section" aria-labelledby="version-heading">
+        <div class="section-heading">
+          <h2 id="version-heading">{v.heading}</h2>
+          <a href={versionPath(data.locale, data.slug)}>{v.all}</a>
+        </div>
+        <VersionList entries={versions.slice(0, 3)} locale={data.locale} />
+      </section>
+    )}
     <Comments locale={data.locale} project={data.slug} />
   </div>
   <DownloadCounter />

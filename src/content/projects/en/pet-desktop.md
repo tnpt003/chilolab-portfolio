@@ -12,7 +12,6 @@ preview:
   alt: Pet Desktop interface for choosing adventure and battle modes.
   caption: Actual application screenshot — development preview for 1.5; releases may differ.
 video: /media/pet-promo.mp4
-videoCaption: 1 minute 44 second promo video, with music. Recorded in the real app; published releases may differ slightly.
 gallery:
   - image: ../../../assets/pet-gallery/fishing.png
     alt: Chilo the cat fishing at a small pond in the corner of the desktop.

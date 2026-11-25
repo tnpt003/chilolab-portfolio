@@ -65,9 +65,7 @@ interface Profile {
   emailMe: string;
   seeProjects: string;
   github: string;
-  portraitCaption: string;
   petAlt: string;
-  petCaption: string;
   experienceTitle: string;
   role: string;
   company: string;
@@ -121,10 +119,8 @@ export const profile: Record<Locale, Profile> = {
     emailMe: 'Gửi email cho mình',
     seeProjects: 'Xem các dự án',
     github: 'GitHub',
-    portraitCaption: 'Nguyễn Tấn Phát',
     petAlt:
       'Chú mèo đội mũ phù thủy của Pet Desktop ngồi ở mép dưới màn hình Windows, cạnh một con slime xanh.',
-    petCaption: 'Pet Desktop trên máy mình, ảnh chụp thật',
     experienceTitle: 'Kinh nghiệm',
     role: 'BA/QC',
     company: 'WeebPal',
@@ -271,10 +267,8 @@ export const profile: Record<Locale, Profile> = {
     emailMe: 'Email me',
     seeProjects: 'See my projects',
     github: 'GitHub',
-    portraitCaption: 'Nguyễn Tấn Phát',
     petAlt:
       'The Pet Desktop cat in a wizard hat sitting on the bottom edge of a Windows screen, next to a green slime.',
-    petCaption: 'Pet Desktop on my screen, an actual capture',
     experienceTitle: 'Experience',
     role: 'BA/QC',
     company: 'WeebPal',

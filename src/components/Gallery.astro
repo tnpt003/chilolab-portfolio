@@ -40,11 +40,6 @@ const items = await Promise.all(
       </li>
     ))}
   </ul>
-  <p class="gallery-note">
-    {vi
-      ? 'Cắt từ video giới thiệu, quay ứng dụng thật. Bấm ảnh để xem lớn.'
-      : 'Cropped from the promo video, recorded in the real app. Select a picture to see it larger.'}
-  </p>
   <dialog class="lightbox" aria-label={vi ? 'Xem ảnh lớn' : 'Picture viewer'}>
     <figure>
       <img alt="" />

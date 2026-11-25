@@ -12,7 +12,6 @@ preview:
   alt: Giao diện chọn chế độ phiêu lưu và chiến đấu trong Pet Desktop.
   caption: Ảnh ứng dụng thật — bản phát triển 1.5, có thể khác bản phát hành.
 video: /media/pet-promo.mp4
-videoCaption: Video giới thiệu 1 phút 44 giây, có nhạc. Quay từ ứng dụng thật; bản phát hành có thể khác đôi chút.
 gallery:
   - image: ../../../assets/pet-gallery/fishing.png
     alt: Mèo Chilo ngồi câu cá bên hồ nhỏ ở góc desktop.
