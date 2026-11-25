@@ -67,7 +67,7 @@ Trang dự án Pet Desktop và trang chủ hiện số lượt tải, lấy từ
 - `/admin/manage` chỉ mở khi có phiên đăng nhập của tài khoản `role = 'owner'` (hoặc `ADMIN_DEV_BYPASS=1` trên localhost). Ngoài ra luôn từ chối. Cloudflare Access đã bỏ ngày 2026-11-25. Mọi thao tác ghi là form POST cùng origin; trang không có JavaScript.
 - Ai chiếm được hộp thư hoặc tài khoản Google của owner sẽ vào được trang quản trị: bật xác minh 2 bước cho cả hai. Đây là lớp khóa duy nhất từ khi bỏ Cloudflare Access.
 - Mọi request ghi phải cùng origin; body ≤ 16 KB; nội dung luôn hiển thị dạng text.
-- Phiên: cookie `__Host-chilolab_session` (HttpOnly, Secure, SameSite=Lax, 30 ngày); D1 chỉ giữ SHA-256 của token.
+- Phiên: cookie `__Host-chilolab_session` (HttpOnly, Secure, SameSite=Lax); D1 chỉ giữ SHA-256 của token. Khách: 30 ngày. Owner: 7 ngày (`OWNER_DAYS` trong `worker/session.ts`), tính từ lúc đăng nhập và kiểm ở mỗi request, nên cả phiên owner cũ hơn 7 ngày cũng hết hiệu lực; hết hạn thì đăng nhập lại ở `/user/login`.
 - Google: OAuth code flow + PKCE + `state`; kiểm `iss`, `aud`, `exp`, `email_verified`.
 - `WRITE_LIMIT`: 10 lần ghi/phút mỗi tài khoản hoặc IP (bộ lọc thô). Góp ý ẩn danh còn có Turnstile.
 - Không có mật khẩu: khách đăng nhập bằng Google hoặc mã 6 số qua email. (Băm mật khẩu đủ mạnh vượt giới hạn 10 ms CPU của gói Free.) Cột `users.password_hash` để trống.
