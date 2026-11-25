@@ -4,14 +4,14 @@ Thiết lập Cloudflare, Google, Resend, Email Routing từng bước: [SETUP-C
 
 Nội dung do chủ site viết (dự án, phiên bản) vẫn là Markdown và sửa qua CMS ([CMS.md](CMS.md)). D1 chỉ chứa dữ liệu **khách truy cập** tạo ra:
 
-| Tính năng                | Bảng                | Ở đâu                                                    |
-| ------------------------ | ------------------- | -------------------------------------------------------- |
-| Tài khoản khách (Google) | `users`, `sessions` | `/user/login`, `/user/account` (`/user` → `/user/login`) |
-| Bình luận theo luồng     | `comments`          | Mỗi trang phiên bản; trang dự án gộp tất cả              |
-| Góp ý / báo lỗi          | `feedback`          | `/<dự-án>/feedback`; đọc ở `/manage/feedback`            |
-| Lượt bấm tải             | `downloads`         | Chỉ ở `/manage/downloads`; một bộ đếm mỗi file mỗi ngày  |
-| Nhật ký quản trị         | `admin_log`         | `/manage/log` (chỉ chủ site)                             |
-| Cài đặt site             | `settings`          | `/manage/settings` (chỉ chủ site)                        |
+| Tính năng                | Bảng                | Ở đâu                                                         |
+| ------------------------ | ------------------- | ------------------------------------------------------------- |
+| Tài khoản khách (Google) | `users`, `sessions` | `/user/login`, `/user/account` (`/user` → `/user/login`)      |
+| Bình luận theo luồng     | `comments`          | Mỗi trang phiên bản; trang dự án gộp tất cả                   |
+| Góp ý / báo lỗi          | `feedback`          | `/<dự-án>/feedback`; đọc ở `/admin/manage/feedback`           |
+| Lượt bấm tải             | `downloads`         | Chỉ ở `/admin/manage/downloads`; một bộ đếm mỗi file mỗi ngày |
+| Nhật ký quản trị         | `admin_log`         | `/admin/manage/log` (chỉ chủ site)                            |
+| Cài đặt site             | `settings`          | `/admin/manage/settings` (chỉ chủ site)                       |
 
 Không lưu IP, user agent hay mật khẩu Google. Chính sách công khai: `/privacy`.
 
@@ -19,10 +19,10 @@ Không lưu IP, user agent hay mật khẩu Google. Chính sách công khai: `/p
 
 - Cần đăng nhập. Trả lời một cấp; trả lời một phản hồi sẽ vào cùng luồng kèm `@tên`.
 - Trang dự án hiện bình luận của mọi phiên bản + của chính nó, có nhãn `vX.Y.Z`. 10 luồng/trang; mỗi luồng hiện 3 phản hồi, còn lại sau nút "Xem thêm".
-- Sửa: hiện nhãn "đã sửa", kiểm duyệt lại. Xóa: không có phản hồi → xóa hẳn; có phản hồi → còn dòng "đã bị xóa", nội dung bị xóa khỏi D1. Gỡ từ `/manage` → "đã bị quản trị viên gỡ".
+- Sửa: hiện nhãn "đã sửa", kiểm duyệt lại. Xóa: không có phản hồi → xóa hẳn; có phản hồi → còn dòng "đã bị xóa", nội dung bị xóa khỏi D1. Gỡ từ `/admin/manage` → "đã bị quản trị viên gỡ".
 - Xóa tài khoản: xóa phiên, tài khoản, mọi phản hồi và nội dung bình luận của người đó (theo quy tắc trên).
-- Kiểm duyệt (`worker/moderation.ts`): danh sách từ (khớp nguyên từ) rồi model `@cf/aisingapore/gemma-sea-lion-v4-27b-it` trên Workers AI. Bị gắn cờ → `held`: chỉ người viết thấy, chủ site duyệt ở `/manage`. Chê sản phẩm / báo lỗi không bị giữ. AI lỗi hoặc hết quota → vẫn hiện, gắn lý do `unchecked`.
-- Bình luận bị giữ được báo qua email cho chủ site (xem mục Email), và hiện ở `/manage`.
+- Kiểm duyệt (`worker/moderation.ts`): danh sách từ (khớp nguyên từ) rồi model `@cf/aisingapore/gemma-sea-lion-v4-27b-it` trên Workers AI. Bị gắn cờ → `held`: chỉ người viết thấy, chủ site duyệt ở `/admin/manage`. Chê sản phẩm / báo lỗi không bị giữ. AI lỗi hoặc hết quota → vẫn hiện, gắn lý do `unchecked`.
+- Bình luận bị giữ được báo qua email cho chủ site (xem mục Email), và hiện ở `/admin/manage`.
 
 ## Chủ site (owner)
 
@@ -30,25 +30,25 @@ Không lưu IP, user agent hay mật khẩu Google. Chính sách công khai: `/p
   `npx wrangler d1 execute chilolab --remote --command "UPDATE users SET role = 'owner' WHERE email = '<email>'"` (đăng nhập Google một lần trước để có tài khoản).
 - Owner có nhãn "Tác giả", không qua AI kiểm duyệt, thấy bình luận đang bị giữ ngay trong danh sách và có nút Duyệt / Gỡ cho mọi bình luận.
 
-## Trang quản trị (`/manage`)
+## Trang quản trị (`/admin/manage`)
 
-Đăng nhập ở `/user/login` bằng tài khoản owner (Google hoặc mã email) rồi mở `/manage`. Chưa đăng nhập → chuyển tới `/user/login?return=/manage`; tài khoản thường → 403.
+Đăng nhập ở `/user/login` bằng tài khoản owner (Google hoặc mã email) rồi mở `/admin/manage`. Chưa đăng nhập → chuyển tới `/user/login?return=/admin/manage`; tài khoản thường → 403. Địa chỉ cũ `/manage…` chuyển hướng 301 sang `/admin/manage…`. (`/admin` vẫn là Sveltia CMS.)
 
 Giao diện cố ý khác hẳn trang khách: nền tối, điểm nhấn hổ phách, thanh "QUẢN TRỊ" cố định, favicon và tiêu đề tab riêng (`worker/manage-ui.ts`). Khi owner xem website, một dải "Chế độ chủ site" màu hổ phách hiện trên cùng với số việc đang chờ; khách không thấy (xem mục Bảo mật).
 
-| Trang                    | Làm gì                                                                                                                     |
-| ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
-| `/manage`                | Tổng quan: việc chờ, số liệu, lượt tải GitHub, biểu đồ bấm tải 30 ngày, hoạt động quản trị gần đây                         |
-| `/manage/comments`       | Chờ duyệt / Đang hiện / Tất cả; lọc theo dự án, phiên bản, lý do, nội dung; chọn nhiều để Cho hiện / Gỡ                    |
-| `/manage/comments/<id>`  | Cả luồng bình luận; duyệt, gỡ, trả lời dưới tên owner                                                                      |
-| `/manage/feedback`       | Chưa xử lý / Đang xử lý / Đã xử lý; lọc dự án, loại; đổi trạng thái hàng loạt; ghi chú nội bộ; xóa                         |
-| `/manage/users`          | Danh sách, tìm kiếm, tab Đã khóa                                                                                           |
-| `/manage/users/<id>`     | Thông tin, bình luận, góp ý của một người; đăng xuất mọi nơi, khóa / mở khóa, xóa (không áp dụng cho owner)                |
-| `/manage/downloads`      | Lượt tải thật từ GitHub Releases và lượt bấm tải trên site (theo phiên bản, 30 ngày)                                       |
-| `/manage/settings?tab=…` | Tab Bình luận (bật/tắt, kiểm duyệt, từ chặn, độ dài tối đa, số bình luận/giờ), Góp ý, Tài khoản, Email thông báo           |
-| `/manage/log`            | Nhật ký quản trị (bảng `admin_log`): ai làm gì, lúc nào; không lưu IP; tự xóa sau một năm                                  |
-| `/manage/status`         | Dịch vụ đã cấu hình (Google, Resend, Turnstile, Access, GitHub) và migration D1 đã chạy chưa                               |
-| `/manage/export/*.csv`   | Tải CSV bình luận, góp ý, lượt bấm tải để tự backup (ô bắt đầu bằng `= + - @` được thêm `'` để Excel không chạy công thức) |
+| Trang                          | Làm gì                                                                                                                     |
+| ------------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `/admin/manage`                | Tổng quan: việc chờ, số liệu, lượt tải GitHub, biểu đồ bấm tải 30 ngày, hoạt động quản trị gần đây                         |
+| `/admin/manage/comments`       | Chờ duyệt / Đang hiện / Tất cả; lọc theo dự án, phiên bản, lý do, nội dung; chọn nhiều để Cho hiện / Gỡ                    |
+| `/admin/manage/comments/<id>`  | Cả luồng bình luận; duyệt, gỡ, trả lời dưới tên owner                                                                      |
+| `/admin/manage/feedback`       | Chưa xử lý / Đang xử lý / Đã xử lý; lọc dự án, loại; đổi trạng thái hàng loạt; ghi chú nội bộ; xóa                         |
+| `/admin/manage/users`          | Danh sách, tìm kiếm, tab Đã khóa                                                                                           |
+| `/admin/manage/users/<id>`     | Thông tin, bình luận, góp ý của một người; đăng xuất mọi nơi, khóa / mở khóa, xóa (không áp dụng cho owner)                |
+| `/admin/manage/downloads`      | Lượt tải thật từ GitHub Releases và lượt bấm tải trên site (theo phiên bản, 30 ngày)                                       |
+| `/admin/manage/settings?tab=…` | Tab Bình luận (bật/tắt, kiểm duyệt, từ chặn, độ dài tối đa, số bình luận/giờ), Góp ý, Tài khoản, Email thông báo           |
+| `/admin/manage/log`            | Nhật ký quản trị (bảng `admin_log`): ai làm gì, lúc nào; không lưu IP; tự xóa sau một năm                                  |
+| `/admin/manage/status`         | Dịch vụ đã cấu hình (Google, Resend, Turnstile, GitHub) và migration D1 đã chạy chưa                                       |
+| `/admin/manage/export/*.csv`   | Tải CSV bình luận, góp ý, lượt bấm tải để tự backup (ô bắt đầu bằng `= + - @` được thêm `'` để Excel không chạy công thức) |
 
 Thao tác xóa / gỡ / khóa luôn qua trang xác nhận liệt kê các mục bị ảnh hưởng. Thao tác hàng loạt tối đa 100 mục mỗi lần.
 
@@ -62,10 +62,10 @@ Trang dự án Pet Desktop và trang chủ hiện số lượt tải, lấy từ
 
 ## Bảo mật
 
-- Worker chỉ chạy cho `/api/*`, `/manage*`, `/user`, `/en/user`; trang khác là file tĩnh.
-- Dải "Chế độ chủ site": `/manage` và `/api/me` đặt cookie đọc được `__Host-chilolab_admin=1` cho owner; website chỉ gọi `/api/me` khi có cookie này và chỉ hiện dải khi API trả `owner: true`. Cookie không cấp quyền gì; đăng xuất hoặc tài khoản không phải owner sẽ xóa nó.
-- `/manage` mở khi: phiên đăng nhập của tài khoản `role = 'owner'`, **hoặc** JWT Cloudflare Access hợp lệ, **hoặc** `ADMIN_DEV_BYPASS=1` trên localhost. Ngoài ra luôn từ chối. Mọi thao tác ghi là form POST cùng origin; trang không có JavaScript.
-- Ai chiếm được hộp thư hoặc tài khoản Google của owner sẽ vào được `/manage`: bật xác minh 2 bước cho cả hai. Muốn thêm một lớp khóa, giữ application Cloudflare Access cho `/manage`.
+- Worker chỉ chạy cho `/api/*`, `/admin/manage*`, `/manage*` (chỉ để chuyển hướng), `/user`, `/en/user`; trang khác là file tĩnh.
+- Dải "Chế độ chủ site": `/admin/manage` và `/api/me` đặt cookie đọc được `__Host-chilolab_admin=1` cho owner; website chỉ gọi `/api/me` khi có cookie này và chỉ hiện dải khi API trả `owner: true`. Cookie không cấp quyền gì; đăng xuất hoặc tài khoản không phải owner sẽ xóa nó.
+- `/admin/manage` chỉ mở khi có phiên đăng nhập của tài khoản `role = 'owner'` (hoặc `ADMIN_DEV_BYPASS=1` trên localhost). Ngoài ra luôn từ chối. Cloudflare Access đã bỏ ngày 2026-11-25. Mọi thao tác ghi là form POST cùng origin; trang không có JavaScript.
+- Ai chiếm được hộp thư hoặc tài khoản Google của owner sẽ vào được trang quản trị: bật xác minh 2 bước cho cả hai. Đây là lớp khóa duy nhất từ khi bỏ Cloudflare Access.
 - Mọi request ghi phải cùng origin; body ≤ 16 KB; nội dung luôn hiển thị dạng text.
 - Phiên: cookie `__Host-chilolab_session` (HttpOnly, Secure, SameSite=Lax, 30 ngày); D1 chỉ giữ SHA-256 của token.
 - Google: OAuth code flow + PKCE + `state`; kiểm `iss`, `aud`, `exp`, `email_verified`.
@@ -75,7 +75,7 @@ Trang dự án Pet Desktop và trang chủ hiện số lượt tải, lấy từ
 ## Chạy trên máy
 
 ```sh
-cp .dev.vars.example .dev.vars   # Turnstile test secret + mở /manage trên localhost
+cp .dev.vars.example .dev.vars   # Turnstile test secret + mở /admin/manage trên localhost
 npm run db:migrate:local
 npm run dev:worker               # build rồi chạy Worker ở http://localhost:8787
 ```
@@ -93,7 +93,7 @@ npm run db:migrate:remote
 ## Cấu hình Cloudflare đã làm
 
 - D1 `chilolab`, `TURNSTILE_SECRET`, Turnstile site key trong `.env.production`.
-- Access cho `/manage` (team `bold-night-e762.cloudflareaccess.com`): giờ là tùy chọn; xóa application đó nếu muốn chỉ đăng nhập qua `/user/login`.
+- Cloudflare Access cho trang quản trị: đã bỏ (2026-11-25). Code không còn kiểm JWT Access; application cũ cho path `manage` cần xóa trong Zero Trust.
 - Workers AI, rate limit `WRITE_LIMIT`, Workers Logs (`observability`) trong `wrangler.jsonc`.
 
 ## Google sign-in (làm một lần)
@@ -132,4 +132,4 @@ Không commit file backup: chúng chứa email và nội dung khách gửi.
 
 ## Giới hạn
 
-D1, Workers, Workers AI (10.000 neuron/ngày), Turnstile, Access đều có gói miễn phí. Xem [D1 limits](https://developers.cloudflare.com/d1/platform/limits/), [Workers limits](https://developers.cloudflare.com/workers/platform/limits/), [Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/).
+D1, Workers, Workers AI (10.000 neuron/ngày), Turnstile đều có gói miễn phí. Xem [D1 limits](https://developers.cloudflare.com/d1/platform/limits/), [Workers limits](https://developers.cloudflare.com/workers/platform/limits/), [Workers AI pricing](https://developers.cloudflare.com/workers-ai/platform/pricing/).

@@ -11,11 +11,10 @@ Porkbun ── đăng ký domain chilolab.com (gia hạn hằng năm)
    │ nameserver
 Cloudflare (gói Free)
    ├─ DNS, HTTPS, chuyển www → apex, Web Analytics
-   ├─ Worker "chilolab-portfolio": trang tĩnh + API (/api, /manage, /user)
+   ├─ Worker "chilolab-portfolio": trang tĩnh + API (/api, /admin/manage, /user)
    ├─ D1 "chilolab": tài khoản, bình luận, góp ý, lượt tải, mã đăng nhập
    ├─ Workers AI: kiểm duyệt bình luận
    ├─ Turnstile: chống spam
-   ├─ Zero Trust Access: (tùy chọn) lớp khóa thêm cho /manage
    └─ Email Routing: nhận thư contact@chilolab.com → Gmail
 Google Cloud ── "Tiếp tục với Google"
 Resend ── GỬI mail: mã đăng nhập 6 số, báo bình luận bị giữ
@@ -39,7 +38,6 @@ GitHub ── code; push lên main = Cloudflare tự build và deploy
 | `GOOGLE_CLIENT_SECRET` | Worker secret                                                                   | **Có**                   |
 | `RESEND_API_KEY`       | Worker secret                                                                   | **Có**                   |
 | Người gửi mail         | `wrangler.jsonc` → `MAIL_FROM` = `ChiloLab <no-reply@chilolab.com>`             | Không                    |
-| Access team, AUD       | `wrangler.jsonc` → `ACCESS_TEAM_DOMAIN`, `ACCESS_AUD`                           | Không                    |
 | Tài khoản chủ site     | D1 `users.role = 'owner'` (đặt bằng SQL, mục 11)                                | Email không ghi vào code |
 
 Xem nhanh secret đang có (chỉ hiện tên): `npx wrangler secret list`.
@@ -104,21 +102,15 @@ Quy tắc: thay đổi schema = **thêm** file `migrations/000N_*.sql` (không s
 3. Site key → `.env.production` (`PUBLIC_TURNSTILE_SITE_KEY=...`, được commit). Secret key → `npx wrangler secret put TURNSTILE_SECRET`.
 4. Quên secret? Widget → **Settings → Rotate Secret Key**, rồi `secret put` lại.
 
-## 8. Cloudflare Access cho `/manage` (tùy chọn)
+## 8. Cloudflare Access (đã bỏ)
 
-Từ khi có trang quản trị, `/manage` mở bằng tài khoản chủ site đăng nhập ở `/user/login` (xem [DATABASE.md](DATABASE.md#trang-quản-trị-manage)). Access chỉ còn là lớp khóa thêm: nếu application Access cho `/manage` còn bật, bạn sẽ phải qua màn hình Access (mã PIN) **trước**, rồi mới tới trang quản trị. Muốn đăng nhập kiểu WordPress (chỉ `/user/login`), xóa application đó: **Zero Trust → Access controls → Applications → … → Delete**. Có thể để nguyên `ACCESS_*` trong `wrangler.jsonc`.
+Trang quản trị giờ ở `/admin/manage` và chỉ mở bằng tài khoản chủ site đăng nhập ở `/user/login` (xem [DATABASE.md](DATABASE.md#trang-quản-trị-adminmanage)). Code không còn kiểm Cloudflare Access từ 2026-11-25, nên hãy xóa application cũ để `/manage` không còn hỏi mã PIN trước khi chuyển hướng:
 
-1. Cloudflare → **Zero Trust** (lần đầu: đặt team name, chọn gói Free).
-2. **Access controls → Applications → Add → Self-hosted**.
-3. **Destination / Public hostname**: Subdomain **để trống**, Domain `chilolab.com`, Path `manage`. (Lỗi đã gặp: ô subdomain còn sót `chilolab-portfolio` → Access bảo vệ nhầm `chilolab-portfolio.chilolab.com`.)
-4. **Policy**: tên `Owner`, Action **Allow**, Include → **Emails** → chỉ email của bạn (không dùng "Everyone" hay "Emails ending in").
-5. Login method: **One-time PIN** (mặc định với "Accept all available identity providers").
-6. Lấy team domain và AUD rồi điền vào `wrangler.jsonc`. Cách nhanh không cần tìm trong dashboard:
-   ```bash
-   curl -s -o /dev/null -D - https://chilolab.com/manage | grep -i location
-   # → https://<team>.cloudflareaccess.com/cdn-cgi/access/login/...?kid=<AUD>
-   ```
-7. Worker tự kiểm chữ ký Access; Access thiếu hoặc sai → chỉ tài khoản chủ site vào được `/manage`.
+1. Cloudflare → **Zero Trust → Access controls → Applications**.
+2. Application có Destination `chilolab.com/manage` → **…** → **Delete**.
+3. Kiểm tra: `curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://chilolab.com/manage` phải trả `301 https://chilolab.com/admin/manage`, không còn `cloudflareaccess.com`.
+
+Bật xác minh 2 bước cho tài khoản Google và hộp thư của chủ site: đó là lớp khóa của trang quản trị.
 
 ## 9. Đăng nhập Google
 
@@ -199,7 +191,7 @@ B=https://chilolab.com
 curl -s -o /dev/null -w '%{http_code}\n' $B/                          # 200
 curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' http://chilolab.com/        # 301 → https
 curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' https://www.chilolab.com/x?a=1  # 301 → apex, giữ ?a=1
-curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' $B/manage    # 302 → /user/login?return=%2Fmanage (hoặc cloudflareaccess.com nếu còn Access)
+curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' $B/admin/manage    # 302 → /user/login?return=%2Fadmin%2Fmanage
 curl -s $B/api/me                                                     # providers google/email = true
 curl -s -o /dev/null -w '%{http_code} %{redirect_url}\n' $B/user      # 301 → /user/login
 npx wrangler secret list                                              # đủ 3 secret
@@ -213,24 +205,24 @@ curl -s -H 'accept: application/dns-json' 'https://cloudflare-dns.com/dns-query?
 
 ## 15. Sự cố đã gặp và cách xử lý
 
-| Triệu chứng                       | Nguyên nhân                                                     | Cách sửa                                                        |
-| --------------------------------- | --------------------------------------------------------------- | --------------------------------------------------------------- |
-| Form góp ý luôn báo lỗi xác minh  | Secret đặt ở mục _Build_                                        | Đặt lại bằng `wrangler secret put` (mục 5)                      |
-| `/admin` (CMS) trắng trang        | CSP chặn unpkg; `/admin/` bị đổi thành `/admin`                 | `public/_headers` có rule cho cả `/admin` và `/admin/*`         |
-| Script trang bị chặn              | Astro nhúng script inline, CSP chặn                             | `astro.config.mjs`: `vite.build.assetsInlineLimit: 0`           |
-| `/manage` trả 403 cho cả chủ site | Tài khoản chưa có `role = 'owner'`, hoặc Destination Access sai | DATABASE.md → Chủ site; mục 8 bước 3                            |
-| Google `redirect_uri_mismatch`    | Thiếu URI hoặc chưa có hiệu lực                                 | Mục 9 bước 5, chờ vài phút                                      |
-| Ô đăng nhập email không hiện      | Thiếu `RESEND_API_KEY`                                          | Mục 10 bước 6                                                   |
-| Mã đăng nhập không tới            | Spam, hoặc Resend lỗi                                           | Xem Spam; Resend → **Logs**; Workers Logs có dòng `mail failed` |
-| `contact@` không nhận             | Chưa xác minh Gmail, hoặc gửi từ chính Gmail đích               | Mục 11 bước 2 và 5                                              |
-| Test local chạy bản cũ            | Còn tiến trình `wrangler dev` cũ giữ cổng                       | Dừng terminal cũ hoặc dùng `--port` khác                        |
+| Triệu chứng                             | Nguyên nhân                                       | Cách sửa                                                        |
+| --------------------------------------- | ------------------------------------------------- | --------------------------------------------------------------- |
+| Form góp ý luôn báo lỗi xác minh        | Secret đặt ở mục _Build_                          | Đặt lại bằng `wrangler secret put` (mục 5)                      |
+| `/admin` (CMS) trắng trang              | CSP chặn unpkg; `/admin/` bị đổi thành `/admin`   | `public/_headers` có rule cho cả `/admin` và `/admin/*`         |
+| Script trang bị chặn                    | Astro nhúng script inline, CSP chặn               | `astro.config.mjs`: `vite.build.assetsInlineLimit: 0`           |
+| `/admin/manage` trả 403 cho cả chủ site | Tài khoản chưa có `role = 'owner'`                | DATABASE.md → Chủ site                                          |
+| Google `redirect_uri_mismatch`          | Thiếu URI hoặc chưa có hiệu lực                   | Mục 9 bước 5, chờ vài phút                                      |
+| Ô đăng nhập email không hiện            | Thiếu `RESEND_API_KEY`                            | Mục 10 bước 6                                                   |
+| Mã đăng nhập không tới                  | Spam, hoặc Resend lỗi                             | Xem Spam; Resend → **Logs**; Workers Logs có dòng `mail failed` |
+| `contact@` không nhận                   | Chưa xác minh Gmail, hoặc gửi từ chính Gmail đích | Mục 11 bước 2 và 5                                              |
+| Test local chạy bản cũ                  | Còn tiến trình `wrangler dev` cũ giữ cổng         | Dừng terminal cũ hoặc dùng `--port` khác                        |
 
 ## 16. Chi phí
 
-| Mục                                                                                                                         | Chi phí                                       |
-| --------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| Domain `chilolab.com` (Porkbun)                                                                                             | Trả hằng năm (xem Porkbun → Renewal)          |
-| Cloudflare Free: Workers, D1, Workers AI (10.000 neuron/ngày), Turnstile, Access (≤ 50 người), Email Routing, Web Analytics | 0                                             |
-| Google OAuth                                                                                                                | 0                                             |
-| Resend Free (100 mail/ngày)                                                                                                 | 0                                             |
-| Workers Paid (chỉ nếu cần đăng nhập bằng mật khẩu hoặc vượt giới hạn Free)                                                  | 5 USD/tháng — cần quyết định rõ trước khi bật |
+| Mục                                                                                                    | Chi phí                                       |
+| ------------------------------------------------------------------------------------------------------ | --------------------------------------------- |
+| Domain `chilolab.com` (Porkbun)                                                                        | Trả hằng năm (xem Porkbun → Renewal)          |
+| Cloudflare Free: Workers, D1, Workers AI (10.000 neuron/ngày), Turnstile, Email Routing, Web Analytics | 0                                             |
+| Google OAuth                                                                                           | 0                                             |
+| Resend Free (100 mail/ngày)                                                                            | 0                                             |
+| Workers Paid (chỉ nếu cần đăng nhập bằng mật khẩu hoặc vượt giới hạn Free)                             | 5 USD/tháng — cần quyết định rõ trước khi bật |

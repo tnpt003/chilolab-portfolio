@@ -28,4 +28,4 @@ Biography (confirmed 2026-11-18, lives in src/lib/profile.ts): HUFLIT, Informati
 
 ## Scope
 
-Static Astro site plus a Cloudflare Worker (`worker/`) for visitor features: Google or email-code sign-in, threaded comments with AI moderation, feedback and download counts, stored in Cloudflare D1 (docs/DATABASE.md). `/manage` is the owner admin panel, opened by signing in at `/user/login` with the owner account (Cloudflare Access is an optional fallback). Cloudflare Web Analytics and Turnstile are the only third-party scripts.
+Static Astro site plus a Cloudflare Worker (`worker/`) for visitor features: Google or email-code sign-in, threaded comments with AI moderation, feedback and download counts, stored in Cloudflare D1 (docs/DATABASE.md). `/admin/manage` is the owner admin panel (the old `/manage` redirects there), opened only by signing in at `/user/login` with the owner account; Cloudflare Access was removed on 2026-11-25. Cloudflare Web Analytics and Turnstile are the only third-party scripts.

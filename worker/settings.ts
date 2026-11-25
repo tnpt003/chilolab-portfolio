@@ -1,6 +1,6 @@
 import type { Env } from './env';
 
-// Site settings, edited by the owner at /manage/settings and stored in the
+// Site settings, edited by the owner at /admin/manage/settings and stored in the
 // D1 table `settings` (migrations/0005_settings.sql). A missing row, or a
 // missing table before the migration runs, falls back to the defaults below,
 // so behaviour matches the site before settings existed.

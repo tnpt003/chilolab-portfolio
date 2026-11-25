@@ -6,11 +6,7 @@ export interface Env {
   WRITE_LIMIT: RateLimit;
   /** Secret: `wrangler secret put TURNSTILE_SECRET`. */
   TURNSTILE_SECRET?: string;
-  /** e.g. chilolab.cloudflareaccess.com — from Zero Trust settings. */
-  ACCESS_TEAM_DOMAIN: string;
-  /** Application Audience (AUD) tag of the Access application for /manage. */
-  ACCESS_AUD: string;
-  /** Local only (.dev.vars): skip Access on localhost. */
+  /** Local only (.dev.vars): open /admin/manage on localhost without sign-in. */
   ADMIN_DEV_BYPASS?: string;
   /** Google OAuth client (public id in vars, secret via `wrangler secret`). */
   GOOGLE_CLIENT_ID?: string;

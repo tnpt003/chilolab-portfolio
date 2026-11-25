@@ -61,8 +61,8 @@ for (const [route, html] of routes) {
     if (!href.startsWith('/') && !href.startsWith('#')) continue;
     // /api/* is answered by the Worker (worker/index.ts), not a built page.
     if (href.startsWith('/api/')) continue;
-    // /manage is the Worker-rendered owner admin panel (worker/manage.ts).
-    if (href === '/manage' || href.startsWith('/manage/')) continue;
+    // /admin/manage is the Worker-rendered owner admin panel (worker/manage.ts).
+    if (href === '/admin/manage' || href.startsWith('/admin/manage/')) continue;
     if (
       href.startsWith('//') ||
       /\.(?:svg|png|webp|jpg|jpeg|ico|css|js|mp4|pdf)(?:[?#]|$)/i.test(href)

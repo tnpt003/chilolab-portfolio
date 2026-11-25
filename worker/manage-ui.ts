@@ -1,6 +1,6 @@
 import { baseHeaders } from './env';
 
-// Look and building blocks of the owner admin panel (/manage).
+// Look and building blocks of the owner admin panel (/admin/manage).
 // Deliberately unlike the public site: dark surfaces, an amber accent and a
 // permanent "QUẢN TRỊ" bar, so the owner always knows which side they are on.
 // Server-rendered and script-free; every value passes through escape().
@@ -8,7 +8,7 @@ import { baseHeaders } from './env';
 export type Admin = {
   /** Shown in the top bar and written to the admin log. */
   name: string;
-  /** users.id when signed in with an owner account; null for Access/dev. */
+  /** users.id when signed in with an owner account; null for the dev bypass. */
   userId: number | null;
 };
 
@@ -72,7 +72,7 @@ export const button = (
 
 /** Opens the single POST form that wraps a page's rows and bulk bar. */
 export const formStart = (back: string, id = 'rows') =>
-  `<form id="${id}" method="post" action="/manage"><input type="hidden" name="back" value="${escape(back)}">`;
+  `<form id="${id}" method="post" action="/admin/manage"><input type="hidden" name="back" value="${escape(back)}">`;
 
 export const checkbox = (id: unknown, label: string) =>
   `<input type="checkbox" name="ids" value="${escape(id)}" aria-label="${escape(label)}">`;
@@ -188,22 +188,22 @@ export type Badges = { held: number; newFeedback: number };
 
 type Item = [href: string, label: string, badge?: keyof Badges];
 const menu: [group: string, items: Item[]][] = [
-  ['', [['/manage', 'Tổng quan']]],
+  ['', [['/admin/manage', 'Tổng quan']]],
   [
     'Kiểm duyệt',
     [
-      ['/manage/comments', 'Bình luận', 'held'],
-      ['/manage/feedback', 'Góp ý', 'newFeedback'],
+      ['/admin/manage/comments', 'Bình luận', 'held'],
+      ['/admin/manage/feedback', 'Góp ý', 'newFeedback'],
     ],
   ],
-  ['Cộng đồng', [['/manage/users', 'Người dùng']]],
-  ['Thống kê', [['/manage/downloads', 'Lượt tải']]],
+  ['Cộng đồng', [['/admin/manage/users', 'Người dùng']]],
+  ['Thống kê', [['/admin/manage/downloads', 'Lượt tải']]],
   [
     'Hệ thống',
     [
-      ['/manage/settings', 'Cài đặt'],
-      ['/manage/log', 'Nhật ký'],
-      ['/manage/status', 'Tình trạng dịch vụ'],
+      ['/admin/manage/settings', 'Cài đặt'],
+      ['/admin/manage/log', 'Nhật ký'],
+      ['/admin/manage/status', 'Tình trạng dịch vụ'],
     ],
   ],
 ];
@@ -321,7 +321,7 @@ export function layout(
   content: string,
 ) {
   const active = (href: string) =>
-    href === '/manage'
+    href === '/admin/manage'
       ? path === href
       : path === href || path.startsWith(`${href}/`);
   const nav = menu
@@ -348,7 +348,7 @@ export function layout(
 </head>
 <body>
 <a class="skip" href="#main">Bỏ qua tới nội dung</a>
-<header class="topbar"><div class="mode">QUẢN TRỊ <span>chilolab.com · chỉ chủ site thấy trang này</span></div><div class="who"><a href="/">Xem website ↗</a><span>${escape(admin.name)}</span>${admin.userId !== null ? `<form method="post" action="/manage/logout"><button>Đăng xuất</button></form>` : ''}</div></header>
+<header class="topbar"><div class="mode">QUẢN TRỊ <span>chilolab.com · chỉ chủ site thấy trang này</span></div><div class="who"><a href="/">Xem website ↗</a><span>${escape(admin.name)}</span>${admin.userId !== null ? `<form method="post" action="/admin/manage/logout"><button>Đăng xuất</button></form>` : ''}</div></header>
 <div class="shell">
 <nav class="side" aria-label="Quản trị"><ul>${nav}</ul><hr><ul><li><a href="/admin/">Nội dung dự án (CMS)</a></li><li><a href="/user/account">Tài khoản của tôi</a></li></ul></nav>
 <main id="main" tabindex="-1">

@@ -49,7 +49,7 @@ function serialize(row: Row, me: number, moderator = false) {
   };
 }
 
-/** Visitor limits from /manage/settings; the owner is exempt. */
+/** Visitor limits from /admin/manage/settings; the owner is exempt. */
 async function limitError(
   env: Env,
   settings: Settings,

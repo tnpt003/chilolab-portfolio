@@ -96,8 +96,8 @@ const ogAlt =
             ? 'Khách không thấy dải này.'
             : 'Visitors do not see this bar.'}
         </span>
-        <a href="/manage" data-owner-pending></a>
-        <a href="/manage">
+        <a href="/admin/manage" data-owner-pending></a>
+        <a href="/admin/manage">
           {locale === 'vi' ? 'Mở trang quản trị' : 'Open the admin panel'}
         </a>
       </div>
@@ -211,7 +211,7 @@ const ogAlt =
     </footer>
     <script>
       // Owner bar: only asked for when the owner hint cookie is present
-      // (set by /manage and /api/me), so visitors never trigger the request.
+      // (set by /admin/manage and /api/me), so visitors never trigger the request.
       // The answer from /api/me decides; the cookie alone shows nothing.
       const bar = document.querySelector<HTMLElement>('[data-owner-bar]');
       if (bar && document.cookie.includes('__Host-chilolab_admin=1'))

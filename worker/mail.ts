@@ -70,7 +70,7 @@ export async function notifyHeld(
       `${comment.author} vừa viết một bình luận bị giữ lại (lý do: ${comment.reason}).`,
       comment.body.slice(0, 600),
       `Trang: ${page}`,
-      `Duyệt hoặc gỡ ngay trong trang (khi đăng nhập bằng tài khoản Tác giả) hoặc tại ${origin}/manage`,
+      `Duyệt hoặc gỡ ngay trong trang (khi đăng nhập bằng tài khoản Tác giả) hoặc tại ${origin}/admin/manage`,
     ],
   );
 }
@@ -92,7 +92,7 @@ export async function notifyFeedback(
     [
       `Góp ý mới cho ${feedback.project} (loại: ${feedback.kind}).`,
       feedback.message.slice(0, 1200),
-      `Xử lý tại ${origin}/manage/feedback`,
+      `Xử lý tại ${origin}/admin/manage/feedback`,
     ],
   );
 }

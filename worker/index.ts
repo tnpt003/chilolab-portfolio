@@ -1,4 +1,4 @@
-import { adminIdentity } from './access';
+import { devIdentity } from './access';
 import { auth } from './auth';
 import { comments } from './comments';
 import {
@@ -121,17 +121,21 @@ export default {
     const url = new URL(request.url);
     const path = url.pathname.replace(/\/+$/, '') || '/';
 
-    if (path === '/manage' || path.startsWith('/manage/')) {
-      // Owner account (users.role = 'owner') signed in at /user/login, or,
-      // as a fallback, Cloudflare Access / the localhost dev bypass.
-      // Anything else is refused: the panel fails closed.
+    // The admin panel moved from /manage to /admin/manage on 2026-11-25.
+    if (path === '/manage' || path.startsWith('/manage/'))
+      return redirect(`/admin${url.pathname}${url.search}`, 301);
+
+    if (path === '/admin/manage' || path.startsWith('/admin/manage/')) {
+      // Only an owner account (users.role = 'owner') signed in at
+      // /user/login, or the localhost dev bypass. Anything else is refused:
+      // the panel fails closed.
       const user = await currentUser(request, env);
       if (user?.role === 'owner')
         return manage(request, env, ctx, {
           name: user.displayName,
           userId: user.id,
         });
-      const identity = await adminIdentity(request, env);
+      const identity = devIdentity(request, env);
       if (identity)
         return manage(request, env, ctx, { name: identity, userId: null });
       if (user || request.method !== 'GET')

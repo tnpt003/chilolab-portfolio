@@ -166,7 +166,7 @@ async function me(request: Request, env: Env) {
   const user = await currentUser(request, env);
   if (request.method === 'GET') {
     const settings = await getSettings(env);
-    // The owner bar on the public site shows what is waiting in /manage.
+    // The owner bar on the public site shows what is waiting in /admin/manage.
     const pending =
       user?.role === 'owner'
         ? await env.DB.prepare(

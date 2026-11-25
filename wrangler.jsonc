@@ -1,5 +1,5 @@
 // Cloudflare Worker for ChiloLab. Pages are answered from ./dist (including
-// _headers and _redirects); worker/index.ts only runs for /api/*, /manage*
+// _headers and _redirects); worker/index.ts only runs for /api/*, /admin/manage*, /manage*
 // and the /user redirects. Setup steps: docs/DATABASE.md.
 {
   "name": "chilolab-portfolio",
@@ -16,7 +16,15 @@
     "binding": "ASSETS",
     "not_found_handling": "404-page",
     "html_handling": "drop-trailing-slash",
-    "run_worker_first": ["/api/*", "/manage", "/manage/*", "/user", "/en/user"],
+    "run_worker_first": [
+      "/api/*",
+      "/admin/manage",
+      "/admin/manage/*",
+      "/manage",
+      "/manage/*",
+      "/user",
+      "/en/user",
+    ],
   },
   "d1_databases": [
     {
@@ -42,8 +50,6 @@
   // RESEND_API_KEY) are
   // set with `wrangler secret put` or in the dashboard.
   "vars": {
-    "ACCESS_TEAM_DOMAIN": "bold-night-e762.cloudflareaccess.com",
-    "ACCESS_AUD": "6c22982b14601e675f0981e5ac990f1feaeec85103cfaca0ac173f5c22b3a337",
     "GOOGLE_CLIENT_ID": "354598476641-kjo3ve152771g4boncv5rooshqd7bmqt.apps.googleusercontent.com",
     "MAIL_FROM": "ChiloLab <no-reply@chilolab.com>",
   },

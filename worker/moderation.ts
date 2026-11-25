@@ -5,8 +5,8 @@ import type { Settings } from './settings';
 // complaints are not abuse and must pass. Two layers:
 // 1. a small word list (instant, free) plus owner-added words, 2. a
 // Southeast-Asian-language model on Workers AI for context. If the model is
-// unavailable the comment is published and marked "unchecked" so /manage can
-// show it. /manage/settings can switch to the word list only, or hold every
+// unavailable the comment is published and marked "unchecked" so /admin/manage can
+// show it. /admin/manage/settings can switch to the word list only, or hold every
 // comment for manual review.
 
 export const MODEL = '@cf/aisingapore/gemma-sea-lion-v4-27b-it';
@@ -74,7 +74,7 @@ export function wordList(body: string, extra: string[] = []) {
   const plainWords = words(strip(body));
   if (plain.some((word) => plainWords.includes(` ${word} `)))
     return 'profanity';
-  // Owner-added words (/manage/settings), matched as whole words with or
+  // Owner-added words (/admin/manage/settings), matched as whole words with or
   // without accents.
   if (
     extra.some(
