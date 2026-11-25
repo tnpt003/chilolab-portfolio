@@ -4,6 +4,8 @@
 - Stack: Astro static output, strict TypeScript, npm with committed lockfile.
 - Vietnamese lives at `/` and `/<slug>`; English at `/en/` and `/en/<slug>`.
 - Keep project slugs lowercase and stable. Add redirects for retired routes.
+- About-page copy (biography, skills, journey, courses, TOEIC) lives in `src/content/profile/<locale>.yml`, loaded by `getProfile()` in `src/lib/content.ts`; keep both files' fields in step and the TOEIC values identical.
+- Interface text (homepage, menu, footer, comments, feedback, sign-in, download counts) lives in `src/content/ui/<locale>.yml`, loaded by `getUi()` in `src/lib/content.ts`; do not hard-code visible copy in components. Keep `{placeholders}` identical across languages.
 - Project content lives in `src/content/projects/<locale>/*.md`; schema is in `src/content.config.ts`. Keep matching slug/locale pairs for both languages.
 - Keep content loading in `src/lib/content.ts`; do not fetch CMS data in visual components.
 - Never invent product capabilities, scores, testimonials, download links or repository URLs. Mark conceptual visuals explicitly until real assets arrive.
@@ -13,7 +15,7 @@
 - Validate meaningful changes with `npm run verify`; format with `npm run format`. CI also checks formatting.
 - Owner: Nguyễn Tấn Phát. Hosting choice: Cloudflare; chilolab.com is planned for purchase at Porkbun. WordPress is the preferred CMS candidate, not yet connected. Read docs/CMS-ROADMAP.md and docs/DEPLOYMENT.md before integration work.
 - Pet releases: https://github.com/tnpt003/Pet-Computer (public). The owner chose it (2026-11-21) as the repository the site's download buttons use; do not link Pet-desktop-share or the private source repository. Auditor source is local at C:/Project VS/PageSpeed-Auth-Auditor and has not been uploaded. Do not infer public downloads from package metadata. Never fabricate contact URLs or silently add account-dependent integrations.
-- Editing UI: Sveltia CMS (git-based, free) at `public/admin/`; it writes the same Markdown files. Keep `public/admin/config.yml` in sync with `src/content.config.ts`. Read docs/CMS.md.
+- Editing UI: Sveltia CMS (git-based, free) at `public/admin/`; it writes the same Markdown files. Keep `public/admin/config.yml` in sync with `src/content.config.ts`. Online, `/admin` opens only for the owner session and `/api/cms/auth` (worker/cms.ts) hands the CMS the CMS_GITHUB_TOKEN secret; keep both failing closed. Read docs/CMS.md.
 - Free-first: Markdown is the active content source, public GitHub is acceptable, Cloudflare is the hosting choice. WordPress is deferred. Do not add paid services without an explicit decision.
 - Keep tokens and credentials out of source. No secrets in PUBLIC_* variables.
 - Version notes live in src/content/versions/{vi,en}/<project>/<version>.md. Read docs/VERSIONS.md; preserve translation metadata, distinguish public posts from actual product release status, and never invent release dates or downloads.

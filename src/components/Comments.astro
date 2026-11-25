@@ -1,6 +1,6 @@
 ---
-import { commentCopy, userPath } from '../lib/community';
-import { pathFor, type Locale } from '../lib/content';
+import { userPath } from '../lib/community';
+import { getUi, pathFor, type Locale } from '../lib/content';
 interface Props {
   locale: Locale;
   project: string;
@@ -8,7 +8,7 @@ interface Props {
   version?: string;
 }
 const { locale, project, version } = Astro.props;
-const t = commentCopy[locale];
+const t = (await getUi(locale)).comments;
 ---
 
 <section

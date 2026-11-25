@@ -1,15 +1,15 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import { copy, pathFor } from '../lib/content';
-import { feedbackCopy } from '../lib/community';
+import { getUi, pathFor } from '../lib/content';
 import { listVersions } from '../lib/versions';
 interface Props {
   project: CollectionEntry<'projects'>;
 }
 const { data } = Astro.props.project;
 const locale = data.locale;
-const t = feedbackCopy[locale];
+const ui = await getUi(locale);
+const t = ui.feedback;
 const versions = (await listVersions(locale, data.slug)).map(
   ({ data: entry }) => entry.version,
 );
@@ -135,7 +135,7 @@ const runtime = {
       <p>{t.noscript}</p>
     </noscript>
     <p class="feedback-back">
-      <a href={pathFor(locale)}>{copy[locale].back}</a>
+      <a href={pathFor(locale)}>{ui.site.back}</a>
     </p>
   </div>
 </Base>

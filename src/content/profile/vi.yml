@@ -1,0 +1,135 @@
+# Trang "Về mình" (VI). Sửa bằng CMS: Về mình / About.
+# Chỉ ghi thông tin thật; không nêu tên khách hàng (NDA). Xem PRODUCT.md.
+locale: vi
+pageTitle: Về mình
+metaDescription: 'Nguyễn Tấn Phát: BA/QC tại WeebPal từ 08/2025, tốt nghiệp Công nghệ thông tin tại HUFLIT, tự làm và phát hành phần mềm Windows tại ChiloLab. Kinh nghiệm, kỹ năng, hành trình và liên hệ.'
+heading: Mình là Phát. Mình làm BA/QC, và thích tự làm những phần mềm nhỏ.
+lead: 'Mình học Công nghệ thông tin ở HUFLIT. Trong giờ làm, mình là BA/QC: trao đổi với khách hàng nước ngoài cho tới khi yêu cầu thật rõ, rồi kiểm thử sản phẩm trước khi bàn giao. Ngoài giờ, mình tự viết, phát hành và sửa dần các app bạn thấy trên trang này.'
+teaser: Mình đang làm BA/QC ở WeebPal và tốt nghiệp ngành Công nghệ thông tin ở HUFLIT. Kinh nghiệm, kỹ năng và chặng đường của mình nằm ở trang riêng.
+readMore: Tìm hiểu thêm về mình
+facts:
+  - icon: briefcase
+    text: BA/QC tại WeebPal
+  - icon: graduation
+    text: Tốt nghiệp CNTT, HUFLIT
+  - icon: globe
+    text: Làm việc bằng tiếng Anh
+emailMe: Gửi email cho mình
+seeProjects: Xem các dự án
+github: GitHub
+petAlt: Chú mèo đội mũ phù thủy của Pet Desktop ngồi ở mép dưới màn hình Windows, cạnh một con slime xanh.
+experienceTitle: Kinh nghiệm
+role: BA/QC
+company: WeebPal
+jobPeriod: 08/2025 – nay
+current: Hiện tại
+duties:
+  - Làm việc trực tiếp bằng tiếng Anh với khách hàng và agency nước ngoài để làm rõ yêu cầu, xác nhận phạm vi và báo lỗi.
+  - Tham gia dự án website cho agency nước ngoài và dự án cho doanh nghiệp Nhật Bản trong các mảng sản xuất, đào tạo trực tuyến (LMS) và chuyển đổi số.
+  - Viết tài liệu yêu cầu và test case, kiểm thử chức năng và API, theo dõi lỗi đến khi đóng.
+educationTitle: Học vấn
+education: Ngành Công nghệ thông tin, Trường Đại học Ngoại ngữ – Tin học TP.HCM (HUFLIT)
+educationPeriod: Tốt nghiệp 2026
+howTitle: Mình làm việc thế nào
+howIntro: Một yêu cầu thường qua tay mình theo bốn bước.
+steps:
+  - icon: message
+    title: Làm rõ yêu cầu
+    text: Hỏi lại khách hàng tới khi phạm vi thật rõ, rồi ghi lại những gì hai bên đã chốt.
+  - icon: testing
+    title: Viết tài liệu và test case
+    text: Biến yêu cầu thành tài liệu và các trường hợp kiểm thử cụ thể.
+  - icon: code
+    title: Kiểm thử
+    text: Kiểm thử chức năng và API trên bản build thật, ghi rõ từng bước để tái hiện lỗi.
+  - icon: history
+    title: Theo dõi đến khi đóng
+    text: Theo từng lỗi tới khi được sửa và kiểm tra lại xong, rồi mới bàn giao.
+skillsTitle: Kỹ năng
+skillsIntro: Những thứ mình đã dùng trong công việc, đồ án ở trường và các app của mình.
+skills:
+  - icon: testing
+    name: Kiểm thử
+    items:
+      - Kiểm thử API thanh toán MoMo, VNPay
+      - Unit test với NUnit, báo cáo Excel
+      - Tự làm công cụ QA website
+  - icon: code
+    name: Web
+    items:
+      - ASP.NET MVC
+      - Entity Framework
+      - Java web
+      - Drupal
+      - PHP
+      - Tích hợp API
+  - icon: phone
+    name: Ứng dụng
+    items:
+      - C#/WPF
+      - Electron
+      - Flutter
+      - Android Studio
+  - icon: database
+    name: Cơ sở dữ liệu
+    items:
+      - SQL Server
+      - MongoDB
+      - Firebase Realtime Database
+  - icon: braces
+    name: Ngôn ngữ lập trình
+    items:
+      - C#
+      - Java
+      - PHP
+      - Python
+  - icon: terminal
+    name: Hệ thống & công cụ
+    items:
+      - Linux
+      - Mạng máy tính
+      - Git
+      - GitHub
+      - GitLab
+  - icon: chip
+    name: IoT
+    items:
+      - Arduino
+      - ESP32
+      - ThingSpeak
+      - Firebase
+journeyTitle: Nhật ký của mình
+journeyKinds:
+  study: Học
+  work: Công việc
+  release: Phát hành
+journey:
+  - kind: work
+    year: 2025
+    date: 2025-08
+    label: 08/2025
+    title: Bắt đầu làm BA/QC tại WeebPal
+    text: Làm việc bằng tiếng Anh với khách hàng nước ngoài, trong đó có doanh nghiệp Nhật Bản.
+  - kind: study
+    year: 2026
+    title: Tốt nghiệp ngành Công nghệ thông tin, HUFLIT
+releaseTitle: 'Phát hành Pet Desktop {version}: {title}'
+releaseCount: '{count} bản Pet Desktop đã đăng ghi chú trên ChiloLab.'
+coursesTitle: Khóa học
+courses:
+  - Quản trị mạng cơ bản (ACBN)
+  - Quản trị mạng Cisco (chương trình CCNA)
+  - Quản trị mã nguồn mở Linux Master
+coursesNote: Chứng nhận hoàn thành khóa học do Trung tâm Athena cấp.
+builtTitle: Mình tự làm
+builtIntro: Hai app mình tự viết từ đầu, đang phát hành và sửa dần theo góp ý ở đây.
+languagesTitle: Ngoại ngữ
+english: 'Tiếng Anh: mình dùng hằng ngày khi làm việc với khách hàng nước ngoài.'
+toeicLabel: TOEIC
+toeicAlt: Ảnh chứng chỉ TOEIC của Nguyễn Tấn Phát, đã che thông tin cá nhân
+toeicOpen: Xem ảnh chứng chỉ cỡ lớn
+contactTitle: Nói chuyện với mình
+contactText: Muốn trao đổi công việc, hỏi về một dự án hay góp ý cho app? Cứ gửi email cho mình nhé, thư nào mình cũng đọc.
+# TOEIC: điền khi có chứng chỉ thật, giống hệt ở en.yml, ví dụ:
+# toeicScore: 750
+# toeicYear: 2026

@@ -38,7 +38,7 @@ Visitors arrive from links (CV, GitHub, social previews) and from Pet Desktop it
 
 - Pet Desktop: real 1.5 development-preview captures (`src/assets/pet-battle-hub.png`, `src/assets/pet-on-desktop.png`), a 1:44 promo video with the owner's own synthesized music (`public/media/pet-promo.mp4`) and six gallery crops from it (`src/assets/pet-gallery/`); version notes in `src/content/versions/`; live GitHub download counts.
 - PageSpeed-Auth-Auditor: one real main-screen capture from its user guide (`src/assets/auditor-main-screen.png`). No public downloads or source.
-- Owner: real portrait (`src/assets/phat-portrait.jpg`) and the biography in `src/lib/profile.ts`.
+- Owner: real portrait (`src/assets/phat-portrait.jpg`) and the biography in `src/content/profile/{vi,en}.yml` (edited in the CMS).
 - Absent, never to be fabricated: testimonials, client names (NDA), TOEIC score (pending from the owner), Auditor performance scores, any download or repository URL not listed under Content integrity.
 
 ## Product Principles
@@ -75,7 +75,7 @@ Source move (decided 2026-11-18): Pet Desktop is now "all rights reserved" (1.5.
 
 PageSpeed-Auth-Auditor is local at `C:/Project VS/PageSpeed-Auth-Auditor`, not uploaded according to the owner. Its README describes an Electron Windows QA app with manual URL health checks, crawling, PageSpeed/Lighthouse audits and Excel reports. It requires Windows 10+ and Chrome. Do not expose its .env, audit reports or session data. A GitHub release destination in package metadata does not establish a public source repo or available downloads.
 
-Biography (confirmed 2026-11-18, lives in src/lib/profile.ts): HUFLIT, Information Technology, graduated 2026 (degree title not given); BA/QC at WeebPal since 08/2025. Do not name WeebPal's clients or client contacts on the site (NDA); describe them by kind. The three Athena certificates (ACBN 07–08/2022, CCNA programme 01–03/2023, Linux Master 04–08/2023) are course completions from a training center, not Cisco/LPI vendor certifications; never publish the PDFs (date of birth, portrait, QR). Do not show course dates on the site (owner's request); link Athena to https://athena.edu.vn/. TOEIC score and image are pending from the owner. Public contact email is contact@chilolab.com (Cloudflare Email Routing to the owner's inbox; owner's choice, 2026-11-25). Do not publish the owner's personal Gmail. Pet media are real app captures of the 1.5 development preview; the Auditor image is a real main-screen capture from its user guide.
+Biography (confirmed 2026-11-18, lives in src/content/profile/{vi,en}.yml): HUFLIT, Information Technology, graduated 2026 (degree title not given); BA/QC at WeebPal since 08/2025. Do not name WeebPal's clients or client contacts on the site (NDA); describe them by kind. The three Athena certificates (ACBN 07–08/2022, CCNA programme 01–03/2023, Linux Master 04–08/2023) are course completions from a training center, not Cisco/LPI vendor certifications; never publish the PDFs (date of birth, portrait, QR). Do not show course dates on the site (owner's request); link Athena to https://athena.edu.vn/. TOEIC score and image are pending from the owner. Public contact email is contact@chilolab.com (Cloudflare Email Routing to the owner's inbox; owner's choice, 2026-11-25). Do not publish the owner's personal Gmail. Pet media are real app captures of the 1.5 development preview; the Auditor image is a real main-screen capture from its user guide.
 
 ## Scope
 

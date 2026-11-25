@@ -15,6 +15,11 @@ export interface Env {
   RESEND_API_KEY?: string;
   /** Sender, e.g. "ChiloLab <no-reply@chilolab.com>" (domain verified in Resend). */
   MAIL_FROM: string;
+  /**
+   * Secret: fine-grained GitHub token (Contents: read and write, only the
+   * site repository) that /api/cms/auth hands the owner's CMS session.
+   */
+  CMS_GITHUB_TOKEN?: string;
 }
 
 export const baseHeaders = {

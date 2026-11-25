@@ -4,9 +4,17 @@ import '@fontsource/be-vietnam-pro/500.css';
 import '@fontsource/be-vietnam-pro/700.css';
 import '@fontsource/be-vietnam-pro/800.css';
 import '../styles/global.css';
-import { copy, listProjects, pathFor, type Locale } from '../lib/content';
+import {
+  getProfile,
+  getUi,
+  listProjects,
+  pathFor,
+  type Locale,
+} from '../lib/content';
 import { feedbackPath, privacyPath, userPath } from '../lib/community';
 import { versionPath } from '../lib/versions';
+import { feedPath } from '../lib/feed';
+import { email, githubUrl } from '../lib/profile';
 import { getImage } from 'astro:assets';
 import shareImage from '../assets/pet-battle-hub.png';
 import Logo from '../components/Logo.astro';
@@ -27,15 +35,55 @@ const {
   noindex = false,
   tab = `${title} · chilolab.com`,
 } = Astro.props;
-const t = copy[locale];
+const ui = await getUi(locale);
+const t = ui.site;
 const other = locale === 'vi' ? 'en' : 'vi';
 const canonical = new URL(pathFor(locale, slug), Astro.site);
 const projects = await listProjects(locale);
-const f = copy[locale].footerLinks;
+const f = t.footerLinks;
 // Link previews (Facebook, Zalo, Discord…). JPEG because some crawlers
 // still skip WebP; only crawlers fetch it, visitors never download it.
 const og = await getImage({ src: shareImage, width: 1200, format: 'jpeg' });
 const ogImage = new URL(og.src, Astro.site);
+// Structured data for search engines: who the owner is (home and About)
+// and the site itself (home). Only facts the pages already show.
+const me = await getProfile(locale);
+const person = {
+  '@type': 'Person',
+  '@id': `${Astro.site}#owner`,
+  name: 'Nguyễn Tấn Phát',
+  url: new URL(pathFor(locale, 'about'), Astro.site).href,
+  jobTitle: me.role,
+  worksFor: { '@type': 'Organization', name: me.company },
+  alumniOf: {
+    '@type': 'CollegeOrUniversity',
+    name: 'Ho Chi Minh City University of Foreign Languages and Information Technology (HUFLIT)',
+  },
+  email: `mailto:${email}`,
+  sameAs: [githubUrl],
+};
+const structured =
+  slug === ''
+    ? [
+        {
+          '@type': 'WebSite',
+          name: 'ChiloLab',
+          url: new URL(pathFor(locale), Astro.site).href,
+          inLanguage: locale,
+          author: { '@id': person['@id'] },
+        },
+        person,
+      ]
+    : slug === 'about'
+      ? [person]
+      : [];
+// Escape "<" so the JSON can never close the script element.
+const jsonLd = structured.length
+  ? JSON.stringify({
+      '@context': 'https://schema.org',
+      '@graph': structured,
+    }).replaceAll('<', '\\u003c')
+  : '';
 const ogAlt =
   locale === 'vi'
     ? 'Giao diện Pet Desktop trên desktop Windows'
@@ -83,6 +131,17 @@ const ogAlt =
     <meta property="og:image:alt" content={ogAlt} />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#184b58" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={
+        locale === 'vi'
+          ? 'ChiloLab: ghi chú phiên bản'
+          : 'ChiloLab: version notes'
+      }
+      href={feedPath(locale)}
+    />
+    {jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
   </head>
   <body>
     <a class="skip" href="#main">

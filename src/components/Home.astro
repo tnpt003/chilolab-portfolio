@@ -6,18 +6,24 @@ import Icon from './Icon.astro';
 import Logo from './Logo.astro';
 import WalkingCat from './WalkingCat.astro';
 import DownloadStat from './DownloadStat.astro';
-import { email, profile } from '../lib/profile';
+import { email } from '../lib/profile';
 import portrait from '../assets/phat-portrait.jpg';
-import { listProjects, pathFor, copy, type Locale } from '../lib/content';
+import {
+  getProfile,
+  getUi,
+  listProjects,
+  pathFor,
+  type Locale,
+} from '../lib/content';
 import { listVersions, versionCopy } from '../lib/versions';
 interface Props {
   locale: Locale;
 }
 const { locale } = Astro.props;
-const t = copy[locale];
+const t = (await getUi(locale)).site;
 const v = versionCopy[locale];
 const projects = await listProjects(locale);
-const me = profile[locale];
+const me = await getProfile(locale);
 
 // Each row shows the project's real state, read from its newest version note.
 const rows = await Promise.all(

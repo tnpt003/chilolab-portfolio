@@ -3,14 +3,14 @@
 // every minute while the page is visible. Hidden until a number arrives, so
 // nothing shows without JavaScript or when the count is unavailable.
 import Icon from './Icon.astro';
-import type { Locale } from '../lib/content';
-import { downloadStatCopy, hasDownloadStats } from '../lib/community';
+import { getUi, type Locale } from '../lib/content';
+import { hasDownloadStats } from '../lib/community';
 interface Props {
   project: string;
   locale: Locale;
 }
 const { project, locale } = Astro.props;
-const t = downloadStatCopy[locale];
+const t = (await getUi(locale)).downloads;
 ---
 
 {hasDownloadStats(project) && (

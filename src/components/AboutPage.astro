@@ -5,14 +5,18 @@ import Logo from './Logo.astro';
 import WindowBar from './WindowBar.astro';
 import portrait from '../assets/phat-portrait.jpg';
 import petOnDesktop from '../assets/pet-on-desktop.png';
-import { copy, listProjects, pathFor, type Locale } from '../lib/content';
+import {
+  getProfile,
+  getUi,
+  listProjects,
+  pathFor,
+  type Locale,
+} from '../lib/content';
 import { listVersions, versionPath } from '../lib/versions';
 import {
   athenaUrl,
   email,
   githubUrl,
-  profile,
-  toeic,
   toeicImage,
   type JourneyEntry,
 } from '../lib/profile';
@@ -20,13 +24,13 @@ interface Props {
   locale: Locale;
 }
 const { locale } = Astro.props;
-const p = profile[locale];
-const t = copy[locale];
+const p = await getProfile(locale);
+const t = (await getUi(locale)).site;
 const projects = await listProjects(locale);
-const toeicText = [toeic.score, toeic.year && `(${toeic.year})`]
+const toeicText = [p.toeicScore, p.toeicYear && `(${p.toeicYear})`]
   .filter(Boolean)
   .join(' ');
-const showToeic = Boolean(toeic.score || toeicImage);
+const showToeic = Boolean(p.toeicScore || toeicImage);
 
 // Release milestones come from the published version notes, never by hand.
 const released = (await listVersions(locale, 'pet-desktop'))
@@ -62,7 +66,7 @@ const milestones = [released[0], released.at(-1)]
     };
   });
 // Newest first, as the owner asked; undated entries close their year.
-const entries = [...p.journey, ...milestones].sort(
+const entries = [...(p.journey as JourneyEntry[]), ...milestones].sort(
   (a, b) =>
     b.year - a.year ||
     Number(Boolean(b.date)) - Number(Boolean(a.date)) ||

@@ -68,6 +68,13 @@ for (const [route, html] of routes) {
       /\.(?:svg|png|webp|jpg|jpeg|ico|css|js|mp4|pdf)(?:[?#]|$)/i.test(href)
     )
       continue;
+    // Feeds and other generated XML files are files in dist, not pages.
+    if (href.endsWith('.xml')) {
+      await readFile(new URL(href.slice(1), root)).catch(() =>
+        assert.fail(`${route}: missing file ${href}`),
+      );
+      continue;
+    }
     const [pathname, fragment] = href.split('#');
     const target = pathname ? pathname.replace(/\/$/, '') || '/' : route;
     assert.ok(routes.has(target), `${route}: broken link ${href}`);

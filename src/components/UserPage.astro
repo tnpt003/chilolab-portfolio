@@ -1,14 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
 import Logo from './Logo.astro';
-import { pathFor, type Locale } from '../lib/content';
-import { privacyPath, userCopy, userPath } from '../lib/community';
+import { getUi, pathFor, type Locale } from '../lib/content';
+import { privacyPath, userPath } from '../lib/community';
 interface Props {
   locale: Locale;
   mode: 'login' | 'account';
 }
 const { locale, mode } = Astro.props;
-const t = userCopy[locale];
+const t = (await getUi(locale)).user;
 const title = mode === 'login' ? t.loginTitle : t.accountTitle;
 // Public by design; the matching secret lives in the Worker.
 const siteKey: string =

@@ -24,83 +24,46 @@ export async function listProjects(locale: Locale) {
   const entries = published.filter(({ data }) => data.locale === locale);
   return entries.sort((a, b) => a.data.order - b.data.order);
 }
-export const copy = {
-  vi: {
-    projects: 'Dự án',
-    me: 'Về mình',
-    about: 'Về ChiloLab',
-    switch: 'English',
-    homeTitle: 'Nguyễn Tấn Phát, BA/QC và người làm phần mềm',
-    title:
-      'Chào bạn, mình là Phát. Mình kiểm thử phần mềm, và tự làm app của riêng mình.',
-    intro:
-      'Mình đang làm BA/QC ở WeebPal và tốt nghiệp ngành Công nghệ thông tin ở HUFLIT. Ở đây có hai app Windows mình tự viết và tự phát hành: một chú mèo sống ngay trên desktop của bạn, và một công cụ giúp kiểm tra website.',
-    metaDescription:
-      'Portfolio của Nguyễn Tấn Phát, BA/QC tại WeebPal, tốt nghiệp Công nghệ thông tin tại HUFLIT. Kinh nghiệm, kỹ năng và hai ứng dụng Windows tự làm: Pet Desktop và PageSpeed-Auth-Auditor.',
-    explore: 'Xem dự án',
-    aboutCta: 'Về mình',
-    hello: 'Meo, chào bạn!',
-    stack: 'Công nghệ',
-    skillsHeading: 'Mình làm việc với',
-    portraitAlt:
-      'Nguyễn Tấn Phát mặc áo khoác xám, đứng trước một bức tường treo ảnh.',
-    selected:
-      'Dự án nào cũng có trang riêng, lịch sử phiên bản và chỗ để bạn góp ý.',
-    detail: 'Xem dự án',
-    back: 'Tất cả dự án',
-    aboutText:
-      'ChiloLab là góc nhỏ để mình thử ý tưởng. Ý tưởng nào làm được thì mình biến thành app chạy thật, phát hành từng bản và sửa dần theo góp ý của mọi người. Bạn có thể tải Pet Desktop về chơi, xem mỗi bản mới có gì, hoặc đăng nhập để bình luận và báo lỗi.',
-    preview: 'Minh họa ý tưởng, không phải ảnh sản phẩm',
-    footer: 'Ý tưởng nhỏ, phát hành thật, sửa theo góp ý.',
-    footerLinks: {
-      projects: 'Dự án',
-      download: 'Tải xuống',
-      versions: 'Các phiên bản',
-      feedback: 'Góp ý & báo lỗi',
-      privacy: 'Quyền riêng tư',
-      account: 'Đăng nhập / tài khoản',
-    },
-    demo: 'Dùng thử',
-    repo: 'Xem mã nguồn',
-    download: 'Tải xuống',
-  },
-  en: {
-    projects: 'Projects',
-    me: 'About me',
-    about: 'About ChiloLab',
-    switch: 'Tiếng Việt',
-    homeTitle: 'Nguyễn Tấn Phát, BA/QC and software maker',
-    title:
-      'Hi, I’m Phát. I test software for a living, and build my own apps on the side.',
-    intro:
-      'I’m a BA/QC at WeebPal and an Information Technology graduate from HUFLIT. Here you’ll find two Windows apps I wrote and release myself: a cat that lives right on your desktop, and a tool for checking websites.',
-    metaDescription:
-      'Portfolio of Nguyễn Tấn Phát, BA/QC at WeebPal and Information Technology graduate of HUFLIT. Experience, skills and two self-made Windows apps: Pet Desktop and PageSpeed-Auth-Auditor.',
-    explore: 'See my projects',
-    aboutCta: 'About me',
-    hello: 'Meow, hello!',
-    stack: 'Built with',
-    skillsHeading: 'What I work with',
-    portraitAlt:
-      'Nguyễn Tấn Phát in a grey jacket, standing in front of a wall of framed photos.',
-    selected:
-      'Each project has its own page, a version history and a place for your feedback.',
-    detail: 'Explore project',
-    back: 'All projects',
-    aboutText:
-      'ChiloLab is my little corner for trying out ideas. The ones that work become real apps, released version by version and improved from what people tell me. Download Pet Desktop to play, see what’s new in each version, or sign in to comment and report bugs.',
-    preview: 'Concept illustration, not a product screenshot',
-    footer: 'Small ideas, real releases, shaped by feedback.',
-    footerLinks: {
-      projects: 'Projects',
-      download: 'Download',
-      versions: 'All versions',
-      feedback: 'Feedback & bug reports',
-      privacy: 'Privacy',
-      account: 'Sign in / account',
-    },
-    demo: 'Try it',
-    repo: 'Source code',
-    download: 'Download',
-  },
-} as const;
+
+/** About-page copy for a locale, from src/content/profile/<locale>.yml. */
+export async function getProfile(locale: Locale) {
+  const entries = await getCollection('profile');
+  for (const language of locales)
+    if (entries.filter(({ data }) => data.locale === language).length !== 1)
+      throw new Error(`Profile needs exactly one ${language} file.`);
+  const [vi, en] = locales.map(
+    (language) => entries.find(({ data }) => data.locale === language)!.data,
+  );
+  if (vi.toeicScore !== en.toeicScore || vi.toeicYear !== en.toeicYear)
+    throw new Error('TOEIC score and year must match in both profile files.');
+  return entries.find(({ data }) => data.locale === locale)!.data;
+}
+
+/**
+ * Interface text for a locale, from src/content/ui/<locale>.yml (CMS:
+ * Chữ giao diện). Placeholders such as {n} must be the same in both languages.
+ */
+export async function getUi(locale: Locale) {
+  const entries = await getCollection('ui');
+  const byLocale = (language: Locale) => {
+    const found = entries.filter(({ data }) => data.locale === language);
+    if (found.length !== 1)
+      throw new Error(`Interface text needs exactly one ${language} file.`);
+    return found[0].data;
+  };
+  const marks = (text: string) => [...text.matchAll(/{w+}/g)].sort().join();
+  const compare = (vi: unknown, en: unknown, path: string) => {
+    if (typeof vi === 'string' && typeof en === 'string') {
+      if (marks(vi) !== marks(en))
+        throw new Error(`Placeholders differ between vi and en at ${path}.`);
+    } else if (vi && en && typeof vi === 'object' && typeof en === 'object')
+      for (const key of Object.keys(vi))
+        compare(
+          (vi as Record<string, unknown>)[key],
+          (en as Record<string, unknown>)[key],
+          `${path}.${key}`,
+        );
+  };
+  compare(byLocale('vi'), byLocale('en'), 'ui');
+  return byLocale(locale);
+}

@@ -1,0 +1,167 @@
+# Chữ giao diện (EN). Sửa bằng CMS: Chữ giao diện.
+# Giữ nguyên các chỗ {n}, {email}... trong câu mẫu.
+locale: en
+site:
+  projects: Projects
+  me: About me
+  about: About ChiloLab
+  switch: Tiếng Việt
+  homeTitle: Nguyễn Tấn Phát, BA/QC and software maker
+  title: Hi, I’m Phát. I test software for a living, and build my own apps on the side.
+  intro: 'I’m a BA/QC at WeebPal and an Information Technology graduate from HUFLIT. Here you’ll find two Windows apps I wrote and release myself: a cat that lives right on your desktop, and a tool for checking websites.'
+  metaDescription: 'Portfolio of Nguyễn Tấn Phát, BA/QC at WeebPal and Information Technology graduate of HUFLIT. Experience, skills and two self-made Windows apps: Pet Desktop and PageSpeed-Auth-Auditor.'
+  explore: See my projects
+  aboutCta: About me
+  hello: Meow, hello!
+  stack: Built with
+  skillsHeading: What I work with
+  portraitAlt: Nguyễn Tấn Phát in a grey jacket, standing in front of a wall of framed photos.
+  selected: Each project has its own page, a version history and a place for your feedback.
+  detail: Explore project
+  back: All projects
+  aboutText: ChiloLab is my little corner for trying out ideas. The ones that work become real apps, released version by version and improved from what people tell me. Download Pet Desktop to play, see what’s new in each version, or sign in to comment and report bugs.
+  preview: Concept illustration, not a product screenshot
+  footer: Small ideas, real releases, shaped by feedback.
+  footerLinks:
+    projects: Projects
+    download: Download
+    versions: All versions
+    feedback: Feedback & bug reports
+    privacy: Privacy
+    account: Sign in / account
+  demo: Try it
+  repo: Source code
+  download: Download
+comments:
+  heading: Comments
+  introProject: Comments from every version are gathered here. Comments with abusive language are held for review.
+  introVersion: Comments about this version. Comments with abusive language are held for review.
+  loading: Loading comments…
+  empty: No comments yet. Be the first!
+  loadFailed: Comments could not be loaded. Please try again later.
+  signIn: Sign in to comment
+  signedInAs: Commenting as
+  placeholder: Write a comment…
+  replyPlaceholder: Write a reply…
+  post: Post
+  cancel: Cancel
+  save: Save
+  reply: Reply
+  edit: Edit
+  remove: Delete
+  confirmRemove: Delete this comment?
+  edited: edited
+  held: Awaiting review — only you can see this comment.
+  deleted: This comment was deleted.
+  removed: This comment was removed by a moderator.
+  formerUser: Deleted account
+  showReplies: Show {n} more replies
+  hideReplies: Hide replies
+  previous: Previous
+  next: Next
+  pageOf: Page {page} of {pages}
+  pagination: Comment pages
+  count: '{n} comments'
+  sending: Sending…
+  failed: Could not send. Please try again.
+  rateLimited: You are posting quickly; wait a minute and try again.
+  closed: New comments are closed for now.
+  tooLong: That comment is too long; the limit is {n} characters.
+  hourlyLimit: You have posted a lot in the last hour. Please come back later.
+  heldNotice: Your comment is being held for review and will appear once approved.
+  versionLabel: Version
+  projectLabel: Project page
+  authorBadge: Author
+  heldOther: Held for review
+  approve: Approve
+  removeOther: Remove
+  confirmRemoveOther: Remove this person's comment?
+  reason_profanity: profanity
+  reason_insult: insult
+  reason_hate: hate
+  reason_sexual: sexual content
+  reason_threat: threat
+  reason_spam: spam
+  reason_link: contains a link
+feedback:
+  title: Feedback and bug reports
+  intro: Only the maker of ChiloLab reads what you send here; it is not shown publicly. No account needed.
+  publicNote: Want a public discussion? Use the comments on
+  kind: What would you like to send?
+  kinds:
+    bug: Bug report
+    idea: Suggestion / idea
+    other: Other
+  summary: Short title
+  summaryHint: 'Example: The cat stops moving after a restart'
+  message: Details
+  messageHintBug: What did you do? What did you expect? What happened instead? Does it happen again?
+  messageHintIdea: Describe the idea and why it would help you.
+  version: Version you use
+  versionUnknown: Not sure / other
+  os: Windows version (optional)
+  osHint: 'Example: Windows 11 23H2'
+  contact: Email or other contact (optional)
+  contactHint: Only used to follow up on this message.
+  send: Send
+  sending: Sending…
+  sent: Thank you! I’ve got your message.
+  verifying: Checking for spam, please wait a few seconds and send again.
+  failed: Could not send. Check your message and try again.
+  rateLimited: You are sending quickly; wait a minute and try again.
+  closed: The feedback form is closed for now. Please check back later.
+  noscript: JavaScript is needed to send feedback.
+user:
+  loginTitle: Sign in
+  loginHeading: Welcome to ChiloLab
+  loginIntro: Sign in to comment on projects and versions and reply.
+  google: Continue with Google
+  or: or
+  emailLabel: Email
+  emailPlaceholder: user@example.com
+  sendCode: Email me a sign-in code
+  codeSent: We sent a 6-digit code to {email}. Check your spam folder too.
+  codeLabel: 6-digit code
+  verify: Sign in
+  changeEmail: Use another email
+  resend: Send a new code
+  sending: Sending…
+  verifying: Checking for spam, please wait a few seconds and try again.
+  emailErrors:
+    invalid_email: That email address is not valid.
+    invalid_code: The code is wrong or has expired.
+    too_many_attempts: Too many wrong attempts. Request a new code.
+    rate_limited: You are requesting codes quickly; wait a minute and try again.
+    verification_failed: Spam check failed, please try again.
+    unavailable: Email sign-in is not enabled yet.
+    mail_failed: The email could not be sent, please try again later.
+    registration_closed: New accounts are not accepted right now; only existing accounts can sign in.
+    blocked: This account has been blocked.
+  newAccount: No account yet? Your first sign-in creates one.
+  agree: By continuing you accept the
+  privacy: Privacy policy
+  unavailable: Google sign-in is not enabled yet. Please check back later.
+  errors:
+    cancelled: You cancelled the sign-in.
+    expired: The sign-in expired, please try again.
+    google: Google could not confirm the account, please try again.
+    unavailable: Google sign-in is not enabled yet.
+    registration_closed: New accounts are not accepted right now; only existing accounts can sign in.
+    blocked: This account has been blocked.
+  accountTitle: Account
+  signedInAs: Signed in as
+  displayName: Display name
+  displayNameHint: Shown next to your comments (2–40 characters).
+  save: Save
+  saved: Saved.
+  signOut: Sign out
+  adminLink: Open the admin panel
+  deleteTitle: Delete account
+  deleteIntro: Deleting your account permanently removes your name, email and the text of all your comments. Comments with replies keep only a "deleted" line.
+  deleteButton: Delete my account
+  deleteConfirm: Permanently delete your account and all your comments?
+  deleted: Your account was deleted.
+  failed: That did not work, please try again.
+downloads:
+  count: '{n} downloads'
+  source: Installer and portable downloads from GitHub Releases, updated every minute.

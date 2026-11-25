@@ -1,0 +1,135 @@
+# Trang "Về mình" (EN). Sửa bằng CMS: Về mình / About.
+# Chỉ ghi thông tin thật; không nêu tên khách hàng (NDA). Xem PRODUCT.md.
+locale: en
+pageTitle: About me
+metaDescription: 'Nguyễn Tấn Phát: BA/QC at WeebPal since August 2025, Information Technology graduate of HUFLIT, and maker of the Windows software released on ChiloLab. Experience, skills, journey and contact.'
+heading: Hi, I’m Phát. I work as a BA/QC, and I love building small apps.
+lead: 'I studied Information Technology at HUFLIT. At work I’m a BA/QC: I talk with overseas clients until the requirements are clear, then test the product before it’s handed over. After hours I write, release and keep improving the apps you see here.'
+teaser: I’m a BA/QC at WeebPal and an Information Technology graduate from HUFLIT. My experience, skills and the road so far have their own page.
+readMore: More about me
+facts:
+  - icon: briefcase
+    text: BA/QC at WeebPal
+  - icon: graduation
+    text: IT graduate, HUFLIT
+  - icon: globe
+    text: Works in English
+emailMe: Email me
+seeProjects: See my projects
+github: GitHub
+petAlt: The Pet Desktop cat in a wizard hat sitting on the bottom edge of a Windows screen, next to a green slime.
+experienceTitle: Experience
+role: BA/QC
+company: WeebPal
+jobPeriod: Aug 2025 – present
+current: Current
+duties:
+  - Work directly in English with overseas clients and agencies to clarify requirements, confirm scope and report defects.
+  - Contribute to website projects for overseas agencies and to projects for Japanese companies in manufacturing, online learning (LMS) and digital transformation.
+  - Write requirement documents and test cases, test features and APIs, and follow defects through to closure.
+educationTitle: Education
+education: Information Technology, Ho Chi Minh City University of Foreign Languages – Information Technology (HUFLIT)
+educationPeriod: Graduated 2026
+howTitle: How I work
+howIntro: Here’s how a requirement usually goes through my hands.
+steps:
+  - icon: message
+    title: Clarify the requirement
+    text: Ask the client until the scope is clear, and write down what we agreed.
+  - icon: testing
+    title: Write documents and test cases
+    text: Turn the requirement into documentation and concrete test cases.
+  - icon: code
+    title: Test
+    text: Test features and APIs on real builds and record how to reproduce each defect.
+  - icon: history
+    title: Follow through to closure
+    text: Stay on each defect until it is fixed and retested, then hand over.
+skillsTitle: Skills
+skillsIntro: Things I’ve used at work, at university and in my own apps.
+skills:
+  - icon: testing
+    name: Testing
+    items:
+      - Tested the MoMo and VNPay payment APIs
+      - NUnit unit tests, Excel reports
+      - Built my own website QA tool
+  - icon: code
+    name: Web
+    items:
+      - ASP.NET MVC
+      - Entity Framework
+      - Java web
+      - Drupal
+      - PHP
+      - API integration
+  - icon: phone
+    name: Apps
+    items:
+      - C#/WPF
+      - Electron
+      - Flutter
+      - Android Studio
+  - icon: database
+    name: Databases
+    items:
+      - SQL Server
+      - MongoDB
+      - Firebase Realtime Database
+  - icon: braces
+    name: Languages
+    items:
+      - C#
+      - Java
+      - PHP
+      - Python
+  - icon: terminal
+    name: Systems & tools
+    items:
+      - Linux
+      - Networking
+      - Git
+      - GitHub
+      - GitLab
+  - icon: chip
+    name: IoT
+    items:
+      - Arduino
+      - ESP32
+      - ThingSpeak
+      - Firebase
+journeyTitle: My journal
+journeyKinds:
+  study: Study
+  work: Work
+  release: Release
+journey:
+  - kind: work
+    year: 2025
+    date: 2025-08
+    label: Aug 2025
+    title: Started as a BA/QC at WeebPal
+    text: Working in English with overseas clients, including Japanese companies.
+  - kind: study
+    year: 2026
+    title: Graduated in Information Technology, HUFLIT
+releaseTitle: 'Released Pet Desktop {version}: {title}'
+releaseCount: '{count} Pet Desktop releases have notes on ChiloLab.'
+coursesTitle: Courses
+courses:
+  - Basic Network Administration (ACBN)
+  - Cisco Network Administration (CCNA programme)
+  - Linux Master open-source administration
+coursesNote: Course completion certificates from the Athena training center.
+builtTitle: Things I built
+builtIntro: Two apps I wrote from scratch, released here and improved with your feedback.
+languagesTitle: Languages
+english: 'English: I use it every day working with overseas clients.'
+toeicLabel: TOEIC
+toeicAlt: Nguyễn Tấn Phát’s TOEIC certificate, with personal details blurred
+toeicOpen: Open the full-size certificate
+contactTitle: Let’s talk
+contactText: Want to talk about work, ask about a project or share feedback on the apps? Drop me an email; I read every one.
+# TOEIC: fill in from the real certificate, identical in vi.yml, e.g.:
+# toeicScore: 750
+# toeicYear: 2026

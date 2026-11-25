@@ -1,5 +1,6 @@
 import { devIdentity } from './access';
 import { auth } from './auth';
+import { cmsAuth, cmsPage } from './cms';
 import { comments } from './comments';
 import {
   asLocale,
@@ -157,6 +158,16 @@ export default {
         `/user/login?${new URLSearchParams({ return: url.pathname + url.search })}`,
       );
     }
+
+    // Sveltia CMS: opens only for the owner session (worker/cms.ts).
+    if (
+      path === '/admin' ||
+      path === '/admin/index.html' ||
+      path === '/admin/config.yml'
+    )
+      return cmsPage(request, env);
+    if (path === '/api/cms/auth' && request.method === 'GET')
+      return cmsAuth(request, env);
 
     if (
       request.method !== 'GET' &&

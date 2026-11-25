@@ -20,6 +20,10 @@
       "/api/*",
       // Videos need byte ranges to seek and replay (worker/media.ts).
       "/media/*",
+      // Sveltia CMS: owner session only (worker/cms.ts).
+      "/admin",
+      "/admin/index.html",
+      "/admin/config.yml",
       "/admin/manage",
       "/admin/manage/*",
       "/manage",
@@ -49,7 +53,7 @@
   // Workers Logs: errors and console output in the dashboard.
   "observability": { "enabled": true },
   // Public values only. Secrets (TURNSTILE_SECRET, GOOGLE_CLIENT_SECRET,
-  // RESEND_API_KEY) are
+  // RESEND_API_KEY, CMS_GITHUB_TOKEN) are
   // set with `wrangler secret put` or in the dashboard.
   "vars": {
     "GOOGLE_CLIENT_ID": "354598476641-kjo3ve152771g4boncv5rooshqd7bmqt.apps.googleusercontent.com",

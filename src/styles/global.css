@@ -2262,3 +2262,59 @@ a:has(> .icon),
   font-size: 0.85em;
   overflow-wrap: anywhere;
 }
+
+/* Print: recruiters often save the About page as a PDF. Keep the content,
+   drop the site chrome, the cat and the backgrounds, and print link targets. */
+@media print {
+  @page {
+    margin: 1.6cm;
+  }
+  body {
+    background: #fff;
+    color: #000;
+    font-size: 11pt;
+  }
+  .skip,
+  .owner-bar,
+  .header nav,
+  .footer,
+  .cat-floor,
+  .taskbar,
+  .journey-rail,
+  .pet-polaroid,
+  video {
+    display: none !important;
+  }
+  .desk,
+  .about-block,
+  .project,
+  .job {
+    background: none !important;
+    box-shadow: none !important;
+  }
+  .button,
+  .button-quiet {
+    border: 0;
+    background: none;
+    color: #000;
+    padding: 0;
+    min-height: 0;
+  }
+  main a[href^='http']::after,
+  main a[href^='mailto:']::after {
+    content: ' (' attr(href) ')';
+    font-size: 0.85em;
+    font-weight: 400;
+  }
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+  .job,
+  .steps li,
+  .journey-entry,
+  .skill-grid > div {
+    break-inside: avoid;
+  }
+}
