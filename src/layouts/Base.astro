@@ -16,8 +16,17 @@ interface Props {
   locale: Locale;
   slug?: string;
   noindex?: boolean;
+  /** Browser tab text; defaults to the title followed by the domain. */
+  tab?: string;
 }
-const { title, description, locale, slug = '', noindex = false } = Astro.props;
+const {
+  title,
+  description,
+  locale,
+  slug = '',
+  noindex = false,
+  tab = `${title} · chilolab.com`,
+} = Astro.props;
 const t = copy[locale];
 const other = locale === 'vi' ? 'en' : 'vi';
 const canonical = new URL(pathFor(locale, slug), Astro.site);
@@ -38,7 +47,7 @@ const ogAlt =
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title} | ChiloLab</title>
+    <title>{tab}</title>
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

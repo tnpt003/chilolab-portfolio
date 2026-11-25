@@ -1,0 +1,135 @@
+---
+import type { ImageMetadata } from 'astro';
+import { getImage, Image } from 'astro:assets';
+
+interface Props {
+  shots: { image: ImageMetadata; alt: string }[];
+  locale: 'vi' | 'en';
+}
+const { shots, locale } = Astro.props;
+const vi = locale === 'vi';
+const items = await Promise.all(
+  shots.map(async (shot) => ({
+    ...shot,
+    full: (
+      await getImage({
+        src: shot.image,
+        width: Math.min(1600, shot.image.width),
+        format: 'webp',
+      })
+    ).src,
+  })),
+);
+---
+
+<section class="project-gallery" aria-labelledby="gallery-heading">
+  <h2 id="gallery-heading">{vi ? 'Hình trong game' : 'In the app'}</h2>
+  <ul>
+    {items.map((shot, index) => (
+      <li>
+        {/* Without JavaScript the link opens the large picture. */}
+        <a href={shot.full} data-index={index}>
+          <Image
+            src={shot.image}
+            alt={shot.alt}
+            widths={[400, 800]}
+            sizes="(min-width: 52rem) 30vw, (min-width: 32rem) 45vw, 92vw"
+            loading="lazy"
+          />
+        </a>
+      </li>
+    ))}
+  </ul>
+  <p class="gallery-note">
+    {vi
+      ? 'Cắt từ video giới thiệu, quay ứng dụng thật. Bấm ảnh để xem lớn.'
+      : 'Cropped from the promo video, recorded in the real app. Select a picture to see it larger.'}
+  </p>
+  <dialog class="lightbox" aria-label={vi ? 'Xem ảnh lớn' : 'Picture viewer'}>
+    <figure>
+      <img alt="" />
+      <figcaption>
+        <span class="lightbox-caption"></span>
+        <span class="lightbox-count"></span>
+      </figcaption>
+    </figure>
+    <button
+      type="button"
+      class="lightbox-prev"
+      aria-label={vi ? 'Ảnh trước' : 'Previous picture'}
+    >
+      ‹
+    </button>
+    <button
+      type="button"
+      class="lightbox-next"
+      aria-label={vi ? 'Ảnh sau' : 'Next picture'}
+    >
+      ›
+    </button>
+    <button
+      type="button"
+      class="lightbox-close"
+      aria-label={vi ? 'Đóng' : 'Close'}
+    >
+      ×
+    </button>
+  </dialog>
+</section>
+
+<script>
+  for (const gallery of document.querySelectorAll<HTMLElement>(
+    '.project-gallery',
+  )) {
+    const links = [
+      ...gallery.querySelectorAll<HTMLAnchorElement>('a[data-index]'),
+    ];
+    const dialog = gallery.querySelector('dialog')!;
+    const picture = dialog.querySelector('img')!;
+    const caption = dialog.querySelector('.lightbox-caption')!;
+    const count = dialog.querySelector('.lightbox-count')!;
+    let current = 0;
+    let opener: HTMLAnchorElement | null = null;
+
+    const show = (index: number) => {
+      current = (index + links.length) % links.length;
+      const link = links[current]!;
+      const alt = link.querySelector('img')?.alt ?? '';
+      picture.src = link.href;
+      picture.alt = alt;
+      caption.textContent = alt;
+      count.textContent = `${current + 1} / ${links.length}`;
+    };
+
+    for (const link of links)
+      link.addEventListener('click', (event) => {
+        if (event.ctrlKey || event.metaKey || event.shiftKey) return;
+        event.preventDefault();
+        opener = link;
+        show(Number(link.dataset.index));
+        dialog.showModal();
+      });
+
+    dialog
+      .querySelector('.lightbox-prev')!
+      .addEventListener('click', () => show(current - 1));
+    dialog
+      .querySelector('.lightbox-next')!
+      .addEventListener('click', () => show(current + 1));
+    dialog
+      .querySelector('.lightbox-close')!
+      .addEventListener('click', () => dialog.close());
+    // A click on the dark backdrop, outside the picture and buttons, closes.
+    dialog.addEventListener('click', (event) => {
+      if (event.target === dialog) dialog.close();
+    });
+    dialog.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowLeft') show(current - 1);
+      if (event.key === 'ArrowRight') show(current + 1);
+    });
+    dialog.addEventListener('close', () => {
+      // Return focus to the picture the visitor was on.
+      (links[current] ?? opener)?.focus();
+    });
+  }
+</script>

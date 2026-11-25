@@ -2126,3 +2126,81 @@ a:has(> .icon),
     border-left: 0;
   }
 }
+
+/* Gallery picture viewer (src/components/Gallery.astro). */
+.lightbox {
+  width: min(96vw, 100rem);
+  max-width: none;
+  max-height: 96vh;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  overflow: visible;
+}
+.lightbox::backdrop {
+  background: rgb(10 25 30 / 0.94);
+}
+.lightbox figure {
+  margin: 0;
+  pointer-events: none;
+}
+.lightbox img {
+  display: block;
+  width: 100%;
+  max-height: calc(96vh - 3rem);
+  object-fit: contain;
+  border-radius: 0.4rem;
+  pointer-events: auto;
+}
+.lightbox figcaption {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 0.6rem;
+  padding: 0.4rem 0.7rem;
+  border-radius: 0.4rem;
+  background: var(--ink-deep);
+  font-size: 0.9rem;
+}
+.lightbox-count {
+  flex: none;
+  opacity: 0.8;
+}
+.lightbox button {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin: 0;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 0.35);
+  border-radius: 50%;
+  background: rgb(10 25 30 / 0.7);
+  color: #fff;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.lightbox button:hover {
+  background: var(--ink);
+}
+.lightbox button:focus-visible {
+  outline: 3px solid var(--apricot);
+  outline-offset: 2px;
+}
+.lightbox-close {
+  top: 0.5rem;
+  right: 0.5rem;
+}
+.lightbox-prev,
+.lightbox-next {
+  top: calc(50% - 1.75rem);
+}
+.lightbox-prev {
+  left: 0.5rem;
+}
+.lightbox-next {
+  right: 0.5rem;
+}

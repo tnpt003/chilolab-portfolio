@@ -16,6 +16,7 @@ import {
 import { downloadStats } from './github';
 import { notifyFeedback } from './mail';
 import { manage } from './manage';
+import { media } from './media';
 import { human } from './turnstile';
 import { currentUser } from './session';
 import { getSettings } from './settings';
@@ -124,6 +125,12 @@ export default {
     // The admin panel moved from /manage to /admin/manage on 2026-11-25.
     if (path === '/manage' || path.startsWith('/manage/'))
       return redirect(`/admin${url.pathname}${url.search}`, 301);
+
+    if (
+      path.startsWith('/media/') &&
+      (request.method === 'GET' || request.method === 'HEAD')
+    )
+      return media(request, env);
 
     if (path === '/admin/manage' || path.startsWith('/admin/manage/')) {
       // Only an owner account (users.role = 'owner') signed in at

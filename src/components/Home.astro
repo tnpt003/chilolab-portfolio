@@ -35,7 +35,12 @@ const rows = await Promise.all(
 );
 ---
 
-<Base title={t.homeTitle} description={t.metaDescription} locale={locale}>
+<Base
+  title={t.homeTitle}
+  tab="chilolab.com"
+  description={t.metaDescription}
+  locale={locale}
+>
   {/* The hero is a desktop: the portrait window sits on it, and the
       ChiloLab cat walks along the taskbar, as Pet Desktop does. */}
   <section class="desk">

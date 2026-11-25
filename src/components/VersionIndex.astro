@@ -14,6 +14,7 @@ const entries = await listVersions(data.locale, data.slug);
 
 <Base
   title={`${data.title} — ${t.heading}`}
+  tab={`${data.title} · ${t.heading} · chilolab.com`}
   description={`${t.intro} ${data.title}`}
   locale={data.locale}
   slug={`${data.slug}/versions`}

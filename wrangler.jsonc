@@ -18,6 +18,8 @@
     "html_handling": "drop-trailing-slash",
     "run_worker_first": [
       "/api/*",
+      // Videos need byte ranges to seek and replay (worker/media.ts).
+      "/media/*",
       "/admin/manage",
       "/admin/manage/*",
       "/manage",

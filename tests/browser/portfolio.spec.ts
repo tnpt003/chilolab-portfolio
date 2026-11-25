@@ -73,6 +73,22 @@ for (const route of routes) {
       await page
         .locator('video')
         .evaluate((video: HTMLVideoElement) => video.pause());
+      // Gallery pictures open in a dialog; arrows move, Escape closes.
+      const lightbox = page.locator('dialog.lightbox');
+      await page.locator('.project-gallery a').first().click();
+      await expect(lightbox).toBeVisible();
+      await expect(page.locator('.lightbox-count')).toHaveText('1 / 6');
+      await page.keyboard.press('ArrowRight');
+      await expect(page.locator('.lightbox-count')).toHaveText('2 / 6');
+      await expect(
+        (
+          await new AxeBuilder({ page })
+            .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+            .analyze()
+        ).violations,
+      ).toEqual([]);
+      await page.keyboard.press('Escape');
+      await expect(lightbox).toBeHidden();
     }
     if (
       route === '/' ||
