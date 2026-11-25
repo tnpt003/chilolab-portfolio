@@ -313,6 +313,19 @@ collections:
         widget: string
         required: false
         pattern: ['^/media/[a-z0-9-]+\.mp4$', 'Dạng /media/ten-video.mp4']
+      - label: Chú thích video
+        name: videoCaption
+        widget: string
+        required: false
+        hint: Độ dài, có âm thanh hay không, quay từ bản nào.
+      - label: Thư viện ảnh
+        name: gallery
+        widget: list
+        required: false
+        hint: Ảnh chụp ứng dụng thật, hiện thành lưới dưới video.
+        fields:
+          - { label: Ảnh, name: image, widget: image }
+          - { label: Mô tả ảnh (alt), name: alt, widget: string }
       - { label: Link dùng thử, name: demoUrl, widget: string, required: false }
       - { label: Link mã nguồn, name: repoUrl, widget: string, required: false }
       - label: Link tải (dự phòng)
@@ -380,6 +393,19 @@ collections:
         widget: string
         required: false
         pattern: ['^/media/[a-z0-9-]+\.mp4$', 'Use /media/name.mp4']
+      - label: Video caption
+        name: videoCaption
+        widget: string
+        required: false
+        hint: Length, whether it has sound, which build it shows.
+      - label: Gallery
+        name: gallery
+        widget: list
+        required: false
+        hint: Real app captures, shown as a grid under the video.
+        fields:
+          - { label: Image, name: image, widget: image }
+          - { label: Alt text, name: alt, widget: string }
       - { label: Demo link, name: demoUrl, widget: string, required: false }
       - {
           label: Repository link,

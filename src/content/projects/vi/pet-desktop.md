@@ -11,7 +11,21 @@ preview:
   image: ../../../assets/pet-battle-hub.png
   alt: Giao diện chọn chế độ phiêu lưu và chiến đấu trong Pet Desktop.
   caption: Ảnh ứng dụng thật — bản phát triển 1.5, có thể khác bản phát hành.
-video: /media/pet-intro.mp4
+video: /media/pet-promo.mp4
+videoCaption: Video giới thiệu 1 phút 44 giây, có nhạc. Quay từ ứng dụng thật; bản phát hành có thể khác đôi chút.
+gallery:
+  - image: ../../../assets/pet-gallery/fishing.png
+    alt: Mèo Chilo ngồi câu cá bên hồ nhỏ ở góc desktop.
+  - image: ../../../assets/pet-gallery/cooking.png
+    alt: Mèo Chilo nấu ăn bên nồi đang sôi trên bếp lửa.
+  - image: ../../../assets/pet-gallery/portal.png
+    alt: Cổng dịch chuyển màu tím hiện bên cạnh mèo, có nhãn Click to enter.
+  - image: ../../../assets/pet-gallery/chapter-map.png
+    alt: Bản đồ Chương 1 The Slime Invasion với năm màn chơi, đang chọn màn Break through.
+  - image: ../../../assets/pet-gallery/battle.png
+    alt: Mèo Chilo được nhấc khỏi mặt đất trong lúc slime tràn lên từ đáy màn hình.
+  - image: ../../../assets/pet-gallery/victory.png
+    alt: Bảng chiến thắng sau khi hạ Slime King, kèm thời gian, số slime đã hạ và các nâng cấp của lượt chơi.
 ---
 
 ## Một người bạn nhỏ trên desktop

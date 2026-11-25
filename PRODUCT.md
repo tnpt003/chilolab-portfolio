@@ -36,7 +36,7 @@ Visitors arrive from links (CV, GitHub, social previews) and from Pet Desktop it
 
 ## Evidence on Hand
 
-- Pet Desktop: real 1.5 development-preview captures (`src/assets/pet-battle-hub.png`, `src/assets/pet-on-desktop.png`) and a silent 32-second intro video (`public/media/pet-intro.mp4`); version notes in `src/content/versions/`; live GitHub download counts.
+- Pet Desktop: real 1.5 development-preview captures (`src/assets/pet-battle-hub.png`, `src/assets/pet-on-desktop.png`), a 1:44 promo video with the owner's own synthesized music (`public/media/pet-promo.mp4`) and six gallery crops from it (`src/assets/pet-gallery/`); version notes in `src/content/versions/`; live GitHub download counts.
 - PageSpeed-Auth-Auditor: one real main-screen capture from its user guide (`src/assets/auditor-main-screen.png`). No public downloads or source.
 - Owner: real portrait (`src/assets/phat-portrait.jpg`) and the biography in `src/lib/profile.ts`.
 - Absent, never to be fabricated: testimonials, client names (NDA), TOEIC score (pending from the owner), Auditor performance scores, any download or repository URL not listed under Content integrity.

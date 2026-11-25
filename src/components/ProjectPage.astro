@@ -1,6 +1,6 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
-import { getImage } from 'astro:assets';
+import { getImage, Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import ProjectVisual from './ProjectVisual.astro';
 import Icon from './Icon.astro';
@@ -36,6 +36,18 @@ const poster =
     ? (await getImage({ src: data.preview.image, width: 800, format: 'webp' }))
         .src
     : undefined;
+const gallery = await Promise.all(
+  data.gallery.map(async (shot) => ({
+    ...shot,
+    full: (
+      await getImage({
+        src: shot.image,
+        width: Math.min(1600, shot.image.width),
+        format: 'webp',
+      })
+    ).src,
+  })),
+);
 ---
 
 <Base
@@ -124,12 +136,35 @@ const poster =
             </a>
           </video>
         </div>
-        <figcaption>
-          {data.locale === 'vi'
-            ? 'Video không âm thanh, 32 giây. Bản phát triển 1.5; bản phát hành có thể khác.'
-            : 'Silent, 32-second introduction. Development preview for 1.5; published releases may differ.'}
-        </figcaption>
+        {data.videoCaption && <figcaption>{data.videoCaption}</figcaption>}
       </figure>
+    )}
+    {gallery.length > 0 && (
+      <section class="project-gallery" aria-labelledby="gallery-heading">
+        <h2 id="gallery-heading">
+          {data.locale === 'vi' ? 'Hình trong game' : 'In the app'}
+        </h2>
+        <ul>
+          {gallery.map((shot) => (
+            <li>
+              <a href={shot.full}>
+                <Image
+                  src={shot.image}
+                  alt={shot.alt}
+                  widths={[400, 800]}
+                  sizes="(min-width: 60rem) 30vw, (min-width: 36rem) 45vw, 92vw"
+                  loading="lazy"
+                />
+              </a>
+            </li>
+          ))}
+        </ul>
+        <p class="gallery-note">
+          {data.locale === 'vi'
+            ? 'Cắt từ video giới thiệu, quay ứng dụng thật. Bấm ảnh để xem lớn.'
+            : 'Cropped from the promo video, recorded in the real app. Select a picture to see it larger.'}
+        </p>
+      </section>
     )}
     <div class:list={['detail-body', { single: !hasLinks }]}>
       {hasLinks && (

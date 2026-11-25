@@ -56,7 +56,7 @@ for (const route of routes) {
       expect((await page.request.get(poster!)).status()).toBe(200);
       await expect(page.locator('video')).toHaveAttribute('controls', '');
       await expect(page.locator('video')).not.toHaveAttribute('autoplay');
-      const media = await page.request.get('/media/pet-intro.mp4', {
+      const media = await page.request.get('/media/pet-promo.mp4', {
         headers: { Range: 'bytes=0-99' },
       });
       expect([200, 206]).toContain(media.status());

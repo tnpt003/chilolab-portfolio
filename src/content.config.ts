@@ -30,6 +30,12 @@ const projects = defineCollection({
         .string()
         .regex(/^\/media\/[a-z0-9-]+\.mp4$/)
         .optional(),
+      // What the video is: length, sound, which build. Shown under it.
+      videoCaption: z.string().min(1).optional(),
+      // Real app captures, shown as a grid under the video.
+      gallery: z
+        .array(z.object({ image: image(), alt: z.string().min(1) }))
+        .default([]),
       demoUrl: z.url({ protocol: /^https?$/ }).optional(),
       repoUrl: z.url({ protocol: /^https?$/ }).optional(),
       downloadUrl: z.url({ protocol: /^https?$/ }).optional(),

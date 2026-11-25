@@ -11,7 +11,21 @@ preview:
   image: ../../../assets/pet-battle-hub.png
   alt: Pet Desktop interface for choosing adventure and battle modes.
   caption: Actual application screenshot — development preview for 1.5; releases may differ.
-video: /media/pet-intro.mp4
+video: /media/pet-promo.mp4
+videoCaption: 1 minute 44 second promo video, with music. Recorded in the real app; published releases may differ slightly.
+gallery:
+  - image: ../../../assets/pet-gallery/fishing.png
+    alt: Chilo the cat fishing at a small pond in the corner of the desktop.
+  - image: ../../../assets/pet-gallery/cooking.png
+    alt: Chilo cooking beside a bubbling pot over a fire.
+  - image: ../../../assets/pet-gallery/portal.png
+    alt: A purple portal appears next to the cat, labelled Click to enter.
+  - image: ../../../assets/pet-gallery/chapter-map.png
+    alt: The Chapter 1 map, The Slime Invasion, with five stages and Break through selected.
+  - image: ../../../assets/pet-gallery/battle.png
+    alt: Chilo lifted off the ground while slimes advance from the bottom of the screen.
+  - image: ../../../assets/pet-gallery/victory.png
+    alt: The victory panel after defeating the Slime King, with time, slimes defeated and the run’s upgrades.
 ---
 
 ## A little desktop companion
