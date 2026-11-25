@@ -1,0 +1,71 @@
+---
+// Live download count from GitHub Releases (worker/github.ts), refreshed
+// every minute while the page is visible. Hidden until a number arrives, so
+// nothing shows without JavaScript or when the count is unavailable.
+import Icon from './Icon.astro';
+import type { Locale } from '../lib/content';
+import { downloadStatCopy, hasDownloadStats } from '../lib/community';
+interface Props {
+  project: string;
+  locale: Locale;
+}
+const { project, locale } = Astro.props;
+const t = downloadStatCopy[locale];
+---
+
+{hasDownloadStats(project) && (
+  <span
+    class="download-stat"
+    data-download-stat={project}
+    data-label={t.count}
+    data-locale={locale}
+    title={t.source}
+    hidden
+  >
+    <Icon name="download" size={16} />
+    <span data-value />
+  </span>
+)}
+
+<script>
+  const nodes = [
+    ...document.querySelectorAll<HTMLElement>('[data-download-stat]'),
+  ];
+  const projects = [
+    ...new Set(nodes.map((node) => node.dataset.downloadStat!)),
+  ];
+
+  async function refresh() {
+    for (const project of projects) {
+      try {
+        const response = await fetch(
+          `/api/downloads/stats?${new URLSearchParams({ project })}`,
+        );
+        if (!response.ok) continue;
+        const { total } = (await response.json()) as { total?: number };
+        if (typeof total !== 'number') continue;
+        for (const node of nodes) {
+          if (node.dataset.downloadStat !== project) continue;
+          const number = new Intl.NumberFormat(
+            node.dataset.locale === 'en' ? 'en-GB' : 'vi-VN',
+          ).format(total);
+          node.querySelector('[data-value]')!.textContent =
+            node.dataset.label!.replace('{n}', number);
+          node.hidden = false;
+        }
+      } catch {
+        // Keep the last number; the count is decoration, never a blocker.
+      }
+    }
+  }
+
+  if (projects.length) {
+    refresh();
+    setInterval(() => {
+      if (document.visibilityState === 'visible') refresh();
+    }, 60_000);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') refresh();
+    });
+  }
+</script>

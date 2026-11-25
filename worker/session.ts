@@ -4,6 +4,8 @@ import { randomToken, sha256, type Env } from './env';
 // The __Host- prefix pins it to this exact host and path "/".
 const COOKIE = '__Host-chilolab_session';
 const DAYS = 30;
+/** Readable hint for the public site's owner bar; never grants access. */
+export const ADMIN_HINT = '__Host-chilolab_admin';
 
 export type User = {
   id: number;
@@ -41,7 +43,8 @@ export async function currentUser(request: Request, env: Env) {
   const row = await env.DB.prepare(
     `SELECT users.id, users.email, users.display_name AS displayName, users.role
      FROM sessions JOIN users ON users.id = sessions.user_id
-     WHERE sessions.token_hash = ? AND sessions.expires_at > ?`,
+     WHERE sessions.token_hash = ? AND sessions.expires_at > ?
+       AND users.blocked_at IS NULL`,
   )
     .bind(await sha256(token), new Date().toISOString())
     .first<User>();

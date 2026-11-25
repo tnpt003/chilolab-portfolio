@@ -74,3 +74,25 @@ export async function notifyHeld(
     ],
   );
 }
+
+/** Tells the site owner about new feedback (setting: notifyFeedback). */
+export async function notifyFeedback(
+  env: Env,
+  origin: string,
+  feedback: { project: string; kind: string; summary: string; message: string },
+) {
+  const owner = await env.DB.prepare(
+    "SELECT email FROM users WHERE role = 'owner' LIMIT 1",
+  ).first<{ email: string }>();
+  if (!owner) return;
+  await sendMail(
+    env,
+    owner.email,
+    `[ChiloLab] Góp ý mới: ${feedback.summary.slice(0, 80)}`,
+    [
+      `Góp ý mới cho ${feedback.project} (loại: ${feedback.kind}).`,
+      feedback.message.slice(0, 1200),
+      `Xử lý tại ${origin}/manage/feedback`,
+    ],
+  );
+}

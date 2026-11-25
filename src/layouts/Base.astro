@@ -79,6 +79,29 @@ const ogAlt =
     <a class="skip" href="#main">
       {locale === 'vi' ? 'Đến nội dung' : 'Skip to content'}
     </a>
+    <div
+      class="owner-bar"
+      data-owner-bar
+      data-pending={
+        locale === 'vi'
+          ? '{held} bình luận chờ duyệt · {feedback} góp ý mới'
+          : '{held} held comments · {feedback} new feedback'
+      }
+      hidden
+    >
+      <div class="wrap">
+        <strong>{locale === 'vi' ? 'Chế độ chủ site' : 'Owner mode'}</strong>
+        <span class="owner-bar-note">
+          {locale === 'vi'
+            ? 'Khách không thấy dải này.'
+            : 'Visitors do not see this bar.'}
+        </span>
+        <a href="/manage" data-owner-pending></a>
+        <a href="/manage">
+          {locale === 'vi' ? 'Mở trang quản trị' : 'Open the admin panel'}
+        </a>
+      </div>
+    </div>
     <header class="header wrap">
       <a class="brand" href={pathFor(locale)}>
         <Logo />
@@ -186,5 +209,28 @@ const ogAlt =
         <span>© {new Date().getFullYear()} Nguyễn Tấn Phát · ChiloLab</span>
       </div>
     </footer>
+    <script>
+      // Owner bar: only asked for when the owner hint cookie is present
+      // (set by /manage and /api/me), so visitors never trigger the request.
+      // The answer from /api/me decides; the cookie alone shows nothing.
+      const bar = document.querySelector<HTMLElement>('[data-owner-bar]');
+      if (bar && document.cookie.includes('__Host-chilolab_admin=1'))
+        fetch('/api/me')
+          .then((response) => (response.ok ? response.json() : null))
+          .then((data) => {
+            if (!data?.user?.owner) return;
+            const pending = bar.querySelector<HTMLElement>(
+              '[data-owner-pending]',
+            )!;
+            const { held = 0, feedback = 0 } = data.pending ?? {};
+            if (held || feedback)
+              pending.textContent = bar.dataset
+                .pending!.replace('{held}', String(held))
+                .replace('{feedback}', String(feedback));
+            else pending.remove();
+            bar.hidden = false;
+          })
+          .catch(() => {});
+    </script>
   </body>
 </html>

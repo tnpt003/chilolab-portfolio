@@ -38,6 +38,8 @@ export const commentCopy = {
     failed: 'Chưa gửi được. Vui lòng thử lại.',
     rateLimited: 'Bạn gửi hơi nhanh, đợi một phút rồi thử lại.',
     closed: 'Bình luận mới đang tạm đóng.',
+    tooLong: 'Bình luận dài quá, tối đa {n} ký tự.',
+    hourlyLimit: 'Bạn đã bình luận nhiều trong giờ qua, vui lòng quay lại sau.',
     heldNotice:
       'Bình luận đang được giữ lại để xem xét và sẽ hiện sau khi được duyệt.',
     versionLabel: 'Phiên bản',
@@ -91,6 +93,9 @@ export const commentCopy = {
     failed: 'Could not send. Please try again.',
     rateLimited: 'You are posting quickly; wait a minute and try again.',
     closed: 'New comments are closed for now.',
+    tooLong: 'That comment is too long; the limit is {n} characters.',
+    hourlyLimit:
+      'You have posted a lot in the last hour. Please come back later.',
     heldNotice:
       'Your comment is being held for review and will appear once approved.',
     versionLabel: 'Version',
@@ -178,7 +183,7 @@ export const userCopy = {
     google: 'Tiếp tục với Google',
     or: 'hoặc',
     emailLabel: 'Email',
-    emailPlaceholder: 'ban@example.com',
+    emailPlaceholder: 'user@example.com',
     sendCode: 'Gửi mã đăng nhập',
     codeSent: 'Đã gửi mã 6 số tới {email}. Kiểm tra cả hộp thư Spam.',
     codeLabel: 'Mã 6 số',
@@ -197,6 +202,7 @@ export const userCopy = {
       mail_failed: 'Chưa gửi được email, vui lòng thử lại sau.',
       registration_closed:
         'Hiện không nhận tài khoản mới; chỉ tài khoản đã có đăng nhập được.',
+      blocked: 'Tài khoản này đã bị khóa.',
     },
     newAccount: 'Chưa có tài khoản? Lần đầu đăng nhập sẽ tự tạo tài khoản.',
     agree: 'Khi tiếp tục, bạn đồng ý với',
@@ -209,6 +215,7 @@ export const userCopy = {
       unavailable: 'Đăng nhập bằng Google chưa được bật.',
       registration_closed:
         'Hiện không nhận tài khoản mới; chỉ tài khoản đã có đăng nhập được.',
+      blocked: 'Tài khoản này đã bị khóa.',
     },
     accountTitle: 'Tài khoản',
     signedInAs: 'Đăng nhập với',
@@ -233,7 +240,7 @@ export const userCopy = {
     google: 'Continue with Google',
     or: 'or',
     emailLabel: 'Email',
-    emailPlaceholder: 'you@example.com',
+    emailPlaceholder: 'user@example.com',
     sendCode: 'Email me a sign-in code',
     codeSent: 'We sent a 6-digit code to {email}. Check your spam folder too.',
     codeLabel: '6-digit code',
@@ -253,6 +260,7 @@ export const userCopy = {
       mail_failed: 'The email could not be sent, please try again later.',
       registration_closed:
         'New accounts are not accepted right now; only existing accounts can sign in.',
+      blocked: 'This account has been blocked.',
     },
     newAccount: 'No account yet? Your first sign-in creates one.',
     agree: 'By continuing you accept the',
@@ -265,6 +273,7 @@ export const userCopy = {
       unavailable: 'Google sign-in is not enabled yet.',
       registration_closed:
         'New accounts are not accepted right now; only existing accounts can sign in.',
+      blocked: 'This account has been blocked.',
     },
     accountTitle: 'Account',
     signedInAs: 'Signed in as',
@@ -290,3 +299,22 @@ export const feedbackPath = (locale: Locale, project: string) =>
   `${locale === 'en' ? '/en' : ''}/${project}/feedback`;
 export const privacyPath = (locale: Locale) =>
   locale === 'en' ? '/en/privacy' : '/privacy';
+
+// Projects whose public download count comes from GitHub Releases
+// (worker/github.ts keeps the matching repository and file names).
+const downloadStatProjects = ['pet-desktop'];
+export const hasDownloadStats = (project: string) =>
+  downloadStatProjects.includes(project);
+
+export const downloadStatCopy = {
+  vi: {
+    count: '{n} lượt tải',
+    source:
+      'Số lần tải bộ cài và bản portable từ GitHub Releases, cập nhật mỗi phút.',
+  },
+  en: {
+    count: '{n} downloads',
+    source:
+      'Installer and portable downloads from GitHub Releases, updated every minute.',
+  },
+} satisfies Record<Locale, Record<string, string>>;

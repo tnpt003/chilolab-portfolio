@@ -13,6 +13,8 @@ import {
   underLimit,
   type Env,
 } from './env';
+import { downloadStats } from './github';
+import { notifyFeedback } from './mail';
 import { manage } from './manage';
 import { human } from './turnstile';
 import { currentUser } from './session';
@@ -37,9 +39,9 @@ async function allowed(request: Request, env: Env) {
   return data;
 }
 
-async function addFeedback(request: Request, env: Env) {
-  if (!(await getSettings(env)).feedbackOpen)
-    return json({ error: 'closed' }, 403);
+async function addFeedback(request: Request, env: Env, ctx: ExecutionContext) {
+  const settings = await getSettings(env);
+  if (!settings.feedbackOpen) return json({ error: 'closed' }, 403);
   const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
   if (!(await underLimit(env, `ip:${ip}`)))
     return json({ error: 'rate_limited' }, 429);
@@ -85,6 +87,15 @@ async function addFeedback(request: Request, env: Env) {
       user?.id ?? null,
     )
     .run();
+  if (settings.notifyFeedback)
+    ctx.waitUntil(
+      notifyFeedback(env, new URL(request.url).origin, {
+        project,
+        kind,
+        summary,
+        message,
+      }).catch((error) => console.error('notify failed', error)),
+    );
   return json({ status: 'received' }, 201);
 }
 
@@ -116,13 +127,13 @@ export default {
       // Anything else is refused: the panel fails closed.
       const user = await currentUser(request, env);
       if (user?.role === 'owner')
-        return manage(request, env, {
+        return manage(request, env, ctx, {
           name: user.displayName,
           userId: user.id,
         });
       const identity = await adminIdentity(request, env);
       if (identity)
-        return manage(request, env, { name: identity, userId: null });
+        return manage(request, env, ctx, { name: identity, userId: null });
       if (user || request.method !== 'GET')
         return new Response('Forbidden', {
           status: 403,
@@ -156,7 +167,9 @@ export default {
         (await comments(request, env, ctx, path, isAllowed));
       if (response) return response;
       if (path === '/api/feedback' && request.method === 'POST')
-        return await addFeedback(request, env);
+        return await addFeedback(request, env, ctx);
+      if (path === '/api/downloads/stats' && request.method === 'GET')
+        return await downloadStats(request, ctx);
       if (path === '/api/downloads' && request.method === 'POST')
         return await countDownload(request, env);
     } catch (error) {

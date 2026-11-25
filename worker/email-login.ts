@@ -153,9 +153,12 @@ async function verify(request: Request, env: Env) {
     .bind(email)
     .run();
   const now = stamp();
-  let user = await env.DB.prepare('SELECT id FROM users WHERE email = ?')
+  let user = await env.DB.prepare(
+    'SELECT id, blocked_at FROM users WHERE email = ?',
+  )
     .bind(email)
-    .first<{ id: number }>();
+    .first<{ id: number; blocked_at?: string | null }>();
+  if (user?.blocked_at) return json({ error: 'blocked' }, 403);
   if (user)
     await env.DB.prepare('UPDATE users SET last_login_at = ? WHERE id = ?')
       .bind(now, user.id)

@@ -63,6 +63,8 @@ const t = commentCopy[locale];
     moderator: boolean;
     /** False when the owner has closed new comments (/manage/settings). */
     open?: boolean;
+    /** Longest comment allowed (/manage/settings). */
+    maxLength?: number;
     comments: Comment[];
   };
   type Copy = Record<string, string>;
@@ -86,7 +88,10 @@ const t = commentCopy[locale];
       ...init,
       headers: init?.body ? { 'Content-Type': 'application/json' } : undefined,
     });
-    if (!response.ok) throw new Error(String(response.status));
+    if (!response.ok) {
+      const data = await response.json().catch(() => ({}));
+      throw new Error(`${response.status}:${data.error ?? ''}`);
+    }
     return response.json();
   }
 
@@ -110,14 +115,20 @@ const t = commentCopy[locale];
     // Set by the API when the signed-in account is the site owner.
     let moderator = false;
     let open = true;
+    // Longest comment allowed; the API sends the owner's setting.
+    let maxLength = 2000;
     const expanded = new Set<number>();
 
     const errorText = (error: unknown) =>
-      String(error).includes('429')
-        ? copy.rateLimited
-        : String(error).includes('403')
-          ? copy.closed
-          : copy.failed;
+      String(error).includes(':too_long')
+        ? copy.tooLong.replace('{n}', String(maxLength))
+        : String(error).includes(':hourly_limit')
+          ? copy.hourlyLimit
+          : String(error).includes('429')
+            ? copy.rateLimited
+            : String(error).includes('403')
+              ? copy.closed
+              : copy.failed;
 
     function editor(
       initial: string,
@@ -133,7 +144,7 @@ const t = commentCopy[locale];
       label.htmlFor = id;
       area.id = id;
       area.required = true;
-      area.maxLength = 2000;
+      area.maxLength = maxLength;
       area.rows = 3;
       area.placeholder = placeholder;
       area.value = initial;
@@ -380,6 +391,7 @@ const t = commentCopy[locale];
       try {
         const data = (await api(`/api/comments?${query}`)) as Page;
         moderator = data.moderator;
+        if (data.maxLength) maxLength = data.maxLength;
         if (open !== (data.open !== false)) {
           open = data.open !== false;
           renderComposer();

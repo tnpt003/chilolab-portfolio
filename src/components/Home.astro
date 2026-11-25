@@ -4,6 +4,7 @@ import { Image } from 'astro:assets';
 import ProjectVisual from './ProjectVisual.astro';
 import Icon from './Icon.astro';
 import WalkingCat from './WalkingCat.astro';
+import DownloadStat from './DownloadStat.astro';
 import { email, profile } from '../lib/profile';
 import portrait from '../assets/phat-portrait.jpg';
 import { listProjects, pathFor, copy, type Locale } from '../lib/content';
@@ -97,6 +98,7 @@ const rows = await Promise.all(
                 <p class:list={['project-status', { released }]}>
                   <span class="status-dot" aria-hidden="true"></span>
                   {status}
+                  <DownloadStat project={data.slug} locale={locale} />
                 </p>
               )}
               <h3>

@@ -45,3 +45,9 @@ Rows and the hero collapse to one column on narrow screens, with media above the
 ## Review decisions
 
 Do not add invented performance scores to Auditor visuals. Do not imply that the concept pet represents the actual app artwork. Distinctiveness should come from real product assets; motion is limited to the logo blink and the About ear reveal, both off under reduced motion. Preserve default cursors and scrolling; all content remains accessible with JavaScript disabled.
+
+## Admin panel and owner mode
+
+`/manage` deliberately does not use the public palette: dark surfaces (`#101417`/`#171d21`), an amber accent (`#f5b545`), a fixed amber "QUẢN TRỊ" bar, its own favicon and a "· Quản trị ChiloLab" tab title, so it can never be mistaken for a visitor page. Navigation is grouped (Kiểm duyệt, Cộng đồng, Thống kê, Hệ thống). It stays script-free, keyboard-focusable (light-blue focus ring), with a skip link and tables that scroll sideways on narrow screens. When the owner browses the public site, a thin amber "Chế độ chủ site" bar at the top links back to `/manage`; visitors never see it.
+
+Public download counts (Pet Desktop) sit in the download panel and in the home project row, in muted text with a download icon. They come from GitHub Releases (installer + portable only), refresh every minute while the page is visible, and stay hidden without JavaScript or when GitHub cannot be reached.

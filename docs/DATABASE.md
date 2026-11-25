@@ -10,6 +10,7 @@ Nội dung do chủ site viết (dự án, phiên bản) vẫn là Markdown và 
 | Bình luận theo luồng     | `comments`          | Mỗi trang phiên bản; trang dự án gộp tất cả              |
 | Góp ý / báo lỗi          | `feedback`          | `/<dự-án>/feedback`; đọc ở `/manage/feedback`            |
 | Lượt bấm tải             | `downloads`         | Chỉ ở `/manage/downloads`; một bộ đếm mỗi file mỗi ngày  |
+| Nhật ký quản trị         | `admin_log`         | `/manage/log` (chỉ chủ site)                             |
 | Cài đặt site             | `settings`          | `/manage/settings` (chỉ chủ site)                        |
 
 Không lưu IP, user agent hay mật khẩu Google. Chính sách công khai: `/privacy`.
@@ -31,24 +32,38 @@ Không lưu IP, user agent hay mật khẩu Google. Chính sách công khai: `/p
 
 ## Trang quản trị (`/manage`)
 
-Kiểu WordPress/Drupal: đăng nhập ở `/user/login` bằng tài khoản owner (Google hoặc mã email) rồi mở `/manage` (trang tài khoản có nút "Vào trang quản trị"). Chưa đăng nhập → chuyển tới `/user/login?return=/manage`; đăng nhập bằng tài khoản thường → 403.
+Đăng nhập ở `/user/login` bằng tài khoản owner (Google hoặc mã email) rồi mở `/manage`. Chưa đăng nhập → chuyển tới `/user/login?return=/manage`; tài khoản thường → 403.
 
-| Trang               | Làm gì                                                                                                                                  |
-| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
-| `/manage`           | Bảng tin: số tài khoản, bình luận, góp ý, lượt tải; bình luận chờ duyệt; cảnh báo cài đặt                                               |
-| `/manage/comments`  | Chờ duyệt / Đang hiện / Tất cả, tìm trong nội dung, Cho hiện / Gỡ                                                                       |
-| `/manage/feedback`  | Chưa xử lý / Đã xử lý, đánh dấu, mở lại, xóa                                                                                            |
-| `/manage/downloads` | Tổng theo phiên bản và 30 ngày gần nhất                                                                                                 |
-| `/manage/users`     | Danh sách tài khoản, tìm kiếm, đăng xuất mọi thiết bị, xóa tài khoản (không xóa được owner)                                             |
-| `/manage/settings`  | Bật/tắt bình luận, cách kiểm duyệt, từ bị chặn thêm, email báo, form góp ý, đăng nhập email, tài khoản mới; xem dịch vụ nào đã cấu hình |
+Giao diện cố ý khác hẳn trang khách: nền tối, điểm nhấn hổ phách, thanh "QUẢN TRỊ" cố định, favicon và tiêu đề tab riêng (`worker/manage-ui.ts`). Khi owner xem website, một dải "Chế độ chủ site" màu hổ phách hiện trên cùng với số việc đang chờ; khách không thấy (xem mục Bảo mật).
 
-Cài đặt (`worker/settings.ts`, bảng `settings`): thiếu dòng hoặc chưa chạy migration → dùng mặc định (mọi thứ bật, kiểm duyệt AI), tức là như trước khi có cài đặt. Kiểm duyệt "Giữ tất cả" gắn lý do `manual`; từ bị chặn thêm gắn lý do `blocked`. Tắt "tài khoản mới" thì Google và mã email đều từ chối email chưa có tài khoản (`registration_closed`); owner đã có tài khoản nên vẫn vào được. Nội dung dự án/phiên bản vẫn sửa ở `/admin` (Sveltia CMS), không ở đây.
+| Trang                    | Làm gì                                                                                                                     |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| `/manage`                | Tổng quan: việc chờ, số liệu, lượt tải GitHub, biểu đồ bấm tải 30 ngày, hoạt động quản trị gần đây                         |
+| `/manage/comments`       | Chờ duyệt / Đang hiện / Tất cả; lọc theo dự án, phiên bản, lý do, nội dung; chọn nhiều để Cho hiện / Gỡ                    |
+| `/manage/comments/<id>`  | Cả luồng bình luận; duyệt, gỡ, trả lời dưới tên owner                                                                      |
+| `/manage/feedback`       | Chưa xử lý / Đang xử lý / Đã xử lý; lọc dự án, loại; đổi trạng thái hàng loạt; ghi chú nội bộ; xóa                         |
+| `/manage/users`          | Danh sách, tìm kiếm, tab Đã khóa                                                                                           |
+| `/manage/users/<id>`     | Thông tin, bình luận, góp ý của một người; đăng xuất mọi nơi, khóa / mở khóa, xóa (không áp dụng cho owner)                |
+| `/manage/downloads`      | Lượt tải thật từ GitHub Releases và lượt bấm tải trên site (theo phiên bản, 30 ngày)                                       |
+| `/manage/settings?tab=…` | Tab Bình luận (bật/tắt, kiểm duyệt, từ chặn, độ dài tối đa, số bình luận/giờ), Góp ý, Tài khoản, Email thông báo           |
+| `/manage/log`            | Nhật ký quản trị (bảng `admin_log`): ai làm gì, lúc nào; không lưu IP; tự xóa sau một năm                                  |
+| `/manage/status`         | Dịch vụ đã cấu hình (Google, Resend, Turnstile, Access, GitHub) và migration D1 đã chạy chưa                               |
+| `/manage/export/*.csv`   | Tải CSV bình luận, góp ý, lượt bấm tải để tự backup (ô bắt đầu bằng `= + - @` được thêm `'` để Excel không chạy công thức) |
 
-Quyền owner không đổi được từ trang quản trị: chỉ đặt bằng lệnh SQL ở trên.
+Thao tác xóa / gỡ / khóa luôn qua trang xác nhận liệt kê các mục bị ảnh hưởng. Thao tác hàng loạt tối đa 100 mục mỗi lần.
+
+Cài đặt (`worker/settings.ts`, bảng `settings`): thiếu dòng hoặc chưa chạy migration → dùng mặc định (mọi thứ bật, kiểm duyệt AI, 2000 ký tự, không giới hạn theo giờ, email báo bình luận bị giữ bật, email báo góp ý tắt). Kiểm duyệt "Giữ tất cả" gắn lý do `manual`; từ bị chặn thêm gắn lý do `blocked`. Tắt "tài khoản mới" thì Google và mã email đều từ chối email chưa có tài khoản (`registration_closed`). Giới hạn độ dài và số bình luận/giờ không áp dụng cho owner (lỗi API: `too_long`, `hourly_limit`).
+
+Khóa tài khoản (`users.blocked_at`): xóa mọi phiên, đăng nhập bị từ chối (`blocked`), phiên cũ không còn hợp lệ; bình luận và góp ý vẫn giữ. Owner không khóa hay xóa được từ trang quản trị, và quyền owner chỉ đặt bằng lệnh SQL ở trên.
+
+## Lượt tải công khai (GitHub)
+
+Trang dự án Pet Desktop và trang chủ hiện số lượt tải, lấy từ `/api/downloads/stats?project=pet-desktop` (`worker/github.ts`): tổng `download_count` của `PetComputer-win-Setup.exe` và `PetComputer-win-Portable.zip` trong mọi release của `tnpt003/Pet-Computer`. File cập nhật tự động (`.nupkg`, `RELEASES`) không tính. GitHub API không cần token (60 lượt/giờ mỗi IP) nên kết quả được cache 1 phút; GitHub lỗi thì dùng số cũ (giữ tối đa 7 ngày). Trang tự lấy lại số mỗi phút khi đang mở. Đổi tên file hay repo phát hành thì sửa `sources` trong `worker/github.ts`.
 
 ## Bảo mật
 
 - Worker chỉ chạy cho `/api/*`, `/manage*`, `/user`, `/en/user`; trang khác là file tĩnh.
+- Dải "Chế độ chủ site": `/manage` và `/api/me` đặt cookie đọc được `__Host-chilolab_admin=1` cho owner; website chỉ gọi `/api/me` khi có cookie này và chỉ hiện dải khi API trả `owner: true`. Cookie không cấp quyền gì; đăng xuất hoặc tài khoản không phải owner sẽ xóa nó.
 - `/manage` mở khi: phiên đăng nhập của tài khoản `role = 'owner'`, **hoặc** JWT Cloudflare Access hợp lệ, **hoặc** `ADMIN_DEV_BYPASS=1` trên localhost. Ngoài ra luôn từ chối. Mọi thao tác ghi là form POST cùng origin; trang không có JavaScript.
 - Ai chiếm được hộp thư hoặc tài khoản Google của owner sẽ vào được `/manage`: bật xác minh 2 bước cho cả hai. Muốn thêm một lớp khóa, giữ application Cloudflare Access cho `/manage`.
 - Mọi request ghi phải cùng origin; body ≤ 16 KB; nội dung luôn hiển thị dạng text.

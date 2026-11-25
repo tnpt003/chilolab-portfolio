@@ -14,8 +14,14 @@ export type Settings = {
   moderation: Moderation;
   /** Extra whole-word matches, one per line, on top of the built-in list. */
   blockedWords: string[];
+  /** Longest comment a visitor may post, in characters (100–2000). */
+  commentMaxLength: number;
+  /** Comments one visitor may post per hour; 0 means no hourly cap. */
+  commentsPerHour: number;
   /** Email the owner when a comment is held. */
   notifyHeld: boolean;
+  /** Email the owner when feedback arrives. */
+  notifyFeedback: boolean;
   /** The anonymous feedback / bug report form. */
   feedbackOpen: boolean;
   /** Sign-in with a 6-digit email code (still needs RESEND_API_KEY). */
@@ -28,12 +34,16 @@ export const defaults: Settings = {
   commentsOpen: true,
   moderation: 'ai',
   blockedWords: [],
+  commentMaxLength: 2000,
+  commentsPerHour: 0,
   notifyHeld: true,
+  notifyFeedback: false,
   feedbackOpen: true,
   emailLogin: true,
   signups: true,
 };
 
+export const COMMENT_MAX = 2000;
 const MAX_WORDS = 200;
 
 export function parseWords(value: string) {
@@ -48,6 +58,19 @@ export function parseWords(value: string) {
         ),
     ),
   ].slice(0, MAX_WORDS);
+}
+
+/** Integer within [min, max]; anything else gives the fallback. */
+export function clampInt(
+  value: unknown,
+  min: number,
+  max: number,
+  fallback: number,
+) {
+  const number = Number(value);
+  if (value === null || value === '' || !Number.isFinite(number))
+    return fallback;
+  return Math.min(max, Math.max(min, Math.round(number)));
 }
 
 const flag = (value: string | undefined, fallback: boolean) =>
@@ -73,30 +96,52 @@ export async function getSettings(env: Env): Promise<Settings> {
     commentsOpen: flag(map.commentsOpen, defaults.commentsOpen),
     moderation: moderation ?? defaults.moderation,
     blockedWords: parseWords(map.blockedWords ?? ''),
+    commentMaxLength: clampInt(
+      map.commentMaxLength,
+      100,
+      COMMENT_MAX,
+      defaults.commentMaxLength,
+    ),
+    commentsPerHour: clampInt(
+      map.commentsPerHour,
+      0,
+      500,
+      defaults.commentsPerHour,
+    ),
     notifyHeld: flag(map.notifyHeld, defaults.notifyHeld),
+    notifyFeedback: flag(map.notifyFeedback, defaults.notifyFeedback),
     feedbackOpen: flag(map.feedbackOpen, defaults.feedbackOpen),
     emailLogin: flag(map.emailLogin, defaults.emailLogin),
     signups: flag(map.signups, defaults.signups),
   };
 }
 
-export async function saveSettings(env: Env, settings: Settings) {
+const store = (value: Settings[keyof Settings]) =>
+  typeof value === 'boolean'
+    ? value
+      ? '1'
+      : '0'
+    : Array.isArray(value)
+      ? value.join('\n')
+      : String(value);
+
+/** Saves only the given keys; returns the keys whose value changed. */
+export async function saveSettings(env: Env, changes: Partial<Settings>) {
+  const current = await getSettings(env);
   const now = new Date().toISOString().replace(/\.\d+Z$/, 'Z');
-  const values: Record<string, string> = {
-    commentsOpen: settings.commentsOpen ? '1' : '0',
-    moderation: settings.moderation,
-    blockedWords: settings.blockedWords.join('\n'),
-    notifyHeld: settings.notifyHeld ? '1' : '0',
-    feedbackOpen: settings.feedbackOpen ? '1' : '0',
-    emailLogin: settings.emailLogin ? '1' : '0',
-    signups: settings.signups ? '1' : '0',
-  };
-  await env.DB.batch(
-    Object.entries(values).map(([key, value]) =>
-      env.DB.prepare(
-        `INSERT INTO settings (key, value, updated_at) VALUES (?, ?, ?)
-         ON CONFLICT (key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
-      ).bind(key, value, now),
-    ),
+  const entries = (Object.keys(changes) as (keyof Settings)[]).map(
+    (key) => [key, store(changes[key]!)] as const,
   );
+  if (entries.length)
+    await env.DB.batch(
+      entries.map(([key, value]) =>
+        env.DB.prepare(
+          `INSERT INTO settings (key, value, updated_at) VALUES (?, ?, ?)
+           ON CONFLICT (key) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
+        ).bind(key, value, now),
+      ),
+    );
+  return entries
+    .filter(([key, value]) => store(current[key]) !== value)
+    .map(([key]) => key);
 }

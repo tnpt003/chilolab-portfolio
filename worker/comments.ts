@@ -2,7 +2,7 @@ import { asLocale, json, readJson, text, underLimit, type Env } from './env';
 import { notifyHeld } from './mail';
 import { moderate } from './moderation';
 import { currentUser } from './session';
-import { getSettings } from './settings';
+import { COMMENT_MAX, getSettings, type Settings } from './settings';
 
 // Threaded comments, one reply level (like YouTube). A project page shows the
 // comments of every version plus its own; a version page shows only its own.
@@ -47,6 +47,31 @@ function serialize(row: Row, me: number, moderator = false) {
     createdAt: row.created_at,
     editedAt: row.edited_at,
   };
+}
+
+/** Visitor limits from /manage/settings; the owner is exempt. */
+async function limitError(
+  env: Env,
+  settings: Settings,
+  userId: number,
+  message: string,
+  isNew: boolean,
+) {
+  if (message.length > settings.commentMaxLength)
+    return json({ error: 'too_long', max: settings.commentMaxLength }, 400);
+  if (isNew && settings.commentsPerHour > 0) {
+    const since = new Date(Date.now() - 3600_000)
+      .toISOString()
+      .replace(/.d+Z$/, 'Z');
+    const row = await env.DB.prepare(
+      'SELECT COUNT(*) AS n FROM comments WHERE user_id = ? AND created_at > ?',
+    )
+      .bind(userId, since)
+      .first<{ n: number }>();
+    if (Number(row?.n ?? 0) >= settings.commentsPerHour)
+      return json({ error: 'hourly_limit' }, 429);
+  }
+  return null;
 }
 
 const placeholders = (count: number) => Array(count).fill('?').join(', ');
@@ -179,6 +204,7 @@ async function list(request: Request, env: Env, allowed: Allowed) {
     signedIn: me !== -1,
     moderator: mod === 1,
     open: settings.commentsOpen || mod === 1,
+    maxLength: mod === 1 ? COMMENT_MAX : settings.commentMaxLength,
     comments: rows.map((row) => ({
       ...serialize(row, me, mod === 1),
       replies: replies
@@ -203,13 +229,17 @@ async function create(
   if (!(await underLimit(env, `user:${user.id}`)))
     return json({ error: 'rate_limited' }, 429);
   const body = await readJson(request);
-  const message = text(body?.body, 1, 2000);
+  const message = text(body?.body, 1, COMMENT_MAX);
   const locale = asLocale(body?.locale);
   const project = String(body?.project ?? '');
   let version =
     typeof body?.version === 'string' && body.version ? body.version : null;
   let parentId: number | null = null;
   if (!message || !locale) return json({ error: 'invalid' }, 400);
+  if (user.role !== 'owner') {
+    const limited = await limitError(env, settings, user.id, message, true);
+    if (limited) return limited;
+  }
 
   if (body?.parentId !== undefined && body.parentId !== null) {
     const parent = await env.DB.prepare(
@@ -289,11 +319,15 @@ async function edit(
   if (!user) return json({ error: 'unauthenticated' }, 401);
   if (!(await underLimit(env, `user:${user.id}`)))
     return json({ error: 'rate_limited' }, 429);
-  const message = text((await readJson(request))?.body, 1, 2000);
+  const message = text((await readJson(request))?.body, 1, COMMENT_MAX);
   if (!message) return json({ error: 'invalid' }, 400);
   const settings = await getSettings(env);
   if (!settings.commentsOpen && user.role !== 'owner')
     return json({ error: 'closed' }, 403);
+  if (user.role !== 'owner') {
+    const limited = await limitError(env, settings, user.id, message, false);
+    if (limited) return limited;
+  }
   const row = await env.DB.prepare(
     'SELECT user_id, status FROM comments WHERE id = ?',
   )

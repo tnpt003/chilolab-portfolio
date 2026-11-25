@@ -12,6 +12,7 @@ import {
   type Env,
 } from './env';
 import {
+  ADMIN_HINT,
   cookie,
   createSession,
   currentUser,
@@ -132,10 +133,11 @@ async function finishGoogle(request: Request, env: Env) {
   const now = new Date().toISOString();
 
   let user = await env.DB.prepare(
-    'SELECT id FROM users WHERE google_sub = ? OR email = ? ORDER BY google_sub = ? DESC LIMIT 1',
+    'SELECT id, blocked_at FROM users WHERE google_sub = ? OR email = ? ORDER BY google_sub = ? DESC LIMIT 1',
   )
     .bind(claims.sub, email, claims.sub)
-    .first<{ id: number }>();
+    .first<{ id: number; blocked_at?: string | null }>();
+  if (user?.blocked_at) return fail('blocked');
   if (user)
     await env.DB.prepare(
       'UPDATE users SET google_sub = ?, email = ?, last_login_at = ? WHERE id = ?',
@@ -164,17 +166,46 @@ async function me(request: Request, env: Env) {
   const user = await currentUser(request, env);
   if (request.method === 'GET') {
     const settings = await getSettings(env);
-    return json({
-      user: user && {
-        displayName: user.displayName,
-        email: user.email,
-        owner: user.role === 'owner',
+    // The owner bar on the public site shows what is waiting in /manage.
+    const pending =
+      user?.role === 'owner'
+        ? await env.DB.prepare(
+            `SELECT (SELECT COUNT(*) FROM comments WHERE status = 'held') AS held,
+                    (SELECT COUNT(*) FROM feedback WHERE status = 'new') AS feedback`,
+          ).first<{ held: number; feedback: number }>()
+        : null;
+    // A readable hint so the public site only asks /api/me when it may be
+    // the owner; it grants nothing (the owner bar still checks this answer).
+    const hinted = readCookie(request, ADMIN_HINT) !== null;
+    const hint = cookie(ADMIN_HINT, '1', 30 * 86400).replace('; HttpOnly', '');
+    const clearHint = cookie(ADMIN_HINT, '', 0).replace('; HttpOnly', '');
+    const extra: HeadersInit =
+      user?.role === 'owner'
+        ? { 'Set-Cookie': hint }
+        : hinted
+          ? { 'Set-Cookie': clearHint }
+          : {};
+    return json(
+      {
+        user: user && {
+          displayName: user.displayName,
+          email: user.email,
+          owner: user.role === 'owner',
+        },
+        ...(pending && {
+          pending: {
+            held: Number(pending.held),
+            feedback: Number(pending.feedback),
+          },
+        }),
+        providers: {
+          google: Boolean(env.GOOGLE_CLIENT_ID),
+          email: mailEnabled(env) && settings.emailLogin,
+        },
       },
-      providers: {
-        google: Boolean(env.GOOGLE_CLIENT_ID),
-        email: mailEnabled(env) && settings.emailLogin,
-      },
-    });
+      200,
+      extra,
+    );
   }
   if (!user) return json({ error: 'unauthenticated' }, 401);
 
@@ -208,10 +239,15 @@ export async function auth(request: Request, env: Env, path: string) {
     return startGoogle(request, env);
   if (path === '/api/auth/google/callback' && request.method === 'GET')
     return finishGoogle(request, env);
-  if (path === '/api/auth/logout' && request.method === 'POST')
-    return json({ status: 'signed_out' }, 200, {
-      'Set-Cookie': await endSession(request, env),
-    });
+  if (path === '/api/auth/logout' && request.method === 'POST') {
+    const headers = new Headers();
+    headers.append('Set-Cookie', await endSession(request, env));
+    headers.append(
+      'Set-Cookie',
+      cookie(ADMIN_HINT, '', 0).replace('; HttpOnly', ''),
+    );
+    return json({ status: 'signed_out' }, 200, headers);
+  }
   if (path === '/api/me') return me(request, env);
   return emailLogin(request, env, path);
 }

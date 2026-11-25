@@ -1,119 +1,118 @@
 import { deleteUserComments, removeComment } from './comments';
-import { baseHeaders, redirect, sameOrigin, type Env } from './env';
+import { redirect, sameOrigin, text, type Env } from './env';
+import { getStats, statsProjects } from './github';
 import { mailEnabled } from './mail';
-import { endSession } from './session';
 import {
+  barChart,
+  bulkBar,
+  button,
+  checkbox,
+  csv,
+  escape,
+  feedbackStates,
+  filters,
+  formStart,
+  htmlHeaders,
+  kinds,
+  layout,
+  pageNumber,
+  pager,
+  PER_PAGE,
+  query,
+  reasons,
+  searchField,
+  select,
+  table,
+  tabs,
+  when,
+  type Admin,
+  type Badges,
+  type Row,
+} from './manage-ui';
+import { ADMIN_HINT, cookie, endSession } from './session';
+import {
+  clampInt,
+  COMMENT_MAX,
   getSettings,
   parseWords,
   saveSettings,
-  type Moderation,
+  type Settings,
 } from './settings';
 
-// Owner admin panel (WordPress-style dashboard) at /manage/*.
-// Reached only after index.ts confirms an owner session or Cloudflare Access.
-// Server-rendered, no JavaScript; every stored value is HTML-escaped and every
-// write is a same-origin POST form.
+// Owner admin panel at /manage/*. index.ts lets a request in only after it
+// confirms an owner session or Cloudflare Access; anything else fails closed.
+// No JavaScript: every write is a same-origin POST, destructive operations
+// ask for confirmation first, and each change is written to admin_log.
 
-export type Admin = {
-  /** Shown in the top bar. */
-  name: string;
-  /** users.id when signed in with an owner account; null for Access/dev. */
-  userId: number | null;
-};
+export type { Admin };
 
-type Row = Record<string, string | number | null>;
+const stamp = () => new Date().toISOString().replace(/\.\d+Z$/, 'Z');
 
-const PER_PAGE = 50;
-
-const escape = (value: unknown) =>
-  String(value ?? '').replace(
-    /[&<>"']/g,
-    (char) =>
-      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[
-        char
-      ]!,
-  );
-
-const kinds: Record<string, string> = {
-  idea: 'Góp ý',
-  bug: 'Báo lỗi',
-  other: 'Khác',
-};
-const reasons: Record<string, string> = {
-  profanity: 'Chửi thề',
-  insult: 'Xúc phạm',
-  hate: 'Thù ghét',
-  sexual: 'Tình dục',
-  threat: 'Đe dọa',
-  spam: 'Spam/quảng cáo',
-  link: 'Có đường link',
-  blocked: 'Từ bị chặn (cài đặt)',
-  manual: 'Duyệt thủ công',
-  unchecked: 'AI chưa kiểm tra được',
-};
 const notices: Record<string, string> = {
   saved: 'Đã lưu cài đặt.',
-  approved: 'Đã cho hiện bình luận.',
-  removed: 'Đã gỡ bình luận.',
-  'feedback-done': 'Đã đánh dấu góp ý là đã xử lý.',
-  'feedback-reopen': 'Đã mở lại góp ý.',
-  'feedback-delete': 'Đã xóa góp ý.',
+  unchanged: 'Không có gì thay đổi.',
+  approve: 'Đã cho hiện bình luận.',
+  remove: 'Đã gỡ bình luận.',
+  reply: 'Đã đăng trả lời.',
+  'fb-new': 'Đã chuyển góp ý về "Chưa xử lý".',
+  'fb-progress': 'Đã chuyển góp ý sang "Đang xử lý".',
+  'fb-done': 'Đã đánh dấu góp ý là đã xử lý.',
+  'fb-delete': 'Đã xóa góp ý.',
+  note: 'Đã lưu ghi chú.',
   'user-signout': 'Đã đăng xuất tài khoản khỏi mọi thiết bị.',
+  'user-block': 'Đã khóa tài khoản.',
+  'user-unblock': 'Đã mở khóa tài khoản.',
   'user-delete': 'Đã xóa tài khoản và bình luận của người đó.',
+  'nothing-selected': 'Chưa chọn mục nào hoặc chưa chọn thao tác.',
+  'reply-empty': 'Nội dung trả lời trống hoặc quá dài.',
+};
+const warnings = new Set(['nothing-selected', 'reply-empty', 'unchanged']);
+
+// ---------- admin log ----------
+
+const actionLabels: Record<string, string> = {
+  approve: 'Cho hiện bình luận',
+  remove: 'Gỡ bình luận',
+  reply: 'Trả lời bình luận',
+  'fb-new': 'Góp ý → chưa xử lý',
+  'fb-progress': 'Góp ý → đang xử lý',
+  'fb-done': 'Góp ý → đã xử lý',
+  'fb-delete': 'Xóa góp ý',
+  note: 'Ghi chú góp ý',
+  'user-signout': 'Đăng xuất người dùng',
+  'user-block': 'Khóa tài khoản',
+  'user-unblock': 'Mở khóa tài khoản',
+  'user-delete': 'Xóa tài khoản',
+  settings: 'Đổi cài đặt',
+  export: 'Xuất CSV',
 };
 
-// ---------- small HTML helpers ----------
-
-function action(
-  back: string,
-  op: string,
-  id: unknown,
-  label: string,
-  style: '' | 'danger' | 'secondary' = '',
+async function log(
+  env: Env,
+  admin: Admin,
+  action: string,
+  target: string,
+  detail = '',
 ) {
-  return `<form method="post" action="/manage"><input type="hidden" name="op" value="${op}"><input type="hidden" name="id" value="${escape(id)}"><input type="hidden" name="back" value="${escape(back)}"><button${style ? ` class="${style}"` : ''}>${label}</button></form>`;
+  try {
+    await env.DB.batch([
+      env.DB.prepare(
+        'INSERT INTO admin_log (actor, action, target, detail) VALUES (?, ?, ?, ?)',
+      ).bind(admin.name, action, target, detail.slice(0, 500)),
+      env.DB.prepare(
+        `DELETE FROM admin_log WHERE at < strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-365 days')`,
+      ),
+    ]);
+  } catch (error) {
+    // Before migration 0006 the table does not exist; the action still ran.
+    console.error('admin_log', error);
+  }
 }
 
-function table(headings: string[], rows: string[], empty: string) {
-  if (!rows.length) return `<p class="empty">${empty}</p>`;
-  return `<div class="table"><table><thead><tr>${headings.map((h) => `<th scope="col">${h}</th>`).join('')}</tr></thead><tbody>${rows.join('')}</tbody></table></div>`;
-}
+// ---------- shared pieces ----------
 
-function tabs(
-  base: string,
-  current: string,
-  items: [string, string, number | null][],
-) {
-  return `<ul class="tabs">${items
-    .map(
-      ([value, label, count]) =>
-        `<li><a href="${base}?status=${value}"${value === current ? ' aria-current="page"' : ''}>${label}${count === null ? '' : ` <span class="count">(${count})</span>`}</a></li>`,
-    )
-    .join('')}</ul>`;
-}
-
-function pager(url: URL, page: number, total: number) {
-  const pages = Math.max(1, Math.ceil(total / PER_PAGE));
-  if (pages <= 1) return '';
-  const link = (target: number, label: string) => {
-    const next = new URL(url);
-    next.searchParams.set('page', String(target));
-    next.searchParams.delete('notice');
-    return `<a href="${escape(next.pathname + next.search)}">${label}</a>`;
-  };
-  return `<nav class="pager" aria-label="Phân trang">${page > 1 ? link(page - 1, '‹ Trước') : ''}<span>Trang ${page}/${pages}</span>${page < pages ? link(page + 1, 'Sau ›') : ''}</nav>`;
-}
-
-function search(url: URL, placeholder: string) {
-  const status = url.searchParams.get('status');
-  return `<form class="search" method="get" action="${escape(url.pathname)}" role="search">${status ? `<input type="hidden" name="status" value="${escape(status)}">` : ''}<label class="sr-only" for="q">Tìm kiếm</label><input id="q" name="q" type="search" maxlength="100" value="${escape(url.searchParams.get('q') ?? '')}" placeholder="${placeholder}"><button class="secondary">Tìm</button></form>`;
-}
-
-const pageNumber = (url: URL) =>
-  Math.max(1, Math.min(10_000, Number(url.searchParams.get('page')) || 1));
-
-const query = (url: URL) =>
-  (url.searchParams.get('q') ?? '').trim().slice(0, 100);
+const commentSelect = `SELECT c.*, u.display_name, u.email, u.role AS author_role
+  FROM comments c LEFT JOIN users u ON u.id = c.user_id`;
 
 function where(row: Row) {
   const target = row.version
@@ -123,59 +122,63 @@ function where(row: Row) {
 }
 
 function who(row: Row) {
-  return row.display_name
-    ? `${escape(row.display_name)}${row.author_role === 'owner' ? ' <span class="tag ok">Tác giả</span>' : ''}<br><small>${escape(row.email)}</small>`
-    : escape(row.author ?? '—');
+  if (!row.display_name) return escape(row.author ?? '—');
+  const name = row.user_id
+    ? `<a href="/manage/users/${escape(row.user_id)}">${escape(row.display_name)}</a>`
+    : escape(row.display_name);
+  return `${name}${row.author_role === 'owner' ? ' <span class="tag ok">Tác giả</span>' : ''}<br><small>${escape(row.email)}</small>`;
 }
 
-function commentRow(row: Row, back: string) {
-  const reason = row.moderation_reason
+const reasonTag = (row: Row) =>
+  row.moderation_reason
     ? `<span class="tag">${escape(reasons[String(row.moderation_reason)] ?? row.moderation_reason)}</span> `
     : '';
-  const state =
-    row.status === 'held' ? '<span class="tag">Bị giữ</span><br>' : '';
-  const actions =
-    (row.status === 'held' ? action(back, 'approve', row.id, 'Cho hiện') : '') +
-    action(back, 'remove-comment', row.id, 'Gỡ', 'danger');
-  return `<tr${row.status === 'held' ? ' class="held"' : ''}><td>${state}${escape(row.created_at)}${row.edited_at ? '<br><small>đã sửa</small>' : ''}</td><td>${where(row)}</td><td>${who(row)}</td><td class="body">${reason}${escape(row.body)}</td><td class="ops">${actions}</td></tr>`;
-}
 
-function feedbackRow(row: Row, back: string) {
+function commentRow(row: Row, pick = true) {
+  const held = row.status === 'held';
   const ops =
-    (row.status === 'new'
-      ? action(back, 'feedback-done', row.id, 'Đã xử lý')
-      : action(back, 'feedback-reopen', row.id, 'Mở lại', 'secondary')) +
-    action(back, 'feedback-delete', row.id, 'Xóa', 'danger');
-  return `<tr class="${row.status === 'done' ? 'done' : ''}"><td>${escape(row.created_at)}</td><td>${escape(row.project)} · ${escape(row.locale)}</td><td>${escape(kinds[String(row.kind)] ?? row.kind)}</td><td class="body">${row.summary ? `<strong>${escape(row.summary)}</strong>\n` : ''}${escape(row.message)}</td><td>${escape(row.app_version)}${row.os ? ` · ${escape(row.os)}` : ''}</td><td>${escape(row.contact)}</td><td class="ops">${ops}</td></tr>`;
+    (held ? button(`approve:${row.id}`, 'Cho hiện') : '') +
+    `<a class="button-link ghost" href="/manage/comments/${escape(row.id)}">Luồng / trả lời</a>` +
+    button(`remove:${row.id}`, 'Gỡ…', 'danger');
+  return `<tr${held ? ' class="held"' : ''}>${pick ? `<td class="pick">${checkbox(row.id, `Chọn bình luận #${row.id}`)}</td>` : ''}<td>${held ? '<span class="tag warn">Bị giữ</span><br>' : ''}${when(row.created_at)}${row.edited_at ? '<br><small>đã sửa</small>' : ''}</td><td>${where(row)}</td><td>${who(row)}</td><td class="body">${reasonTag(row)}${escape(row.body)}</td><td class="ops">${ops}</td></tr>`;
 }
 
-const commentSelect = `SELECT c.*, u.display_name, u.email, u.role AS author_role
-  FROM comments c LEFT JOIN users u ON u.id = c.user_id`;
+const commentHeadings = (pick = true) => [
+  ...(pick ? ['<span class="sr-only">Chọn</span>'] : []),
+  'Thời gian',
+  'Ở đâu',
+  'Người viết',
+  'Nội dung (lý do)',
+  '',
+];
 
-// ---------- pages ----------
-
-type Counts = { held: number; newFeedback: number };
-
-async function counts(env: Env): Promise<Counts> {
+async function badges(env: Env): Promise<Badges> {
   const row = await env.DB.prepare(
     `SELECT (SELECT COUNT(*) FROM comments WHERE status = 'held') AS held,
             (SELECT COUNT(*) FROM feedback WHERE status = 'new') AS newFeedback`,
-  ).first<Counts>();
+  ).first<Badges>();
   return {
     held: Number(row?.held ?? 0),
     newFeedback: Number(row?.newFeedback ?? 0),
   };
 }
 
-async function dashboard(env: Env, back: string) {
+const count = (rows: Row[], key: string, field = 'status') =>
+  Number(rows.find((row) => row[field] === key)?.n ?? 0);
+
+// ---------- pages ----------
+
+async function dashboard(env: Env, ctx: ExecutionContext, back: string) {
   const [stats, held, feedback, daily] = await env.DB.batch<Row>([
     env.DB.prepare(
       `SELECT (SELECT COUNT(*) FROM users) AS users,
               (SELECT COUNT(*) FROM users WHERE created_at >= date('now', '-6 days')) AS newUsers,
               (SELECT COUNT(*) FROM comments WHERE status = 'published') AS published,
+              (SELECT COUNT(*) FROM comments WHERE created_at >= date('now', '-6 days') AND status IN ('published', 'held')) AS newComments,
               (SELECT COUNT(*) FROM comments WHERE status = 'held') AS held,
               (SELECT COUNT(*) FROM feedback WHERE status = 'new') AS feedback,
-              (SELECT COALESCE(SUM(count), 0) FROM downloads WHERE day >= date('now', '-29 days')) AS downloads`,
+              (SELECT COUNT(*) FROM feedback WHERE status = 'progress') AS progress,
+              (SELECT COALESCE(SUM(count), 0) FROM downloads WHERE day >= date('now', '-29 days')) AS clicks`,
     ),
     env.DB.prepare(
       `${commentSelect} WHERE c.status = 'held' ORDER BY c.created_at LIMIT 5`,
@@ -184,53 +187,61 @@ async function dashboard(env: Env, back: string) {
       `SELECT * FROM feedback WHERE status = 'new' ORDER BY created_at DESC LIMIT 5`,
     ),
     env.DB.prepare(
-      `SELECT day, SUM(count) AS total FROM downloads WHERE day >= date('now', '-6 days') GROUP BY day ORDER BY day DESC`,
+      `SELECT day, SUM(count) AS total FROM downloads WHERE day >= date('now', '-29 days') GROUP BY day`,
     ),
   ]);
+  // admin_log arrives with migration 0006; the dashboard works without it.
+  const recent = await env.DB.prepare(
+    'SELECT * FROM admin_log ORDER BY id DESC LIMIT 6',
+  )
+    .all<Row>()
+    .catch(() => ({ results: [] as Row[] }));
   const s = stats.results[0] ?? {};
-  const card = (label: string, value: unknown, href: string, note = '') =>
-    `<a class="card" href="${href}"><span class="value">${escape(value ?? 0)}</span><span class="label">${label}</span>${note ? `<small>${note}</small>` : ''}</a>`;
+  const github = await getStats('pet-desktop', ctx);
+  const card = (
+    label: string,
+    value: unknown,
+    href: string,
+    note = '',
+    alert = false,
+  ) =>
+    `<a class="card${alert ? ' alert' : ''}" href="${href}"><span class="value">${escape(value ?? 0)}</span><span class="label">${label}</span>${note ? `<small>${note}</small>` : ''}</a>`;
   const settings = await getSettings(env);
-  const warnings = [
+  const flags = [
     !settings.commentsOpen && 'Bình luận mới đang <strong>tắt</strong>.',
     settings.moderation === 'manual' &&
       'Mọi bình luận đang được <strong>giữ chờ duyệt</strong>.',
     !settings.feedbackOpen && 'Form góp ý đang <strong>tắt</strong>.',
     !settings.signups && 'Đang <strong>không nhận</strong> tài khoản mới.',
   ].filter(Boolean);
-  return `<h1>Bảng tin</h1>
-${warnings.length ? `<div class="notice warn"><p>${warnings.join(' ')} <a href="/manage/settings">Đổi trong Cài đặt</a></p></div>` : ''}
-<section class="cards" aria-label="Tổng quan">
+  return `<h1>Tổng quan</h1>
+<p class="intro">Tình hình website và những việc đang chờ bạn.</p>
+${flags.length ? `<div class="notice warn"><p>${flags.join(' ')} <a href="/manage/settings">Đổi trong Cài đặt</a></p></div>` : ''}
+<section class="cards" aria-label="Số liệu chính">
+${card('Bình luận chờ duyệt', s.held, '/manage/comments?status=held', '', Number(s.held) > 0)}
+${card('Góp ý chưa xử lý', s.feedback, '/manage/feedback', `${escape(s.progress ?? 0)} đang xử lý`, Number(s.feedback) > 0)}
+${card('Bình luận đang hiện', s.published, '/manage/comments?status=published', `+${escape(s.newComments ?? 0)} trong 7 ngày`)}
 ${card('Tài khoản khách', s.users, '/manage/users', `+${escape(s.newUsers ?? 0)} trong 7 ngày`)}
-${card('Bình luận đang hiện', s.published, '/manage/comments?status=published')}
-${card('Bình luận chờ duyệt', s.held, '/manage/comments?status=held')}
-${card('Góp ý chưa xử lý', s.feedback, '/manage/feedback')}
-${card('Lượt bấm tải (30 ngày)', s.downloads, '/manage/downloads')}
+${card('Lượt tải Pet Desktop', github ? github.total : '—', '/manage/downloads', 'Theo GitHub Releases')}
+${card('Lượt bấm tải (30 ngày)', s.clicks, '/manage/downloads', 'Trên chilolab.com')}
 </section>
 <div class="columns">
-<section class="box"><h2>Bình luận chờ duyệt</h2>${table(
-    ['Thời gian', 'Ở đâu', 'Người viết', 'Nội dung', ''],
-    held.results.map((row) => commentRow(row, back)),
+<section class="box wide"><h2>Bình luận chờ duyệt</h2>${formStart(back, 'held')}${table(
+    commentHeadings(false),
+    held.results.map((row) => commentRow(row, false)),
     'Không có bình luận nào đang bị giữ.',
-  )}<p><a href="/manage/comments?status=held">Xem tất cả →</a></p></section>
+  )}</form><p><a href="/manage/comments?status=held">Xem tất cả</a></p></section>
 <section class="box"><h2>Góp ý mới</h2>${
     feedback.results.length
-      ? `<ul class="list">${feedback.results.map((row) => `<li><strong>${escape(row.summary || kinds[String(row.kind)])}</strong> <small>· ${escape(row.project)} · ${escape(row.created_at)}</small></li>`).join('')}</ul>`
+      ? `<ul class="list">${feedback.results.map((row) => `<li><strong>${escape(row.summary || kinds[String(row.kind)])}</strong> <small>· ${escape(row.project)} · ${when(row.created_at)}</small></li>`).join('')}</ul>`
       : '<p class="empty">Không có góp ý mới.</p>'
-  }<p><a href="/manage/feedback">Xem tất cả →</a></p></section>
-<section class="box"><h2>Lượt tải 7 ngày qua</h2>${table(
-    ['Ngày (UTC)', 'Lượt bấm tải'],
-    daily.results.map(
-      (row) =>
-        `<tr><td>${escape(row.day)}</td><td>${escape(row.total)}</td></tr>`,
-    ),
-    'Chưa có lượt tải trong 7 ngày qua.',
-  )}</section>
-<section class="box"><h2>Lối tắt</h2><ul class="list">
-<li><a href="/admin/">Sửa nội dung dự án và phiên bản (Sveltia CMS)</a></li>
-<li><a href="/manage/settings">Cài đặt bình luận, góp ý, đăng nhập</a></li>
-<li><a href="/">Xem trang web</a></li>
-</ul></section>
+  }<p><a href="/manage/feedback">Xem tất cả</a></p></section>
+<section class="box"><h2>Lượt bấm tải trên site, 30 ngày</h2>${barChart(30, daily.results, 'Lượt bấm tải mỗi ngày')}</section>
+<section class="box"><h2>Hoạt động quản trị gần đây</h2>${
+    recent.results.length
+      ? `<ul class="list">${recent.results.map((row) => `<li>${escape(actionLabels[String(row.action)] ?? row.action)} <small>· ${escape(row.target)} · ${when(row.at)}</small></li>`).join('')}</ul>`
+      : '<p class="empty">Chưa có hoạt động nào.</p>'
+  }<p><a href="/manage/log">Xem nhật ký</a></p></section>
 </div>`;
 }
 
@@ -241,93 +252,240 @@ async function commentsPage(env: Env, url: URL, back: string) {
     ) ?? 'held';
   const page = pageNumber(url);
   const q = query(url);
-  const filter =
-    status === 'all' ? `c.status IN ('published', 'held')` : `c.status = ?`;
+  const place = url.searchParams.get('where') ?? '';
+  const reason = url.searchParams.get('reason') ?? '';
+  const parts = [
+    status === 'all' ? `c.status IN ('published', 'held')` : `c.status = ?`,
+  ];
   const args: (string | number)[] = status === 'all' ? [] : [status];
-  const searchSql = q ? ` AND instr(lower(c.body), lower(?)) > 0` : '';
-  if (q) args.push(q);
+  if (q) {
+    parts.push('instr(lower(c.body), lower(?)) > 0');
+    args.push(q);
+  }
+  if (place) {
+    const [project, version] = place.split('@');
+    parts.push(version ? 'c.project = ? AND c.version = ?' : 'c.project = ?');
+    args.push(...(version ? [project!, version] : [project!]));
+  }
+  if (reason && reasons[reason]) {
+    parts.push('c.moderation_reason = ?');
+    args.push(reason);
+  }
+  const filter = parts.join(' AND ');
   const order = status === 'held' ? 'c.created_at' : 'c.created_at DESC';
-  const [rows, total, groups] = await env.DB.batch<Row>([
+  const [rows, total, groups, places] = await env.DB.batch<Row>([
     env.DB.prepare(
-      `${commentSelect} WHERE ${filter}${searchSql} ORDER BY ${order}, c.id LIMIT ? OFFSET ?`,
+      `${commentSelect} WHERE ${filter} ORDER BY ${order}, c.id LIMIT ? OFFSET ?`,
     ).bind(...args, PER_PAGE, (page - 1) * PER_PAGE),
-    env.DB.prepare(
-      `SELECT COUNT(*) AS n FROM comments c WHERE ${filter}${searchSql}`,
-    ).bind(...args),
+    env.DB.prepare(`SELECT COUNT(*) AS n FROM comments c WHERE ${filter}`).bind(
+      ...args,
+    ),
     env.DB.prepare(
       `SELECT status, COUNT(*) AS n FROM comments GROUP BY status`,
     ),
+    env.DB.prepare(
+      `SELECT DISTINCT project, version FROM comments WHERE status IN ('published', 'held') ORDER BY project, version`,
+    ),
   ]);
-  const count = (key: string) =>
-    Number(groups.results.find((row) => row.status === key)?.n ?? 0);
+  const projects = [
+    ...new Set(places.results.map((row) => String(row.project))),
+  ];
+  const placeOptions: [string, string][] = projects.flatMap((project) => [
+    [project, `${project} (mọi phiên bản)`] as [string, string],
+    ...places.results
+      .filter((row) => row.project === project && row.version)
+      .map(
+        (row) =>
+          [`${project}@${row.version}`, `${project} v${row.version}`] as [
+            string,
+            string,
+          ],
+      ),
+  ]);
+  const held = count(groups.results, 'held');
+  const published = count(groups.results, 'published');
   return `<h1>Bình luận</h1>
-<p class="intro">AI hoặc danh sách từ cấm giữ lại bình luận có dấu hiệu xúc phạm; chỉ người viết thấy chúng cho tới khi bạn "Cho hiện". Cách kiểm duyệt đổi ở <a href="/manage/settings">Cài đặt</a>.</p>
-<div class="toolbar">${tabs('/manage/comments', status, [
-    ['held', 'Chờ duyệt', count('held')],
-    ['published', 'Đang hiện', count('published')],
-    ['all', 'Tất cả', count('held') + count('published')],
-  ])}${search(url, 'Tìm trong nội dung…')}</div>
-${table(
-  ['Thời gian', 'Ở đâu', 'Người viết', 'Nội dung (lý do)', ''],
-  rows.results.map((row) => commentRow(row, back)),
-  q ? 'Không tìm thấy bình luận nào.' : 'Không có bình luận nào ở mục này.',
-)}
+<p class="intro">AI hoặc danh sách từ cấm giữ lại bình luận có dấu hiệu xúc phạm; chỉ người viết thấy chúng cho tới khi bạn "Cho hiện". Cách kiểm duyệt đổi ở <a href="/manage/settings">Cài đặt</a>. <a href="/manage/export/comments.csv">Xuất CSV</a></p>
+<div class="toolbar">${tabs(url, 'status', status, [
+    ['held', 'Chờ duyệt', held],
+    ['published', 'Đang hiện', published],
+    ['all', 'Tất cả', held + published],
+  ])}${filters(
+    url,
+    ['status'],
+    select('where', 'Ở đâu', place, placeOptions) +
+      select(
+        'reason',
+        'Lý do',
+        reason,
+        Object.entries(reasons) as [string, string][],
+      ) +
+      searchField(url, 'Tìm trong nội dung…'),
+  )}</div>
+${formStart(back)}${bulkBar([
+    ['approve', 'Cho hiện'],
+    ['remove', 'Gỡ'],
+  ])}${table(
+    commentHeadings(),
+    rows.results.map((row) => commentRow(row)),
+    q || place || reason
+      ? 'Không tìm thấy bình luận nào khớp bộ lọc.'
+      : 'Không có bình luận nào ở mục này.',
+  )}</form>
 ${pager(url, page, Number(total.results[0]?.n ?? 0))}`;
+}
+
+async function threadPage(env: Env, id: number, back: string, admin: Admin) {
+  const first = await env.DB.prepare(`${commentSelect} WHERE c.id = ?`)
+    .bind(id)
+    .first<Row>();
+  if (!first) return null;
+  const top = first.parent_id
+    ? await env.DB.prepare(`${commentSelect} WHERE c.id = ?`)
+        .bind(first.parent_id)
+        .first<Row>()
+    : first;
+  if (!top) return null;
+  const { results: replies } = await env.DB.prepare(
+    `${commentSelect} WHERE c.parent_id = ? ORDER BY c.created_at, c.id`,
+  )
+    .bind(top.id)
+    .all<Row>();
+  const item = (row: Row) => {
+    const gone = row.status === 'deleted' || row.status === 'removed';
+    const state =
+      row.status === 'held'
+        ? '<span class="tag warn">Bị giữ</span>'
+        : row.status === 'deleted'
+          ? '<span class="tag info">Người viết đã xóa</span>'
+          : row.status === 'removed'
+            ? '<span class="tag">Đã gỡ</span>'
+            : '';
+    const ops = gone
+      ? ''
+      : (row.status === 'held' ? button(`approve:${row.id}`, 'Cho hiện') : '') +
+        button(`remove:${row.id}`, 'Gỡ…', 'danger');
+    return `<div class="meta"><strong>${who(row)}</strong> · ${when(row.created_at)}${row.edited_at ? ' · đã sửa' : ''} ${state} ${reasonTag(row)}${row.id === id ? '<span class="tag info">Đang xem</span>' : ''}</div>${gone ? '<p class="text muted">(không còn nội dung)</p>' : `<p class="text">${escape(row.body)}</p>`}${ops}`;
+  };
+  const canReply = admin.userId !== null && top.status === 'published';
+  return `<p><a href="/manage/comments">← Bình luận</a></p>
+<h1>Luồng bình luận</h1>
+<p class="intro">Ở ${where(top)}. Trả lời ở đây đăng dưới tên tài khoản chủ site, kèm nhãn "Tác giả", không qua kiểm duyệt.</p>
+${formStart(back)}<ol class="thread"><li>${item(top)}${
+    replies.length
+      ? `<ol class="replies">${replies.map((row) => `<li>${item(row)}</li>`).join('')}</ol>`
+      : ''
+  }</li></ol>
+${
+  canReply
+    ? `<div class="box"><div class="field"><label for="reply">Trả lời luồng này</label><textarea id="reply" name="reply" rows="4" maxlength="${COMMENT_MAX}"></textarea></div>${button(`reply:${top.id}`, 'Đăng trả lời')}</div>`
+    : `<p class="muted">${admin.userId === null ? 'Đang vào bằng Cloudflare Access, không có tài khoản để đăng trả lời.' : 'Chỉ trả lời được luồng đang hiện công khai.'}</p>`
+}</form>`;
 }
 
 async function feedbackPage(env: Env, url: URL, back: string) {
   const status =
-    ['new', 'done', 'all'].find(
+    ['new', 'progress', 'done', 'all'].find(
       (value) => value === url.searchParams.get('status'),
     ) ?? 'new';
   const page = pageNumber(url);
-  const filter = status === 'all' ? '1 = 1' : 'status = ?';
-  const args = status === 'all' ? [] : [status];
-  const [rows, total, groups] = await env.DB.batch<Row>([
+  const project = url.searchParams.get('project') ?? '';
+  const kind = url.searchParams.get('kind') ?? '';
+  const parts = [status === 'all' ? '1 = 1' : 'f.status = ?'];
+  const args: string[] = status === 'all' ? [] : [status];
+  if (project) {
+    parts.push('f.project = ?');
+    args.push(project);
+  }
+  if (kind && kinds[kind]) {
+    parts.push('f.kind = ?');
+    args.push(kind);
+  }
+  const filter = parts.join(' AND ');
+  const [rows, total, groups, projects] = await env.DB.batch<Row>([
     env.DB.prepare(
-      `SELECT * FROM feedback WHERE ${filter} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+      `SELECT f.*, u.display_name FROM feedback f LEFT JOIN users u ON u.id = f.user_id
+       WHERE ${filter} ORDER BY f.created_at DESC LIMIT ? OFFSET ?`,
     ).bind(...args, PER_PAGE, (page - 1) * PER_PAGE),
-    env.DB.prepare(`SELECT COUNT(*) AS n FROM feedback WHERE ${filter}`).bind(
+    env.DB.prepare(`SELECT COUNT(*) AS n FROM feedback f WHERE ${filter}`).bind(
       ...args,
     ),
     env.DB.prepare(
       `SELECT status, COUNT(*) AS n FROM feedback GROUP BY status`,
     ),
+    env.DB.prepare(`SELECT DISTINCT project FROM feedback ORDER BY project`),
   ]);
-  const count = (key: string) =>
-    Number(groups.results.find((row) => row.status === key)?.n ?? 0);
+  const body = rows.results.map((row) => {
+    const moves = (['new', 'progress', 'done'] as const)
+      .filter((state) => state !== row.status)
+      .map((state) =>
+        button(
+          `fb-${state}:${row.id}`,
+          state === 'new' ? 'Mở lại' : feedbackStates[state]!,
+          state === 'done' ? '' : 'ghost',
+        ),
+      )
+      .join('');
+    const note = `<details class="note"><summary>${row.note ? 'Sửa ghi chú' : 'Thêm ghi chú'}</summary><label class="sr-only" for="note-${row.id}">Ghi chú nội bộ</label><textarea id="note-${row.id}" name="note-${row.id}" rows="3" maxlength="2000">${escape(row.note)}</textarea><br>${button(`note:${row.id}`, 'Lưu ghi chú', 'ghost')}</details>`;
+    const from = row.user_id
+      ? `<br><small>Tài khoản: <a href="/manage/users/${escape(row.user_id)}">${escape(row.display_name ?? `#${row.user_id}`)}</a></small>`
+      : '';
+    return `<tr class="${row.status === 'done' ? 'done' : ''}"><td class="pick">${checkbox(row.id, `Chọn góp ý #${row.id}`)}</td><td>${when(row.created_at)}<br><span class="tag ${row.status === 'new' ? 'warn' : row.status === 'progress' ? 'info' : 'ok'}">${feedbackStates[String(row.status)] ?? escape(row.status)}</span></td><td>${escape(row.project)} · ${escape(row.locale)}<br><small>${escape(kinds[String(row.kind)] ?? row.kind)}</small></td><td class="body">${row.summary ? `<strong>${escape(row.summary)}</strong>\n` : ''}${escape(row.message)}${row.note ? `\n<small>Ghi chú: ${escape(row.note)}</small>` : ''}${note}</td><td>${escape(row.app_version)}${row.os ? ` · ${escape(row.os)}` : ''}</td><td>${escape(row.contact)}${from}</td><td class="ops">${moves}${button(`fb-delete:${row.id}`, 'Xóa…', 'danger')}</td></tr>`;
+  });
+  const n = (key: string) => count(groups.results, key);
   return `<h1>Góp ý và báo lỗi</h1>
-<p class="intro">Gửi từ form <code>/&lt;dự-án&gt;/feedback</code>. Không hiện công khai.</p>
-<div class="toolbar">${tabs('/manage/feedback', status, [
-    ['new', 'Chưa xử lý', count('new')],
-    ['done', 'Đã xử lý', count('done')],
-    ['all', 'Tất cả', count('new') + count('done')],
-  ])}</div>
-${table(
-  [
-    'Thời gian',
-    'Dự án',
-    'Loại',
-    'Tiêu đề / nội dung',
-    'Phiên bản · Windows',
-    'Liên hệ',
-    '',
-  ],
-  rows.results.map((row) => feedbackRow(row, back)),
-  'Không có góp ý nào ở mục này.',
-)}
+<p class="intro">Gửi từ form <code>/&lt;dự-án&gt;/feedback</code>. Không hiện công khai; ghi chú chỉ bạn thấy. <a href="/manage/export/feedback.csv">Xuất CSV</a></p>
+<div class="toolbar">${tabs(url, 'status', status, [
+    ['new', 'Chưa xử lý', n('new')],
+    ['progress', 'Đang xử lý', n('progress')],
+    ['done', 'Đã xử lý', n('done')],
+    ['all', 'Tất cả', n('new') + n('progress') + n('done')],
+  ])}${filters(
+    url,
+    ['status'],
+    select(
+      'project',
+      'Dự án',
+      project,
+      projects.results.map((row) => [String(row.project), String(row.project)]),
+    ) +
+      select('kind', 'Loại', kind, Object.entries(kinds) as [string, string][]),
+  )}</div>
+${formStart(back)}${bulkBar([
+    ['fb-progress', 'Chuyển sang đang xử lý'],
+    ['fb-done', 'Đánh dấu đã xử lý'],
+    ['fb-new', 'Mở lại (chưa xử lý)'],
+    ['fb-delete', 'Xóa'],
+  ])}${table(
+    [
+      '<span class="sr-only">Chọn</span>',
+      'Thời gian',
+      'Dự án',
+      'Tiêu đề / nội dung',
+      'Phiên bản · Windows',
+      'Liên hệ',
+      '',
+    ],
+    body,
+    'Không có góp ý nào ở mục này.',
+  )}</form>
 ${pager(url, page, Number(total.results[0]?.n ?? 0))}`;
 }
 
-async function downloadsPage(env: Env) {
+async function downloadsPage(env: Env, ctx: ExecutionContext) {
   const [totals, daily] = await env.DB.batch<Row>([
     env.DB.prepare(
       `SELECT project, version, kind, SUM(count) AS total FROM downloads GROUP BY project, version, kind`,
     ),
     env.DB.prepare(
-      `SELECT day, SUM(count) AS total FROM downloads WHERE day >= date('now', '-29 days') GROUP BY day ORDER BY day DESC`,
+      `SELECT day, SUM(count) AS total FROM downloads WHERE day >= date('now', '-29 days') GROUP BY day`,
     ),
   ]);
+  const github = await Promise.all(
+    statsProjects.map(
+      async (project) => [project, await getStats(project, ctx)] as const,
+    ),
+  );
   const rows = totals.results.sort(
     (a, b) =>
       String(a.project).localeCompare(String(b.project)) ||
@@ -336,68 +494,80 @@ async function downloadsPage(env: Env) {
       }),
   );
   return `<h1>Lượt tải</h1>
-<p class="intro">Đếm lượt bấm nút tải trên trang (một bộ đếm mỗi file mỗi ngày), không phải số lượt tải thật từ GitHub.</p>
+<p class="intro">Hai nguồn khác nhau: <strong>GitHub</strong> đếm số lần file thật sự được tải (cũng là số hiện công khai trên trang dự án); <strong>bấm tải trên site</strong> chỉ đếm lượt bấm nút trên chilolab.com. <a href="/manage/export/downloads.csv">Xuất CSV</a></p>
 <div class="columns">
-<section class="box"><h2>Theo phiên bản</h2>${table(
+${github
+  .map(
+    ([project, stats]) =>
+      `<section class="box"><h2>${escape(project)} · GitHub Releases</h2>${
+        stats
+          ? `<p class="big">${escape(stats.total)}</p><dl class="facts">${Object.entries(
+              stats.files,
+            )
+              .map(
+                ([file, n]) =>
+                  `<dt>${file === 'setup' ? 'Bộ cài (Setup.exe)' : file === 'portable' ? 'Portable (.zip)' : escape(file)}</dt><dd>${escape(n)}</dd>`,
+              )
+              .join(
+                '',
+              )}<dt>Kiểm tra lúc</dt><dd>${when(stats.checkedAt)}${stats.stale ? ' <span class="tag warn">GitHub chưa trả lời, đang dùng số cũ</span>' : ''}</dd></dl><p class="hint">Không tính file cập nhật tự động (.nupkg, RELEASES). Cập nhật tối đa mỗi phút.</p>`
+          : '<p class="empty">Chưa lấy được số từ GitHub.</p>'
+      }</section>`,
+  )
+  .join('')}
+<section class="box"><h2>Bấm tải trên site, 30 ngày</h2>${barChart(30, daily.results, 'Lượt bấm tải mỗi ngày')}</section>
+</div>
+<section class="box"><h2>Bấm tải trên site, theo phiên bản</h2>${table(
     ['Dự án', 'Phiên bản', 'Loại', 'Tổng'],
     rows.map(
       (row) =>
         `<tr><td>${escape(row.project)}</td><td>${escape(row.version)}</td><td>${row.kind === 'setup' ? 'Bộ cài' : 'Portable'}</td><td>${escape(row.total)}</td></tr>`,
     ),
-    'Chưa có lượt tải nào được ghi nhận.',
-  )}</section>
-<section class="box"><h2>30 ngày gần nhất</h2>${table(
-    ['Ngày (UTC)', 'Lượt bấm tải'],
-    daily.results.map(
-      (row) =>
-        `<tr><td>${escape(row.day)}</td><td>${escape(row.total)}</td></tr>`,
-    ),
-    'Chưa có dữ liệu 30 ngày gần nhất.',
-  )}</section>
-</div>`;
+    'Chưa có lượt bấm tải nào được ghi nhận.',
+  )}</section>`;
 }
 
-async function usersPage(env: Env, url: URL, back: string, admin: Admin) {
+async function usersPage(env: Env, url: URL) {
   const page = pageNumber(url);
   const q = query(url);
-  const filter = q
-    ? `WHERE instr(lower(u.email), lower(?)) > 0 OR instr(lower(u.display_name), lower(?)) > 0`
-    : '';
-  const args = q ? [q, q] : [];
-  const [rows, total] = await env.DB.batch<Row>([
+  const state =
+    ['all', 'blocked'].find(
+      (value) => value === url.searchParams.get('state'),
+    ) ?? 'all';
+  const parts: string[] = [];
+  const args: string[] = [];
+  if (q) {
+    parts.push(
+      '(instr(lower(u.email), lower(?)) > 0 OR instr(lower(u.display_name), lower(?)) > 0)',
+    );
+    args.push(q, q);
+  }
+  if (state === 'blocked') parts.push('u.blocked_at IS NOT NULL');
+  const filter = parts.length ? `WHERE ${parts.join(' AND ')}` : '';
+  const [rows, total, blocked] = await env.DB.batch<Row>([
     env.DB.prepare(
-      `SELECT u.id, u.email, u.display_name, u.role, u.google_sub IS NOT NULL AS google,
+      `SELECT u.id, u.email, u.display_name, u.role, u.blocked_at, u.google_sub IS NOT NULL AS google,
               u.created_at, u.last_login_at,
-              (SELECT COUNT(*) FROM comments c WHERE c.user_id = u.id AND c.status IN ('published', 'held')) AS comments,
-              (SELECT COUNT(*) FROM sessions s WHERE s.user_id = u.id AND s.expires_at > strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) AS sessions
+              (SELECT COUNT(*) FROM comments c WHERE c.user_id = u.id AND c.status IN ('published', 'held')) AS comments
        FROM users u ${filter}
        ORDER BY u.role = 'owner' DESC, u.created_at DESC LIMIT ? OFFSET ?`,
     ).bind(...args, PER_PAGE, (page - 1) * PER_PAGE),
     env.DB.prepare(`SELECT COUNT(*) AS n FROM users u ${filter}`).bind(...args),
+    env.DB.prepare(
+      'SELECT COUNT(*) AS n, (SELECT COUNT(*) FROM users) AS everyone FROM users WHERE blocked_at IS NOT NULL',
+    ),
   ]);
-  const confirmId = Number(url.searchParams.get('confirm'));
-  const confirmRow = rows.results.find((row) => row.id === confirmId);
-  const confirm =
-    confirmRow && confirmRow.role !== 'owner'
-      ? `<div class="notice warn" role="alert"><p>Xóa vĩnh viễn tài khoản <strong>${escape(confirmRow.display_name)}</strong> (${escape(confirmRow.email)}) và nội dung mọi bình luận của người này? Bình luận có người trả lời sẽ còn dòng "đã bị xóa".</p>${action('/manage/users', 'user-delete', confirmRow.id, 'Xóa vĩnh viễn', 'danger')} <a href="/manage/users">Hủy</a></div>`
-      : '';
-  const body = rows.results.map((row) => {
-    const isOwner = row.role === 'owner';
-    const self = admin.userId !== null && row.id === admin.userId;
-    const ops = [
-      !self && Number(row.sessions) > 0
-        ? action(back, 'user-signout', row.id, 'Đăng xuất mọi nơi', 'secondary')
-        : '',
-      !isOwner
-        ? `<a class="button-link danger" href="/manage/users?confirm=${escape(row.id)}">Xóa…</a>`
-        : '',
-    ].join('');
-    return `<tr><td>${escape(row.display_name)}${self ? ' <small>(bạn)</small>' : ''}<br><small>${escape(row.email)}</small></td><td>${isOwner ? '<span class="tag ok">Chủ site</span>' : 'Thành viên'}</td><td>${row.google ? 'Google' : 'Mã email'}</td><td>${escape(row.created_at)}</td><td>${escape(row.last_login_at ?? '—')}</td><td>${escape(row.comments)}</td><td class="ops">${ops}</td></tr>`;
-  });
+  const body = rows.results.map(
+    (row) =>
+      `<tr><td><a href="/manage/users/${escape(row.id)}">${escape(row.display_name)}</a><br><small>${escape(row.email)}</small></td><td>${row.role === 'owner' ? '<span class="tag ok">Chủ site</span>' : 'Thành viên'}${row.blocked_at ? ' <span class="tag">Đã khóa</span>' : ''}</td><td>${row.google ? 'Google' : 'Mã email'}</td><td>${when(row.created_at)}</td><td>${when(row.last_login_at)}</td><td>${escape(row.comments)}</td><td class="ops"><a class="button-link ghost" href="/manage/users/${escape(row.id)}">Chi tiết</a></td></tr>`,
+  );
+  const b = blocked.results[0] ?? {};
   return `<h1>Người dùng</h1>
-<p class="intro">Tài khoản tạo khi khách đăng nhập lần đầu (Google hoặc mã email). Quyền chủ site chỉ đặt được bằng SQL (xem <code>docs/DATABASE.md</code>), không đổi được từ đây.</p>
-${confirm}
-<div class="toolbar">${search(url, 'Tìm theo tên hoặc email…')}</div>
+<p class="intro">Tài khoản tạo khi khách đăng nhập lần đầu (Google hoặc mã email). Mở một tài khoản để xem bình luận, góp ý, đăng xuất, khóa hoặc xóa. Quyền chủ site chỉ đặt được bằng SQL (xem <code>docs/DATABASE.md</code>).</p>
+<div class="toolbar">${tabs(url, 'state', state, [
+    ['all', 'Tất cả', Number(b.everyone ?? 0)],
+    ['blocked', 'Đã khóa', Number(b.n ?? 0)],
+  ])}${filters(url, ['state'], searchField(url, 'Tìm theo tên hoặc email…'))}</div>
 ${table(
   [
     'Tên / email',
@@ -409,194 +579,459 @@ ${table(
     '',
   ],
   body,
-  q ? 'Không tìm thấy tài khoản nào.' : 'Chưa có tài khoản nào.',
+  q ? 'Không tìm thấy tài khoản nào.' : 'Chưa có tài khoản nào ở mục này.',
 )}
 ${pager(url, page, Number(total.results[0]?.n ?? 0))}`;
 }
 
-async function settingsPage(env: Env) {
+async function userPage(env: Env, id: number, back: string, admin: Admin) {
+  const user = await env.DB.prepare(
+    `SELECT u.*, u.google_sub IS NOT NULL AS google,
+       (SELECT COUNT(*) FROM sessions s WHERE s.user_id = u.id AND s.expires_at > strftime('%Y-%m-%dT%H:%M:%fZ', 'now')) AS sessions
+     FROM users u WHERE u.id = ?`,
+  )
+    .bind(id)
+    .first<Row>();
+  if (!user) return null;
+  const [comments, feedback, counts] = await env.DB.batch<Row>([
+    env.DB.prepare(
+      `${commentSelect} WHERE c.user_id = ? AND c.status IN ('published', 'held') ORDER BY c.created_at DESC LIMIT 50`,
+    ).bind(id),
+    env.DB.prepare(
+      'SELECT * FROM feedback WHERE user_id = ? ORDER BY created_at DESC LIMIT 50',
+    ).bind(id),
+    env.DB.prepare(
+      `SELECT status, COUNT(*) AS n FROM comments WHERE user_id = ? GROUP BY status`,
+    ).bind(id),
+  ]);
+  const owner = user.role === 'owner';
+  const self = admin.userId === id;
+  const ops = [
+    !self && Number(user.sessions) > 0
+      ? button(`user-signout:${id}`, 'Đăng xuất mọi thiết bị', 'ghost')
+      : '',
+    !owner && !user.blocked_at
+      ? button(`user-block:${id}`, 'Khóa tài khoản…', 'danger')
+      : '',
+    !owner && user.blocked_at ? button(`user-unblock:${id}`, 'Mở khóa') : '',
+    !owner ? button(`user-delete:${id}`, 'Xóa vĩnh viễn…', 'danger') : '',
+  ].join('');
+  return `<p><a href="/manage/users">← Người dùng</a></p>
+<h1>${escape(user.display_name)}</h1>
+${user.blocked_at ? `<div class="notice danger"><p>Tài khoản bị khóa từ ${when(user.blocked_at)}: không đăng nhập hay bình luận được. Bình luận cũ vẫn giữ nguyên.</p></div>` : ''}
+<div class="columns">
+<section class="box"><h2>Thông tin</h2><dl class="facts">
+<dt>Email</dt><dd>${escape(user.email)}</dd>
+<dt>Vai trò</dt><dd>${owner ? '<span class="tag ok">Chủ site</span>' : 'Thành viên'}${self ? ' <small>(bạn)</small>' : ''}</dd>
+<dt>Đăng nhập bằng</dt><dd>${user.google ? 'Google' : 'Mã email'}</dd>
+<dt>Tạo lúc</dt><dd>${when(user.created_at)}</dd>
+<dt>Đăng nhập cuối</dt><dd>${when(user.last_login_at)}</dd>
+<dt>Phiên còn hạn</dt><dd>${escape(user.sessions)}</dd>
+<dt>Bình luận</dt><dd>${count(counts.results, 'published')} đang hiện · ${count(counts.results, 'held')} bị giữ</dd>
+</dl></section>
+<section class="box"><h2>Thao tác</h2>${
+    owner
+      ? '<p class="muted">Tài khoản chủ site không khóa hay xóa được từ đây, để trang quản trị không tự khóa mình.</p>'
+      : '<p class="hint">Khóa: không đăng nhập, không bình luận, mọi phiên bị đăng xuất; dữ liệu vẫn giữ và mở khóa được. Xóa: mất tài khoản và nội dung mọi bình luận của người này.</p>'
+  }${formStart(back, 'user-ops')}${ops || '<p class="empty">Không có thao tác nào.</p>'}</form></section>
+</div>
+<section class="box"><h2>Bình luận gần đây</h2>${formStart(back)}${table(
+    commentHeadings(false),
+    comments.results.map((row) => commentRow(row, false)),
+    'Người này chưa có bình luận nào.',
+  )}</form></section>
+<section class="box"><h2>Góp ý đã gửi khi đăng nhập</h2>${
+    feedback.results.length
+      ? `<ul class="list">${feedback.results.map((row) => `<li><strong>${escape(row.summary || kinds[String(row.kind)])}</strong> <small>· ${escape(row.project)} · ${feedbackStates[String(row.status)] ?? ''} · ${when(row.created_at)}</small></li>`).join('')}</ul>`
+      : '<p class="empty">Không có góp ý nào gắn với tài khoản này.</p>'
+  }</section>`;
+}
+
+type Tab = 'comments' | 'feedback' | 'accounts' | 'email';
+const settingTabs: [Tab, string][] = [
+  ['comments', 'Bình luận'],
+  ['feedback', 'Góp ý'],
+  ['accounts', 'Tài khoản'],
+  ['email', 'Email thông báo'],
+];
+
+async function settingsPage(env: Env, url: URL) {
+  const tab =
+    settingTabs.find(([key]) => key === url.searchParams.get('tab'))?.[0] ??
+    'comments';
   const s = await getSettings(env);
-  const check = (name: string, on: boolean, label: string, hint: string) =>
-    `<div class="field check"><input type="checkbox" id="${name}" name="${name}" value="1"${on ? ' checked' : ''}><label for="${name}">${label}</label><p class="hint">${hint}</p></div>`;
-  const radio = (value: Moderation, label: string, hint: string) =>
+  const check = (name: keyof Settings, label: string, hint: string) =>
+    `<div class="field check"><input type="checkbox" id="${name}" name="${name}" value="1"${s[name] ? ' checked' : ''}><label for="${name}">${label}</label><p class="hint">${hint}</p></div>`;
+  const radio = (value: Settings['moderation'], label: string, hint: string) =>
     `<div class="field check"><input type="radio" id="moderation-${value}" name="moderation" value="${value}"${s.moderation === value ? ' checked' : ''}><label for="moderation-${value}">${label}</label><p class="hint">${hint}</p></div>`;
-  const status = (ok: boolean, label: string, hint: string) =>
-    `<tr><td>${label}</td><td>${ok ? '<span class="tag ok">Đã cấu hình</span>' : '<span class="tag">Chưa có</span>'}</td><td><small>${hint}</small></td></tr>`;
-  return `<h1>Cài đặt</h1>
-<form method="post" action="/manage" class="settings">
-<input type="hidden" name="op" value="settings">
-<input type="hidden" name="back" value="/manage/settings">
-<fieldset><legend>Bình luận</legend>
-${check('commentsOpen', s.commentsOpen, 'Cho phép bình luận mới', 'Tắt thì khách không viết hay sửa bình luận được; bình luận cũ vẫn hiện. Bạn (chủ site) vẫn viết được.')}
+  const number = (
+    name: keyof Settings,
+    label: string,
+    min: number,
+    max: number,
+    hint: string,
+  ) =>
+    `<div class="field"><label for="${name}">${label}</label><input type="number" id="${name}" name="${name}" min="${min}" max="${max}" value="${escape(s[name])}" aria-describedby="${name}-hint"><p class="hint" id="${name}-hint">${hint}</p></div>`;
+  const mail = mailEnabled(env)
+    ? ''
+    : '<div class="notice warn"><p>Chưa có <code>RESEND_API_KEY</code>, nên chưa gửi được email nào. Xem <a href="/manage/status">Tình trạng dịch vụ</a>.</p></div>';
+  const forms: Record<Tab, string> = {
+    comments: `<fieldset><legend>Bình luận</legend>
+${check('commentsOpen', 'Cho phép bình luận mới', 'Tắt thì khách không viết hay sửa bình luận được; bình luận cũ vẫn hiện. Bạn (chủ site) vẫn viết được.')}
 <p class="label">Kiểm duyệt</p>
 ${radio('ai', 'Danh sách từ + AI (mặc định)', 'Lọc từ cấm, rồi Workers AI đọc ngữ cảnh. Tốn quota AI miễn phí mỗi ngày.')}
 ${radio('words', 'Chỉ danh sách từ', 'Không gọi AI. Nhanh hơn, nhưng bỏ sót xúc phạm không dùng từ cấm.')}
 ${radio('manual', 'Giữ tất cả chờ duyệt', 'Mọi bình luận của khách chỉ hiện sau khi bạn duyệt ở mục Bình luận.')}
 <div class="field"><label for="blockedWords">Từ bị chặn thêm</label><textarea id="blockedWords" name="blockedWords" rows="5" maxlength="8000" aria-describedby="blockedWords-hint">${escape(s.blockedWords.join('\n'))}</textarea><p class="hint" id="blockedWords-hint">Mỗi dòng một từ hoặc cụm từ (2–40 ký tự, tối đa 200). Khớp nguyên từ, có hoặc không dấu. Cộng thêm vào danh sách có sẵn trong <code>worker/moderation.ts</code>.</p></div>
-${check('notifyHeld', s.notifyHeld, 'Gửi email cho tôi khi có bình luận bị giữ', 'Gửi qua Resend tới email tài khoản chủ site. Gói miễn phí: 100 email/ngày.')}
-</fieldset>
-<fieldset><legend>Góp ý và báo lỗi</legend>
-${check('feedbackOpen', s.feedbackOpen, 'Nhận góp ý qua form', 'Tắt thì form <code>/&lt;dự-án&gt;/feedback</code> báo đang tạm đóng.')}
-</fieldset>
-<fieldset><legend>Đăng nhập và tài khoản</legend>
-${check('emailLogin', s.emailLogin, 'Cho đăng nhập bằng mã email', 'Cần thêm secret RESEND_API_KEY. Tắt thì chỉ còn Google. Nếu bạn đăng nhập bằng mã email, hãy chắc chắn còn đăng nhập được bằng Google trước khi tắt.')}
-${check('signups', s.signups, 'Cho tạo tài khoản mới', 'Tắt thì chỉ tài khoản đã có đăng nhập được, giống "Anyone can register" của WordPress.')}
-</fieldset>
-<p><button>Lưu thay đổi</button></p>
-</form>
-<section class="box"><h2>Tình trạng dịch vụ</h2>
-<p class="intro">Chỉ đọc. Secret đặt bằng <code>npx wrangler secret put …</code> hoặc trong Cloudflare Dashboard, không lưu ở đây.</p>
+${number('commentMaxLength', 'Độ dài tối đa của một bình luận (ký tự)', 100, COMMENT_MAX, `Từ 100 đến ${COMMENT_MAX}. Không áp dụng cho bạn.`)}
+${number('commentsPerHour', 'Số bình luận tối đa mỗi người trong một giờ', 0, 500, '0 là không giới hạn theo giờ (vẫn còn giới hạn chống spam 10 lần ghi mỗi phút). Không áp dụng cho bạn.')}
+</fieldset>`,
+    feedback: `<fieldset><legend>Góp ý và báo lỗi</legend>
+${check('feedbackOpen', 'Nhận góp ý qua form', 'Tắt thì form <code>/&lt;dự-án&gt;/feedback</code> báo đang tạm đóng.')}
+</fieldset>`,
+    accounts: `<fieldset><legend>Đăng nhập và tài khoản</legend>
+${check('emailLogin', 'Cho đăng nhập bằng mã email', 'Cần secret RESEND_API_KEY. Tắt thì chỉ còn Google. Nếu bạn đăng nhập bằng mã email, hãy chắc chắn còn đăng nhập được bằng Google trước khi tắt.')}
+${check('signups', 'Cho tạo tài khoản mới', 'Tắt thì chỉ tài khoản đã có đăng nhập được, giống "Anyone can register" của WordPress.')}
+</fieldset>`,
+    email: `${mail}<fieldset><legend>Email gửi cho bạn</legend>
+<p class="hint">Gửi qua Resend tới email của tài khoản chủ site. Gói miễn phí: 100 email/ngày.</p>
+${check('notifyHeld', 'Khi có bình luận bị giữ', 'Kèm nội dung, lý do và đường dẫn tới trang.')}
+${check('notifyFeedback', 'Khi có góp ý hoặc báo lỗi mới', 'Kèm tiêu đề, nội dung và đường dẫn tới mục Góp ý.')}
+</fieldset>`,
+  };
+  return `<h1>Cài đặt</h1>
+<p class="intro">Mỗi tab lưu riêng. Mọi thay đổi được ghi vào <a href="/manage/log">Nhật ký</a>.</p>
+<div class="settings-tabs">${tabs(
+    url,
+    'tab',
+    tab,
+    settingTabs.map(([key, label]) => [key, label, null]),
+  )}</div>
+<form method="post" action="/manage" class="settings">
+<input type="hidden" name="back" value="/manage/settings?tab=${tab}">
+${forms[tab]}
+<p>${button(`settings:${tab}`, 'Lưu thay đổi')}</p>
+</form>`;
+}
+
+async function logPage(env: Env, url: URL) {
+  const page = pageNumber(url);
+  const q = query(url);
+  const filter = q
+    ? 'WHERE instr(lower(action || target || detail), lower(?)) > 0'
+    : '';
+  const args = q ? [q] : [];
+  const [rows, total] = await env.DB.batch<Row>([
+    env.DB.prepare(
+      `SELECT * FROM admin_log ${filter} ORDER BY id DESC LIMIT ? OFFSET ?`,
+    ).bind(...args, PER_PAGE, (page - 1) * PER_PAGE),
+    env.DB.prepare(`SELECT COUNT(*) AS n FROM admin_log ${filter}`).bind(
+      ...args,
+    ),
+  ]);
+  return `<h1>Nhật ký quản trị</h1>
+<p class="intro">Mọi thao tác trong trang này: ai làm, làm gì, lúc nào. Không lưu IP. Tự xóa sau một năm.</p>
+<div class="toolbar"><span></span>${filters(url, [], searchField(url, 'Tìm trong nhật ký…'))}</div>
 ${table(
-  ['Dịch vụ', 'Trạng thái', 'Ghi chú'],
-  [
-    status(
-      Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
-      'Đăng nhập Google',
-      'GOOGLE_CLIENT_ID (vars) + GOOGLE_CLIENT_SECRET (secret)',
-    ),
-    status(
-      mailEnabled(env),
-      'Gửi email (Resend)',
-      'RESEND_API_KEY (secret), người gửi MAIL_FROM',
-    ),
-    status(
-      Boolean(env.TURNSTILE_SECRET),
-      'Chống spam (Turnstile)',
-      'TURNSTILE_SECRET (secret)',
-    ),
-    status(
-      Boolean(env.ACCESS_TEAM_DOMAIN && env.ACCESS_AUD),
-      'Cloudflare Access (tùy chọn)',
-      'Lối vào /manage dự phòng ngoài tài khoản chủ site',
-    ),
-  ],
-  '',
+  ['Thời gian', 'Người làm', 'Thao tác', 'Đối tượng', 'Chi tiết'],
+  rows.results.map(
+    (row) =>
+      `<tr><td>${when(row.at)}</td><td>${escape(row.actor)}</td><td>${escape(actionLabels[String(row.action)] ?? row.action)}</td><td>${escape(row.target)}</td><td class="body">${escape(row.detail)}</td></tr>`,
+  ),
+  'Chưa có hoạt động nào.',
 )}
-</section>`;
+${pager(url, page, Number(total.results[0]?.n ?? 0))}`;
 }
 
-// ---------- layout ----------
-
-const menu: [string, string, keyof Counts | null][] = [
-  ['/manage', 'Bảng tin', null],
-  ['/manage/comments', 'Bình luận', 'held'],
-  ['/manage/feedback', 'Góp ý', 'newFeedback'],
-  ['/manage/downloads', 'Lượt tải', null],
-  ['/manage/users', 'Người dùng', null],
-  ['/manage/settings', 'Cài đặt', null],
-];
-
-function layout(
-  title: string,
-  path: string,
-  admin: Admin,
-  badge: Counts,
-  notice: string | null,
-  content: string,
-) {
-  const nav = menu
-    .map(([href, label, key]) => {
-      const count = key ? badge[key] : 0;
-      return `<li><a href="${href}"${href === path ? ' aria-current="page"' : ''}>${label}${count ? ` <span class="badge" aria-label="${count} mục mới">${count}</span>` : ''}</a></li>`;
-    })
-    .join('');
-  return `<!doctype html>
-<html lang="vi">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex, nofollow">
-<title>${escape(title)} ‹ Quản trị ChiloLab</title>
-<style>
-*{box-sizing:border-box}
-body{font:15px/1.5 system-ui,sans-serif;margin:0;color:#1d2a30;background:#f1f4f5}
-a{color:#16606f}
-.skip{position:absolute;left:-999px;top:0;background:#fff;padding:.5rem 1rem;z-index:10}.skip:focus{left:.5rem}
-.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.topbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;background:#12262d;color:#dbe6ea;padding:.45rem 1rem;font-size:.88rem}
-.topbar a{color:#fff;text-decoration:none}.topbar .site{font-weight:700}
-.topbar form{display:inline}.topbar button{background:none;border:0;color:#fff;text-decoration:underline;padding:0;margin:0 0 0 .8rem;font:inherit;cursor:pointer}
-.shell{display:grid;grid-template-columns:200px 1fr;min-height:calc(100vh - 36px)}
-.side{background:#1b343c}
-.side ul{list-style:none;margin:0;padding:.6rem 0}
-.side a{display:flex;justify-content:space-between;align-items:center;color:#dbe6ea;text-decoration:none;padding:.55rem 1rem;border-left:4px solid transparent}
-.side a:hover{background:#244650;color:#fff}
-.side a[aria-current=page]{background:#16606f;color:#fff;border-left-color:#f0a020;font-weight:600}
-.side .sep{border-top:1px solid #2c4c55;margin:.5rem 0}
-.badge{background:#d63b2a;color:#fff;border-radius:1rem;padding:0 .45rem;font-size:.75rem;font-weight:700}
-main{padding:1.4rem 1.6rem 3rem;min-width:0}
-h1{font-size:1.45rem;margin:0 0 1rem;font-weight:600}h2{font-size:1.05rem;margin:0 0 .8rem}
-.intro,.empty,small,.hint{color:#5a6b73}.intro{margin-top:-.4rem;max-width:80ch}
-.notice{background:#fff;border-left:4px solid #2e8b57;padding:.2rem 1rem;margin:0 0 1rem;box-shadow:0 1px 1px #0001}
-.notice.warn{border-left-color:#f0a020}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.8rem;margin-bottom:1.2rem}
-.card{display:flex;flex-direction:column;background:#fff;border:1px solid #d7e0e4;padding:1rem;text-decoration:none;color:inherit;border-radius:.3rem}
-.card:hover{border-color:#16606f}.card .value{font-size:1.8rem;font-weight:700;color:#16606f}
-.columns{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:1rem}
-.box{background:#fff;border:1px solid #d7e0e4;padding:1rem;border-radius:.3rem;min-width:0;margin-bottom:1rem}
-.list{margin:0;padding-left:1.1rem}.list li{margin:.3rem 0}
-.toolbar{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.6rem;margin-bottom:.8rem}
-.tabs{display:flex;flex-wrap:wrap;gap:.2rem .9rem;list-style:none;margin:0;padding:0}
-.tabs a{text-decoration:none}.tabs a[aria-current=page]{color:#1d2a30;font-weight:700}
-.count{color:#5a6b73;font-weight:400}
-.search{display:flex;gap:.3rem}.search input{min-width:14rem}
-input[type=search],textarea{font:inherit;padding:.35rem .5rem;border:1px solid #9fb1b8;border-radius:.3rem;background:#fff}
-textarea{width:100%;max-width:40rem}
-.table{overflow-x:auto}
-table{border-collapse:collapse;width:100%;background:#fff}
-th,td{border-bottom:1px solid #e2e8eb;padding:.55rem .6rem;text-align:left;vertical-align:top}
-th{background:#f7f9fa;font-weight:600;border-bottom:1px solid #c8d3d8}
-tr.held td{background:#fff8e6}
-td.body{white-space:pre-wrap;word-break:break-word;max-width:50ch}
-td.ops{white-space:nowrap}
-.tag{display:inline-block;background:#fde8e4;color:#7a1d12;border-radius:.3rem;padding:0 .4rem;font-size:.78rem;font-weight:600}
-.tag.ok{background:#e2f3e8;color:#1d5e36}
-tr.done{opacity:.55}
-td form{display:inline}
-button,.button-link{font:inherit;font-size:.88rem;display:inline-block;padding:.25rem .7rem;margin:.1rem;border:1px solid #16606f;background:#16606f;color:#fff;border-radius:.3rem;cursor:pointer;text-decoration:none}
-button.secondary,.button-link.secondary{background:#fff;color:#16606f}
-button.danger,.button-link.danger{background:#fff;color:#a3261b;border-color:#a3261b}
-a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #f0a020;outline-offset:2px}
-.pager{display:flex;gap:1rem;margin-top:.8rem}
-.settings{background:#fff;border:1px solid #d7e0e4;padding:1rem 1.2rem;border-radius:.3rem;margin-bottom:1rem;max-width:56rem}
-fieldset{border:0;border-top:1px solid #e2e8eb;margin:0 0 .6rem;padding:.8rem 0 0}
-legend{font-weight:700;font-size:1.05rem;padding-right:.6rem}
-.field{margin:.6rem 0}.field>label,.label{display:block;font-weight:600;margin:.4rem 0 .2rem}
-.field.check{display:grid;grid-template-columns:auto 1fr;column-gap:.5rem;align-items:baseline}
-.field.check label{font-weight:600;margin:0}.field.check .hint{grid-column:2;margin:.1rem 0 0}
-.hint{font-size:.85rem;margin:.2rem 0 0}
-@media (max-width:760px){.shell{grid-template-columns:1fr}.side ul{display:flex;flex-wrap:wrap;padding:0}.side a{border-left:0;border-bottom:3px solid transparent;padding:.5rem .7rem}.side a[aria-current=page]{border-bottom-color:#f0a020}.side .sep{display:none}main{padding:1rem}}
-</style>
-</head>
-<body>
-<a class="skip" href="#main">Bỏ qua tới nội dung</a>
-<header class="topbar"><a class="site" href="/">← ChiloLab</a><span>Xin chào, <strong>${escape(admin.name)}</strong>${admin.userId !== null ? `<form method="post" action="/manage/logout"><button>Đăng xuất</button></form>` : ''}</span></header>
-<div class="shell">
-<nav class="side" aria-label="Quản trị"><ul>${nav}<li class="sep" aria-hidden="true"></li><li><a href="/admin/">Nội dung (CMS)</a></li><li><a href="/user/account">Tài khoản của tôi</a></li></ul></nav>
-<main id="main" tabindex="-1">
-${notice && notices[notice] ? `<div class="notice" role="status"><p>${notices[notice]}</p></div>` : ''}
-${content}
-</main>
-</div>
-</body>
-</html>`;
+async function statusPage(env: Env, ctx: ExecutionContext) {
+  const service = (ok: boolean, label: string, hint: string) =>
+    `<tr><td>${label}</td><td>${ok ? '<span class="tag ok">Đã cấu hình</span>' : '<span class="tag">Chưa có</span>'}</td><td><small>${hint}</small></td></tr>`;
+  const schema = await env.DB.prepare(
+    `SELECT (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'settings') AS settings,
+            (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'admin_log') AS adminLog,
+            (SELECT COUNT(*) FROM pragma_table_info('users') WHERE name = 'blocked_at') AS blocked,
+            (SELECT COUNT(*) FROM pragma_table_info('feedback') WHERE name = 'note') AS note`,
+  ).first<Row>();
+  const migrated = (value: unknown) => Number(value) > 0;
+  const github = await getStats('pet-desktop', ctx);
+  return `<h1>Tình trạng dịch vụ</h1>
+<p class="intro">Chỉ đọc. Secret đặt bằng <code>npx wrangler secret put …</code> hoặc trong Cloudflare Dashboard, không lưu ở đây.</p>
+<section class="box"><h2>Dịch vụ bên ngoài</h2>${table(
+    ['Dịch vụ', 'Trạng thái', 'Ghi chú'],
+    [
+      service(
+        Boolean(env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET),
+        'Đăng nhập Google',
+        'GOOGLE_CLIENT_ID (vars) + GOOGLE_CLIENT_SECRET (secret)',
+      ),
+      service(
+        mailEnabled(env),
+        'Gửi email (Resend)',
+        'RESEND_API_KEY (secret), người gửi MAIL_FROM',
+      ),
+      service(
+        Boolean(env.TURNSTILE_SECRET),
+        'Chống spam (Turnstile)',
+        'TURNSTILE_SECRET (secret)',
+      ),
+      service(
+        Boolean(env.ACCESS_TEAM_DOMAIN && env.ACCESS_AUD),
+        'Cloudflare Access (tùy chọn)',
+        'Lối vào /manage dự phòng ngoài tài khoản chủ site',
+      ),
+      `<tr><td>Lượt tải GitHub</td><td>${github ? (github.stale ? '<span class="tag warn">Đang dùng số cũ</span>' : '<span class="tag ok">Hoạt động</span>') : '<span class="tag">Không lấy được</span>'}</td><td><small>API công khai của GitHub, không cần token; giới hạn 60 lượt/giờ nên có cache 1 phút.</small></td></tr>`,
+    ],
+    '',
+  )}</section>
+<section class="box"><h2>Cơ sở dữ liệu (D1)</h2>${table(
+    ['Migration', 'Trạng thái'],
+    [
+      `<tr><td>0005 · Cài đặt site</td><td>${migrated(schema?.settings) ? '<span class="tag ok">Đã chạy</span>' : '<span class="tag">Chưa chạy</span>'}</td></tr>`,
+      `<tr><td>0006 · Khóa tài khoản, ghi chú góp ý, nhật ký</td><td>${migrated(schema?.adminLog) && migrated(schema?.blocked) && migrated(schema?.note) ? '<span class="tag ok">Đã chạy</span>' : '<span class="tag">Chưa chạy</span>'}</td></tr>`,
+    ],
+    '',
+  )}<p class="hint">Chưa chạy thì: <code>npm run db:migrate:remote</code>.</p></section>`;
 }
 
-// ---------- request handling ----------
+// ---------- CSV export ----------
 
-const htmlHeaders = {
-  ...baseHeaders,
-  'Content-Type': 'text/html; charset=utf-8',
-  'Content-Security-Policy':
-    "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
-  'X-Robots-Tag': 'noindex, nofollow',
+async function exportCsv(env: Env, name: string, admin: Admin) {
+  const queries: Record<string, [string, string[]]> = {
+    comments: [
+      `SELECT c.id, c.created_at, c.edited_at, c.project, c.version, c.parent_id, c.status, c.moderation_reason, c.locale, u.display_name AS author, c.body
+       FROM comments c LEFT JOIN users u ON u.id = c.user_id
+       WHERE c.status IN ('published', 'held') ORDER BY c.id`,
+      [
+        'id',
+        'created_at',
+        'edited_at',
+        'project',
+        'version',
+        'parent_id',
+        'status',
+        'moderation_reason',
+        'locale',
+        'author',
+        'body',
+      ],
+    ],
+    feedback: [
+      `SELECT id, created_at, project, kind, status, summary, message, note, app_version, os, contact, locale FROM feedback ORDER BY id`,
+      [
+        'id',
+        'created_at',
+        'project',
+        'kind',
+        'status',
+        'summary',
+        'message',
+        'note',
+        'app_version',
+        'os',
+        'contact',
+        'locale',
+      ],
+    ],
+    downloads: [
+      `SELECT day, project, version, kind, count FROM downloads ORDER BY day, project, version, kind`,
+      ['day', 'project', 'version', 'kind', 'count'],
+    ],
+  };
+  const entry = queries[name];
+  if (!entry) return null;
+  const { results } = await env.DB.prepare(entry[0]).all<Row>();
+  await log(env, admin, 'export', `${name}.csv`, `${results.length} dòng`);
+  return csv(name, entry[1], results);
+}
+
+// ---------- writes ----------
+
+type Op = {
+  label: string;
+  /** Asks "are you sure?" first. */
+  destructive?: boolean;
+  /** May be applied to several ticked rows at once. */
+  bulk?: boolean;
+  /** Returns a short description for the log, or null when nothing changed. */
+  run: (env: Env, id: number, admin: Admin) => Promise<string | null>;
+};
+
+const setFeedback =
+  (status: 'new' | 'progress' | 'done') => async (env: Env, id: number) => {
+    const done = await env.DB.prepare(
+      'UPDATE feedback SET status = ? WHERE id = ? AND status <> ?',
+    )
+      .bind(status, id, status)
+      .run();
+    return done.meta.changes ? `góp ý #${id}` : null;
+  };
+
+const ops: Record<string, Op> = {
+  approve: {
+    label: 'Cho hiện bình luận',
+    bulk: true,
+    run: async (env, id) => {
+      const done = await env.DB.prepare(
+        `UPDATE comments SET status = 'published', moderation_reason = NULL
+         WHERE id = ? AND status = 'held'`,
+      )
+        .bind(id)
+        .run();
+      return done.meta.changes ? `bình luận #${id}` : null;
+    },
+  },
+  remove: {
+    label: 'Gỡ bình luận',
+    destructive: true,
+    bulk: true,
+    run: async (env, id) => {
+      const row = await env.DB.prepare(
+        `SELECT status, substr(body, 1, 120) AS body FROM comments WHERE id = ?`,
+      )
+        .bind(id)
+        .first<{ status: string; body: string }>();
+      if (!row || !['published', 'held'].includes(row.status)) return null;
+      await removeComment(env, id, 'removed');
+      return `bình luận #${id}: ${row.body}`;
+    },
+  },
+  'fb-new': { label: 'Mở lại góp ý', bulk: true, run: setFeedback('new') },
+  'fb-progress': {
+    label: 'Chuyển góp ý sang đang xử lý',
+    bulk: true,
+    run: setFeedback('progress'),
+  },
+  'fb-done': {
+    label: 'Đánh dấu góp ý đã xử lý',
+    bulk: true,
+    run: setFeedback('done'),
+  },
+  'fb-delete': {
+    label: 'Xóa vĩnh viễn góp ý',
+    destructive: true,
+    bulk: true,
+    run: async (env, id) => {
+      const done = await env.DB.prepare('DELETE FROM feedback WHERE id = ?')
+        .bind(id)
+        .run();
+      return done.meta.changes ? `góp ý #${id}` : null;
+    },
+  },
+  'user-signout': {
+    label: 'Đăng xuất khỏi mọi thiết bị',
+    run: async (env, id, admin) => {
+      if (id === admin.userId) return null;
+      await env.DB.prepare('DELETE FROM sessions WHERE user_id = ?')
+        .bind(id)
+        .run();
+      return `tài khoản #${id}`;
+    },
+  },
+  'user-block': {
+    label: 'Khóa tài khoản',
+    destructive: true,
+    run: async (env, id) => {
+      const [done] = await env.DB.batch([
+        env.DB.prepare(
+          `UPDATE users SET blocked_at = ? WHERE id = ? AND role <> 'owner' AND blocked_at IS NULL`,
+        ).bind(stamp(), id),
+        env.DB.prepare(
+          `DELETE FROM sessions WHERE user_id = ? AND user_id IN (SELECT id FROM users WHERE role <> 'owner')`,
+        ).bind(id),
+      ]);
+      return done!.meta.changes ? `tài khoản #${id}` : null;
+    },
+  },
+  'user-unblock': {
+    label: 'Mở khóa tài khoản',
+    run: async (env, id) => {
+      const done = await env.DB.prepare(
+        'UPDATE users SET blocked_at = NULL WHERE id = ? AND blocked_at IS NOT NULL',
+      )
+        .bind(id)
+        .run();
+      return done.meta.changes ? `tài khoản #${id}` : null;
+    },
+  },
+  'user-delete': {
+    label: 'Xóa vĩnh viễn tài khoản',
+    destructive: true,
+    run: async (env, id) => {
+      // Owner accounts cannot be deleted here, so the panel never locks itself out.
+      const target = await env.DB.prepare(
+        'SELECT role, email FROM users WHERE id = ?',
+      )
+        .bind(id)
+        .first<{ role: string; email: string }>();
+      if (!target || target.role === 'owner') return null;
+      await deleteUserComments(env, id);
+      await env.DB.batch([
+        env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id),
+        env.DB.prepare(
+          'UPDATE feedback SET user_id = NULL WHERE user_id = ?',
+        ).bind(id),
+        env.DB.prepare(
+          `DELETE FROM users WHERE id = ? AND role <> 'owner'`,
+        ).bind(id),
+      ]);
+      return `tài khoản #${id}`;
+    },
+  },
+};
+
+/** Lines describing what a destructive operation is about to touch. */
+async function describe(env: Env, op: string, ids: number[]) {
+  const marks = ids.map(() => '?').join(', ');
+  if (op === 'remove') {
+    const { results } = await env.DB.prepare(
+      `${commentSelect} WHERE c.id IN (${marks})`,
+    )
+      .bind(...ids)
+      .all<Row>();
+    return results.map(
+      (row) =>
+        `<li><strong>${escape(row.display_name ?? row.author ?? '—')}</strong> ở ${escape(row.project)}${row.version ? ` v${escape(row.version)}` : ''}: ${escape(String(row.body).slice(0, 160))}</li>`,
+    );
+  }
+  if (op === 'fb-delete') {
+    const { results } = await env.DB.prepare(
+      `SELECT * FROM feedback WHERE id IN (${marks})`,
+    )
+      .bind(...ids)
+      .all<Row>();
+    return results.map(
+      (row) =>
+        `<li><strong>${escape(row.summary || kinds[String(row.kind)])}</strong> · ${escape(row.project)} · ${when(row.created_at)}</li>`,
+    );
+  }
+  const { results } = await env.DB.prepare(
+    `SELECT id, display_name, email FROM users WHERE id IN (${marks})`,
+  )
+    .bind(...ids)
+    .all<Row>();
+  return results.map(
+    (row) =>
+      `<li><strong>${escape(row.display_name)}</strong> (${escape(row.email)})</li>`,
+  );
+}
+
+const consequences: Record<string, string> = {
+  remove:
+    'Nội dung bị xóa khỏi cơ sở dữ liệu. Bình luận có người trả lời sẽ còn dòng "đã bị quản trị viên gỡ".',
+  'fb-delete': 'Góp ý bị xóa vĩnh viễn, không khôi phục được.',
+  'user-block':
+    'Người này bị đăng xuất khỏi mọi thiết bị, không đăng nhập hay bình luận được nữa. Dữ liệu vẫn giữ; mở khóa được bất cứ lúc nào.',
+  'user-delete':
+    'Tài khoản và nội dung mọi bình luận của người này bị xóa vĩnh viễn. Bình luận có người trả lời sẽ còn dòng "đã bị xóa".',
 };
 
 /** Only return to an admin page after a POST. */
 function backTo(value: unknown, notice: string) {
   const raw = typeof value === 'string' ? value : '';
   const target = new URL(
-    /^\/manage(\/[a-z]+)?(\?[^#\\]*)?$/.test(raw) ? raw : '/manage',
+    /^\/manage(\/[a-z]+(\/\d{1,12})?)?(\?[^#\\]*)?$/.test(raw)
+      ? raw
+      : '/manage',
     'https://admin.invalid',
   );
   target.searchParams.delete('confirm');
@@ -604,116 +1039,250 @@ function backTo(value: unknown, notice: string) {
   return target.pathname + target.search;
 }
 
-async function post(request: Request, env: Env, admin: Admin) {
-  if (!sameOrigin(request)) return new Response('Forbidden', { status: 403 });
-  const form = await request.formData();
-  const op = String(form.get('op'));
+const settingKeys: Record<Tab, (keyof Settings)[]> = {
+  comments: [
+    'commentsOpen',
+    'moderation',
+    'blockedWords',
+    'commentMaxLength',
+    'commentsPerHour',
+  ],
+  feedback: ['feedbackOpen'],
+  accounts: ['emailLogin', 'signups'],
+  email: ['notifyHeld', 'notifyFeedback'],
+};
 
-  if (op === 'settings') {
-    const moderation =
-      (['ai', 'words', 'manual'] as const).find(
-        (value) => value === form.get('moderation'),
-      ) ?? 'ai';
-    await saveSettings(env, {
-      commentsOpen: form.get('commentsOpen') === '1',
-      moderation,
-      blockedWords: parseWords(
-        String(form.get('blockedWords') ?? '').slice(0, 8000),
-      ),
-      notifyHeld: form.get('notifyHeld') === '1',
-      feedbackOpen: form.get('feedbackOpen') === '1',
-      emailLogin: form.get('emailLogin') === '1',
-      signups: form.get('signups') === '1',
-    });
-    return redirect(backTo(form.get('back'), 'saved'), 303);
+function readSetting(
+  form: FormData,
+  key: keyof Settings,
+): Settings[keyof Settings] {
+  const value = form.get(key);
+  switch (key) {
+    case 'moderation':
+      return (
+        (['ai', 'words', 'manual'] as const).find((mode) => mode === value) ??
+        'ai'
+      );
+    case 'blockedWords':
+      return parseWords(String(value ?? '').slice(0, 8000));
+    case 'commentMaxLength':
+      return clampInt(value, 100, COMMENT_MAX, COMMENT_MAX);
+    case 'commentsPerHour':
+      return clampInt(value, 0, 500, 0);
+    default:
+      return value === '1';
   }
-
-  const id = Number(form.get('id'));
-  if (!Number.isSafeInteger(id) || id < 1)
-    return new Response('Bad request', { status: 400 });
-  let notice = op;
-  if (op === 'approve') {
-    await env.DB.prepare(
-      `UPDATE comments SET status = 'published', moderation_reason = NULL
-       WHERE id = ? AND status = 'held'`,
-    )
-      .bind(id)
-      .run();
-    notice = 'approved';
-  } else if (op === 'remove-comment') {
-    await removeComment(env, id, 'removed');
-    notice = 'removed';
-  } else if (op === 'feedback-done' || op === 'feedback-reopen')
-    await env.DB.prepare('UPDATE feedback SET status = ? WHERE id = ?')
-      .bind(op === 'feedback-done' ? 'done' : 'new', id)
-      .run();
-  else if (op === 'feedback-delete')
-    await env.DB.prepare('DELETE FROM feedback WHERE id = ?').bind(id).run();
-  else if (op === 'user-signout') {
-    if (id === admin.userId)
-      return new Response('Bad request', { status: 400 });
-    await env.DB.prepare('DELETE FROM sessions WHERE user_id = ?')
-      .bind(id)
-      .run();
-  } else if (op === 'user-delete') {
-    // Owner accounts cannot be deleted here, so the panel never locks itself out.
-    const target = await env.DB.prepare('SELECT role FROM users WHERE id = ?')
-      .bind(id)
-      .first<{ role: string }>();
-    if (!target || target.role === 'owner')
-      return new Response('Bad request', { status: 400 });
-    await deleteUserComments(env, id);
-    await env.DB.batch([
-      env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id),
-      env.DB.prepare(
-        'UPDATE feedback SET user_id = NULL WHERE user_id = ?',
-      ).bind(id),
-      env.DB.prepare(`DELETE FROM users WHERE id = ? AND role <> 'owner'`).bind(
-        id,
-      ),
-    ]);
-  } else return new Response('Bad request', { status: 400 });
-  return redirect(backTo(form.get('back'), notice), 303);
 }
 
-export async function manage(request: Request, env: Env, admin: Admin) {
+async function post(
+  request: Request,
+  env: Env,
+  admin: Admin,
+): Promise<Response | { confirm: string; back: string }> {
+  if (!sameOrigin(request)) return new Response('Forbidden', { status: 403 });
+  const form = await request.formData();
+  const back = form.get('back');
+  const action = String(form.get('do') ?? '');
+  const bad = () => new Response('Bad request', { status: 400 });
+
+  if (action.startsWith('settings:')) {
+    const tab = action.slice(9) as Tab;
+    const keys = settingKeys[tab];
+    if (!keys) return bad();
+    const changes = Object.fromEntries(
+      keys.map((key) => [key, readSetting(form, key)]),
+    ) as Partial<Settings>;
+    const changed = await saveSettings(env, changes);
+    if (changed.length)
+      await log(env, admin, 'settings', tab, changed.join(', '));
+    return redirect(backTo(back, changed.length ? 'saved' : 'unchanged'), 303);
+  }
+
+  const [name, rawId] = action.split(':');
+  const single = Number(rawId);
+
+  if (name === 'reply' || name === 'note') {
+    if (!Number.isSafeInteger(single) || single < 1) return bad();
+    if (name === 'note') {
+      const note = text(form.get(`note-${single}`) ?? '', 0, 2000) ?? '';
+      await env.DB.prepare('UPDATE feedback SET note = ? WHERE id = ?')
+        .bind(note || null, single)
+        .run();
+      await log(env, admin, 'note', `góp ý #${single}`, note.slice(0, 200));
+      return redirect(backTo(back, 'note'), 303);
+    }
+    const body = text(form.get('reply'), 1, COMMENT_MAX);
+    if (!body || admin.userId === null)
+      return redirect(backTo(back, 'reply-empty'), 303);
+    const top = await env.DB.prepare(
+      'SELECT id, project, version, locale, status, parent_id FROM comments WHERE id = ?',
+    )
+      .bind(single)
+      .first<Row>();
+    if (!top || top.parent_id !== null || top.status !== 'published')
+      return bad();
+    await env.DB.prepare(
+      `INSERT INTO comments (project, version, parent_id, user_id, body, locale, status)
+       VALUES (?, ?, ?, ?, ?, ?, 'published')`,
+    )
+      .bind(top.project, top.version, top.id, admin.userId, body, top.locale)
+      .run();
+    await log(env, admin, 'reply', `bình luận #${single}`, body.slice(0, 200));
+    return redirect(backTo(back, 'reply'), 303);
+  }
+
+  const bulk = action === 'bulk';
+  const opName = bulk ? String(form.get('bulk') ?? '') : (name ?? '');
+  const op = ops[opName];
+  const ids = bulk
+    ? [
+        ...new Set(
+          form
+            .getAll('ids')
+            .map(Number)
+            .filter((id) => Number.isSafeInteger(id) && id > 0),
+        ),
+      ].slice(0, 100)
+    : Number.isSafeInteger(single) && single > 0
+      ? [single]
+      : [];
+  if (bulk && (!op || !ids.length))
+    return redirect(backTo(back, 'nothing-selected'), 303);
+  if (!op || !ids.length || (bulk && !op.bulk)) return bad();
+
+  if (op.destructive && form.get('confirmed') !== '1') {
+    const items = await describe(env, opName, ids);
+    if (!items.length) return redirect(backTo(back, 'nothing-selected'), 303);
+    const safeBack = backTo(back, '').replace(/[?&]notice=$/, '');
+    const confirm = `<section class="confirm"><h1>Xác nhận: ${op.label.toLowerCase()}</h1>
+<div class="notice danger"><p>${consequences[opName] ?? ''}</p></div>
+<p>${items.length} mục sẽ bị ảnh hưởng:</p><ul class="list">${items.join('')}</ul>
+${formStart(safeBack)}<input type="hidden" name="confirmed" value="1">${
+      bulk
+        ? `<input type="hidden" name="bulk" value="${escape(opName)}">${ids.map((id) => `<input type="hidden" name="ids" value="${id}">`).join('')}${button('bulk', `Có, ${op.label.toLowerCase()}`, 'danger')}`
+        : button(
+            `${opName}:${ids[0]}`,
+            `Có, ${op.label.toLowerCase()}`,
+            'danger',
+          )
+    } <a class="button-link ghost" href="${escape(safeBack)}">Hủy</a></form></section>`;
+    return { confirm, back: safeBack };
+  }
+
+  const done: string[] = [];
+  for (const id of ids) {
+    const result = await op.run(env, id, admin);
+    if (result) done.push(result);
+  }
+  if (done.length)
+    await log(
+      env,
+      admin,
+      opName,
+      done.length === 1 ? done[0]! : `${done.length} mục`,
+      done.length === 1 ? '' : done.join('; '),
+    );
+  return redirect(backTo(back, done.length ? opName : 'unchanged'), 303);
+}
+
+// ---------- routing ----------
+
+export async function manage(
+  request: Request,
+  env: Env,
+  ctx: ExecutionContext,
+  admin: Admin,
+) {
   const url = new URL(request.url);
   const path = url.pathname.replace(/\/+$/, '') || '/manage';
+  // Lets the public site show the owner bar; /api/me still decides.
+  const hint: Record<string, string> =
+    admin.userId !== null
+      ? {
+          'Set-Cookie': `${ADMIN_HINT}=1; Path=/; Max-Age=${30 * 86400}; Secure; SameSite=Lax`,
+        }
+      : {};
+  const render = async (
+    title: string,
+    content: string,
+    notice = '',
+    menuPath = path,
+  ) =>
+    new Response(
+      layout(title, menuPath, admin, await badges(env), notice, content),
+      { headers: { ...htmlHeaders, ...hint } },
+    );
 
   if (path === '/manage/logout') {
     if (request.method !== 'POST' || !sameOrigin(request))
       return new Response('Method not allowed', { status: 405 });
-    return redirect('/', 303, { 'Set-Cookie': await endSession(request, env) });
+    const headers = new Headers({ Location: '/', 'Cache-Control': 'no-store' });
+    headers.append('Set-Cookie', await endSession(request, env));
+    headers.append(
+      'Set-Cookie',
+      cookie(ADMIN_HINT, '', 0).replace('; HttpOnly', ''),
+    );
+    return new Response(null, { status: 303, headers });
   }
-  if (request.method === 'POST' && path === '/manage')
-    return post(request, env, admin);
+
+  if (request.method === 'POST' && path === '/manage') {
+    const result = await post(request, env, admin);
+    if (result instanceof Response) return result;
+    return render(
+      'Xác nhận',
+      result.confirm,
+      '',
+      new URL(result.back, 'https://admin.invalid').pathname,
+    );
+  }
   if (request.method !== 'GET' && request.method !== 'HEAD')
     return new Response('Method not allowed', { status: 405 });
+
+  const exportMatch = /^\/manage\/export\/([a-z]+)\.csv$/.exec(path);
+  if (exportMatch) {
+    const response = await exportCsv(env, exportMatch[1]!, admin);
+    if (response) return response;
+  }
 
   const back =
     path +
     url.search.replace(/([?&])notice=[^&]*&?/, '$1').replace(/[?&]$/, '');
-  const pages: Record<string, [string, () => Promise<string>]> = {
-    '/manage': ['Bảng tin', () => dashboard(env, back)],
+  const detail = /^\/manage\/(comments|users)\/(\d{1,12})$/.exec(path);
+  const pages: Record<string, [string, () => Promise<string | null>]> = {
+    '/manage': ['Tổng quan', () => dashboard(env, ctx, back)],
     '/manage/comments': ['Bình luận', () => commentsPage(env, url, back)],
     '/manage/feedback': ['Góp ý', () => feedbackPage(env, url, back)],
-    '/manage/downloads': ['Lượt tải', () => downloadsPage(env)],
-    '/manage/users': ['Người dùng', () => usersPage(env, url, back, admin)],
-    '/manage/settings': ['Cài đặt', () => settingsPage(env)],
+    '/manage/downloads': ['Lượt tải', () => downloadsPage(env, ctx)],
+    '/manage/users': ['Người dùng', () => usersPage(env, url)],
+    '/manage/settings': ['Cài đặt', () => settingsPage(env, url)],
+    '/manage/log': ['Nhật ký', () => logPage(env, url)],
+    '/manage/status': ['Tình trạng dịch vụ', () => statusPage(env, ctx)],
   };
-  const entry = pages[path];
-  if (!entry)
-    return new Response('Not found', { status: 404, headers: htmlHeaders });
-  const [content, badge] = await Promise.all([entry[1](), counts(env)]);
-  return new Response(
-    layout(
-      entry[0],
-      path,
-      admin,
-      badge,
-      url.searchParams.get('notice'),
-      content,
-    ),
-    { headers: htmlHeaders },
-  );
+  const entry: [string, () => Promise<string | null>] | undefined = detail
+    ? detail[1] === 'comments'
+      ? [
+          'Luồng bình luận',
+          () => threadPage(env, Number(detail[2]), back, admin),
+        ]
+      : ['Người dùng', () => userPage(env, Number(detail[2]), back, admin)]
+    : pages[path];
+  const notFound = () =>
+    new Response('Not found', { status: 404, headers: htmlHeaders });
+  if (!entry) return notFound();
+
+  let content: string | null;
+  try {
+    content = await entry[1]();
+  } catch (error) {
+    // Most often: the code is newer than the database (migration not run).
+    console.error('manage page', path, error);
+    content = `<h1>${escape(entry[0])}</h1><div class="notice danger"><p>Không tải được trang này. Nếu vừa cập nhật code, có thể database chưa chạy migration mới: <code>npm run db:migrate:remote</code>. Xem <a href="/manage/status">Tình trạng dịch vụ</a>.</p></div>`;
+  }
+  if (content === null) return notFound();
+
+  const code = url.searchParams.get('notice') ?? '';
+  const notice = notices[code]
+    ? `<div class="notice${warnings.has(code) ? ' warn' : ''}" role="status"><p>${notices[code]}</p></div>`
+    : '';
+  return render(entry[0], content, notice);
 }

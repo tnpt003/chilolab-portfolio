@@ -16,6 +16,7 @@ import VersionList from './VersionList.astro';
 import Comments from './Comments.astro';
 import { feedbackPath } from '../lib/community';
 import DownloadCounter from './DownloadCounter.astro';
+import DownloadStat from './DownloadStat.astro';
 interface Props {
   project: CollectionEntry<'projects'>;
 }
@@ -60,6 +61,7 @@ const poster =
             {latest.releasedAt && (
               <time datetime={latest.releasedAt}>{latest.releasedAt}</time>
             )}
+            <DownloadStat project={data.slug} locale={data.locale} />
           </p>
         </div>
         <div class="actions">
