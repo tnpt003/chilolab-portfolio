@@ -20,7 +20,7 @@ const toeicFiles = import.meta.glob<{ default: ImageMetadata }>(
 export const toeicImage = Object.values(toeicFiles)[0]?.default;
 
 export const githubUrl = 'https://github.com/tnpt003';
-export const email = 'tnpt003@gmail.com';
+export const email = 'contact@chilolab.com';
 export const athenaUrl = 'https://athena.edu.vn/';
 
 export type JourneyKind = 'study' | 'work' | 'release';
