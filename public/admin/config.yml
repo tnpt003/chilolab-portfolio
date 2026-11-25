@@ -307,7 +307,7 @@ collections:
         fields:
           - { label: Ảnh, name: image, widget: image }
           - { label: Mô tả ảnh (alt), name: alt, widget: string }
-          - { label: Chú thích, name: caption, widget: string }
+          - { label: Chú thích, name: caption, widget: string, required: false }
       - label: Video (/media/ten-video.mp4)
         name: video
         widget: string
@@ -417,7 +417,7 @@ collections:
         fields:
           - { label: Image, name: image, widget: image }
           - { label: Alt text, name: alt, widget: string }
-          - { label: Caption, name: caption, widget: string }
+          - { label: Caption, name: caption, widget: string, required: false }
       - label: Video (/media/name.mp4)
         name: video
         widget: string

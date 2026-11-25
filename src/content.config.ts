@@ -23,7 +23,7 @@ const projects = defineCollection({
         .object({
           image: image(),
           alt: z.string().min(1),
-          caption: z.string().min(1),
+          caption: z.string().min(1).optional(),
         })
         .optional(),
       video: z

@@ -9,10 +9,7 @@ stack: ['Electron', 'Node.js', 'Lighthouse', 'Puppeteer', 'ExcelJS']
 preview:
   image: ../../../assets/auditor-main-screen.png
   alt: Màn hình chính của PageSpeed-Auth-Auditor với bốn bước được đánh số - mở trình duyệt đăng nhập, nhập URL, chọn Desktop hoặc Mobile, chạy kiểm tra.
-  caption: Ảnh chụp thật màn hình chính, lấy từ tài liệu hướng dẫn sử dụng của ứng dụng.
 ---
-
-## PageSpeed-Auth-Auditor
 
 PageSpeed-Auth-Auditor là app desktop (Electron) mình làm cho việc QA website, với ba luồng làm việc:
 

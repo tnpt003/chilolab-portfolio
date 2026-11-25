@@ -24,7 +24,6 @@ install:
 preview:
   image: ../../../assets/pet-battle-hub.png
   alt: Giao diện chọn chế độ phiêu lưu và chiến đấu trong Pet Desktop.
-  caption: Ảnh ứng dụng thật — bản phát triển 1.5, có thể khác bản phát hành.
 video: /media/pet-promo.mp4
 gallery:
   - image: ../../../assets/pet-gallery/fishing.png

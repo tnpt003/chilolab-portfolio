@@ -44,7 +44,6 @@ export const copy = {
     skillsHeading: 'Mình làm việc với',
     portraitAlt:
       'Nguyễn Tấn Phát mặc áo khoác xám, đứng trước một bức tường treo ảnh.',
-    portraitCaption: 'Phát, người đứng sau ChiloLab',
     selected:
       'Dự án nào cũng có trang riêng, lịch sử phiên bản và chỗ để bạn góp ý.',
     detail: 'Xem dự án',
@@ -84,7 +83,6 @@ export const copy = {
     skillsHeading: 'What I work with',
     portraitAlt:
       'Nguyễn Tấn Phát in a grey jacket, standing in front of a wall of framed photos.',
-    portraitCaption: 'Phát, the person behind ChiloLab',
     selected:
       'Each project has its own page, a version history and a place for your feedback.',
     detail: 'Explore project',

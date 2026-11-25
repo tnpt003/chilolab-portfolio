@@ -7,7 +7,7 @@ interface Props {
   label: string;
   title: string;
   meta?: string;
-  preview?: { image: ImageMetadata; alt: string; caption: string };
+  preview?: { image: ImageMetadata; alt: string; caption?: string };
 }
 const { kind, label, title, meta, preview } = Astro.props;
 ---
@@ -54,5 +54,8 @@ const { kind, label, title, meta, preview } = Astro.props;
       </div>
     )}
   </div>
-  <figcaption>{preview ? preview.caption : label}</figcaption>
+  {/* A concept drawing must say so; a real capture needs no caption. */}
+  {(!preview || preview.caption) && (
+    <figcaption>{preview?.caption ?? label}</figcaption>
+  )}
 </figure>

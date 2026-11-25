@@ -9,10 +9,7 @@ stack: ['Electron', 'Node.js', 'Lighthouse', 'Puppeteer', 'ExcelJS']
 preview:
   image: ../../../assets/auditor-main-screen.png
   alt: PageSpeed-Auth-Auditor main screen with four numbered steps - open the login browser, enter URLs, choose desktop or mobile, run the audit.
-  caption: Actual main-screen capture, taken from the app's user guide.
 ---
-
-## PageSpeed-Auth-Auditor
 
 PageSpeed-Auth-Auditor is a desktop app (Electron) I made for website QA, with three workflows:
 

@@ -24,7 +24,6 @@ install:
 preview:
   image: ../../../assets/pet-battle-hub.png
   alt: Pet Desktop interface for choosing adventure and battle modes.
-  caption: Actual application screenshot — development preview for 1.5; releases may differ.
 video: /media/pet-promo.mp4
 gallery:
   - image: ../../../assets/pet-gallery/fishing.png

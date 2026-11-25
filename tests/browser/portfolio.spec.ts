@@ -80,13 +80,10 @@ for (const route of routes) {
       await expect(page.locator('.lightbox-count')).toHaveText('1 / 6');
       await page.keyboard.press('ArrowRight');
       await expect(page.locator('.lightbox-count')).toHaveText('2 / 6');
-      await expect(
-        (
-          await new AxeBuilder({ page })
-            .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
-            .analyze()
-        ).violations,
-      ).toEqual([]);
+      const open = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+        .analyze();
+      expect(open.violations).toEqual([]);
       await page.keyboard.press('Escape');
       await expect(lightbox).toBeHidden();
     }
