@@ -16,6 +16,8 @@ const routes = [
   '/en/pagespeed-auth-auditor/versions',
   '/pagespeed-auth-auditor/versions/1.2.0',
   '/en/pagespeed-auth-auditor/versions/1.2.0',
+  '/pagespeed-auth-auditor/versions/1.2.2',
+  '/en/pagespeed-auth-auditor/versions/1.2.2',
   '/pet-desktop/feedback',
   '/en/pet-desktop/feedback',
   '/user/login',
@@ -146,4 +148,29 @@ test('version history navigation preserves version and release status', async ({
   await page.goto('/pagespeed-auth-auditor/versions/1.2.0');
   await expect(page.locator('.version-status')).toHaveText('Đang phát triển');
   await expect(page.locator('time')).toHaveCount(0);
+});
+
+test('auditor download panel points at the newest public release', async ({
+  page,
+}) => {
+  await page.goto('/pagespeed-auth-auditor');
+  const panel = page.locator('.download-panel');
+  await expect(panel.locator('.download-release strong')).toHaveText('v1.2.2');
+  // Version-free file names keep the latest/download links valid.
+  await expect(
+    panel.getByRole('link', {
+      name: 'Tải PageSpeed-Auth-Auditor bản mới nhất cho Windows',
+    }),
+  ).toHaveAttribute(
+    'href',
+    /pagespeed-auth-auditor-releases\/releases\/latest\/download\/PageSpeed-Auth-Auditor-Setup-win\.exe$/,
+  );
+  await expect(
+    panel.getByRole('link', { name: 'Bản Portable', exact: true }),
+  ).toHaveAttribute(
+    'href',
+    /\/releases\/latest\/download\/PageSpeed-Auth-Auditor-Portable-win\.exe$/,
+  );
+  await page.goto('/pagespeed-auth-auditor/versions/1.2.2');
+  await expect(page.locator('.version-status')).toHaveText('Đã phát hành');
 });

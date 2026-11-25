@@ -39,6 +39,7 @@ Chỉ bản `released` được khai báo ngày phát hành và link tải. Tron
 ## Bài được tạo ban đầu
 
 - Pet 1.4.0–1.5.0: tóm tắt release notes trên GitHub Releases (1.4.0 không có ghi chú release nên tóm tắt từ CHANGELOG tại tag v1.5.0). Ngày phát hành lấy theo tiêu đề CHANGELOG; link tải trỏ đúng asset của từng tag, đã kiểm tra tồn tại ngày 2026-11-12.
+- Auditor 1.2.1 và 1.2.2: phát hành công khai ngày 2026-11-25 ở https://github.com/tnpt003/pagespeed-auth-auditor-releases (chỉ có bản phát hành, không có mã nguồn). Tên file không chứa số phiên bản (`PageSpeed-Auth-Auditor-Setup-win.exe`, `PageSpeed-Auth-Auditor-Portable-win.exe`) nên nút tải dạng `releases/latest` luôn đúng. Ảnh gallery là app thật crawl chilolab.com.
 - Auditor 1.2.0: dựa trên package.json, README và docs/RELEASE-GUIDE.md local. Không công bố đường dẫn máy hay nội dung riêng tư lên bài web; không gán ngày hoặc link tải chưa xác minh.
 
 Sau khi sửa, chạy `npm.cmd run format`, `npm.cmd run verify` và `npm.cmd run test:browser`, rồi xem lại bài trước khi push. Danh sách phiên bản trên trang sản phẩm tự hiển thị ba bài mới nhất theo order.
