@@ -122,13 +122,35 @@ Thiết lập Resend (một lần):
 
 Email liên hệ `contact@chilolab.com` dùng **Cloudflare Email Routing** (miễn phí, chỉ chuyển tiếp thư đến): Dashboard → `chilolab.com` → **Email → Email Routing** → bật, xác minh địa chỉ đích, thêm quy tắc `contact@` → địa chỉ đích. Email Routing dùng MX ở apex; Resend dùng subdomain `send`, nên hai bên không đụng nhau.
 
-## Sao lưu
+## Bảo trì tự động (cron)
+
+Worker chạy `worker/maintenance.ts` mỗi ngày lúc 19:00 UTC (02:00 giờ Việt Nam), khai báo ở `triggers.crons` trong `wrangler.jsonc`. Xem log ở Cloudflare dashboard → Worker → Logs (dòng `cleanup` và `backup`).
+
+- **Dọn dữ liệu (mỗi ngày):** xóa phiên đăng nhập hết hạn, phiên owner quá 7 ngày, mã email hết hạn và nhật ký quản trị quá một năm.
+- **Backup (mỗi Chủ nhật UTC, tức sáng thứ Hai giờ Việt Nam):** chép mọi bảng trừ `sessions` và `email_codes` thành một file JSON nén `d1/chilolab-YYYY-MM-DD.json.gz` trong bucket R2 riêng tư `chilolab-backups`, giữ 12 bản gần nhất (khoảng 3 tháng). Chưa gắn bucket thì bước này tự bỏ qua.
+
+### Bật backup tự động (một lần)
+
+1. Cloudflare dashboard → **R2** → bật R2. Gói miễn phí: 10 GB lưu trữ; Cloudflare có thể yêu cầu thêm phương thức thanh toán khi bật R2, dù không vượt mức miễn phí thì không bị tính tiền.
+2. Tạo bucket riêng tư: `npx wrangler r2 bucket create chilolab-backups`. Không bật public access cho bucket này.
+3. Trong `wrangler.jsonc`, bỏ dấu `//` ở dòng `"r2_buckets"`, commit và push.
+
+### Khôi phục
+
+1. Tải file backup: dashboard → R2 → `chilolab-backups` → `d1/`, hoặc `npx wrangler r2 object get chilolab-backups/d1/<tên-file> --remote --file backup.json.gz`.
+2. `node scripts/restore-backup.mjs backup.json.gz > restore.sql`
+3. Thử trước trên máy: `npx wrangler d1 execute chilolab --local --file restore.sql`.
+4. Áp lên server: `npx wrangler d1 execute chilolab --remote --file restore.sql`. Lệnh này thay toàn bộ dữ liệu các bảng có trong backup; mọi người phải đăng nhập lại.
+
+Database phải có đủ migration trước khi khôi phục. D1 còn có Time Travel (khôi phục cả database về một thời điểm trong 30 ngày gần nhất): `npx wrangler d1 time-travel restore chilolab --timestamp <ISO>`.
+
+### Backup thủ công
 
 ```sh
 npx wrangler d1 export chilolab --remote --output backup.sql
 ```
 
-Không commit file backup: chúng chứa email và nội dung khách gửi.
+Không commit file backup hay `restore.sql`: chúng chứa email và nội dung khách gửi.
 
 ## Giới hạn
 

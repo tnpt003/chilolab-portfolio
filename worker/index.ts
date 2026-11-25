@@ -17,6 +17,7 @@ import {
 import { downloadStats } from './github';
 import { notifyFeedback } from './mail';
 import { manage } from './manage';
+import { scheduled } from './maintenance';
 import { media } from './media';
 import { human } from './turnstile';
 import { currentUser } from './session';
@@ -200,5 +201,13 @@ export default {
     }
     if (path.startsWith('/api/')) return json({ error: 'not_found' }, 404);
     return env.ASSETS.fetch(request);
+  },
+  // Daily upkeep: cleanup, plus a weekly backup (worker/maintenance.ts).
+  scheduled(controller, env, ctx) {
+    ctx.waitUntil(
+      scheduled(controller, env).catch((error) =>
+        console.error('scheduled', error),
+      ),
+    );
   },
 } satisfies ExportedHandler<Env>;

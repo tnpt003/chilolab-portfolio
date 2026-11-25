@@ -18,3 +18,5 @@ playwright-report/
 image/
 *.sql.backup
 backup*.sql
+backup*.json.gz
+restore*.sql

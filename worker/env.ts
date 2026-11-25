@@ -20,6 +20,8 @@ export interface Env {
    * site repository) that /api/cms/auth hands the owner's CMS session.
    */
   CMS_GITHUB_TOKEN?: string;
+  /** Private R2 bucket for weekly D1 backups (worker/maintenance.ts). */
+  BACKUPS?: R2Bucket;
 }
 
 export const baseHeaders = {
