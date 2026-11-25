@@ -2,7 +2,7 @@
 title: Pet Desktop
 slug: pet-desktop
 locale: vi
-description: Một chú mèo hoạt hình sống trên desktop Windows. Bế, vuốt ve, cho ăn, thay đồ cho mèo; khi muốn thì đưa mèo đi phiêu lưu đánh slime. Bản cài tự cập nhật.
+description: Một chú mèo nhỏ sống ngay trên desktop Windows của bạn. Bế, vuốt ve, cho ăn, thay đồ cho mèo; lúc nào thích thì dắt mèo đi phiêu lưu đánh slime. App tự cập nhật khi có bản mới.
 kind: pet
 order: 1
 stack: ['C#', 'WPF', '.NET 10', 'Python']
@@ -30,13 +30,13 @@ gallery:
 
 ## Một người bạn nhỏ trên desktop
 
-Pet Desktop mang một chú mèo hoạt hình lên desktop Windows. Bạn có thể nhấc, kéo thả, vuốt ve, cho ăn và chơi cùng mèo; tùy chỉnh ngoại hình và phụ kiện.
+Pet Desktop đưa chú mèo Chilo lên desktop Windows của bạn. Mèo tự đi dạo, câu cá, nấu ăn ngay trên màn hình. Bạn có thể nhấc mèo lên, kéo thả, vuốt ve, cho ăn, chơi cùng mèo, và đổi ngoại hình, phụ kiện cho mèo.
 
-Chế độ chiến đấu là phần tùy chọn: desktop trở thành không gian phiêu lưu với slime, kỹ năng và trang bị. Khi không tham gia chiến đấu, mèo vẫn là người bạn đồng hành trên desktop.
+Chế độ chiến đấu là phần thêm, chơi hay không tùy bạn: desktop biến thành nơi phiêu lưu với slime, kỹ năng và trang bị. Không đánh nhau thì mèo vẫn ở đó làm bạn với bạn trên desktop.
 
 ## Công nghệ
 
-Dự án được xây bằng C# / WPF trên .NET 10, với dịch vụ hành vi Python tùy chọn. Chuyển động, tương tác, hoạt ảnh và chiến đấu được xử lý bằng C#; mèo vẫn có hành vi cục bộ khi dịch vụ Python không hoạt động.
+Mình viết Pet Desktop bằng C# / WPF trên .NET 10, kèm một dịch vụ hành vi bằng Python (không bắt buộc). Chuyển động, tương tác, hoạt ảnh và chiến đấu đều chạy bằng C#, nên dịch vụ Python có tắt thì mèo vẫn hoạt động bình thường.
 
 ## Cài đặt
 

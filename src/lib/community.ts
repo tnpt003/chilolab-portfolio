@@ -119,7 +119,7 @@ export const feedbackCopy = {
   vi: {
     title: 'Góp ý và báo lỗi',
     intro:
-      'Chỉ người làm ChiloLab đọc được nội dung gửi ở đây; nó không hiện công khai. Không cần đăng nhập.',
+      'Những gì bạn gửi ở đây chỉ mình đọc, không hiện công khai. Không cần đăng nhập.',
     publicNote: 'Muốn thảo luận công khai? Hãy dùng phần bình luận ở',
     kind: 'Bạn muốn gửi gì?',
     kinds: { bug: 'Báo lỗi', idea: 'Góp ý / ý tưởng', other: 'Khác' },
@@ -137,7 +137,7 @@ export const feedbackCopy = {
     contactHint: 'Chỉ dùng để hỏi thêm về nội dung này.',
     send: 'Gửi',
     sending: 'Đang gửi…',
-    sent: 'Cảm ơn bạn! Nội dung đã được gửi.',
+    sent: 'Cảm ơn bạn! Mình đã nhận được rồi nhé.',
     verifying:
       'Đang xác minh chống spam, vui lòng đợi vài giây rồi bấm gửi lại.',
     failed: 'Gửi chưa được. Kiểm tra nội dung rồi thử lại.',
@@ -166,7 +166,7 @@ export const feedbackCopy = {
     contactHint: 'Only used to follow up on this message.',
     send: 'Send',
     sending: 'Sending…',
-    sent: 'Thank you! Your message was sent.',
+    sent: 'Thank you! I’ve got your message.',
     verifying: 'Checking for spam, please wait a few seconds and send again.',
     failed: 'Could not send. Check your message and try again.',
     rateLimited: 'You are sending quickly; wait a minute and try again.',

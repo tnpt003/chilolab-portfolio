@@ -2,7 +2,7 @@
 title: Pet Desktop
 slug: pet-desktop
 locale: en
-description: An animated cat that lives on your Windows desktop. Pick it up, pet it, feed it and dress it up; when you feel like it, take it on adventures against slimes. Installed copies update themselves.
+description: A little cat that lives right on your Windows desktop. Pick it up, pet it, feed it and dress it up; whenever you like, take it on adventures against slimes. The app updates itself when a new version is out.
 kind: pet
 order: 1
 stack: ['C#', 'WPF', '.NET 10', 'Python']
@@ -30,13 +30,13 @@ gallery:
 
 ## A little desktop companion
 
-Pet Desktop brings an animated cat to your Windows desktop. Pick it up, drag and drop it, pet it, feed it, play together, and customize its appearance and accessories.
+Pet Desktop puts Chilo the cat on your Windows desktop. It wanders around, goes fishing and cooks right on your screen. You can pick it up, drag it around, pet it, feed it, play together, and change its look and accessories.
 
-Battle Mode is optional: your desktop becomes an adventure space with slimes, skills, and equipment. Outside battles, the cat remains a desktop companion.
+Battle Mode is an extra you can take or leave: your desktop turns into an adventure with slimes, skills and gear. Outside battles, the cat simply keeps you company.
 
 ## Technology
 
-Built with C# / WPF on .NET 10, with an optional Python behavior service. C# handles movement, input, animation, and battles; local behavior remains available without the Python service.
+I built Pet Desktop with C# / WPF on .NET 10, plus an optional Python behavior service. Movement, input, animation and battles all run in C#, so the cat works just fine without the Python service.
 
 ## Installing
 

@@ -14,7 +14,7 @@ preview:
 
 ## PageSpeed-Auth-Auditor
 
-PageSpeed-Auth-Auditor là ứng dụng desktop Electron dành cho quy trình QA website, với ba luồng làm việc:
+PageSpeed-Auth-Auditor là app desktop (Electron) mình làm cho việc QA website, với ba luồng làm việc:
 
 - Kiểm tra sức khỏe các URL được nhập trực tiếp.
 - Crawl từ một URL ban đầu để khám phá trang và tạo báo cáo Site Health.
@@ -28,4 +28,4 @@ PageSpeed Insights phục vụ các trang công khai. Lighthouse là phương th
 
 Ứng dụng xuất báo cáo Site Health và kết quả audit dưới dạng Excel, gồm các nhóm điểm Performance, Accessibility, Best Practices và SEO khi có dữ liệu.
 
-Ứng dụng yêu cầu Windows 10 trở lên và Google Chrome. Mã nguồn hiện được phát triển cục bộ; chưa có đường dẫn repository công khai hoặc gói tải xuống được xác nhận tại đây.
+App cần Windows 10 trở lên và Google Chrome. Mình vẫn đang phát triển trên máy, nên hiện chưa có repo công khai hay bản tải về.

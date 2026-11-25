@@ -601,20 +601,19 @@ a:has(> .icon),
   width: min(100%, 360px);
   padding: 2.4rem 0 3.5rem;
 }
-/* The portrait sits in the ChiloLab mark: a window with cat ears. */
+/* The portrait sits in the ChiloLab mark: a round frame with cat ears. */
 .cat-frame {
   position: relative;
-  padding: 14px 14px 10px;
-  background: var(--ink);
-  border-radius: 28px;
+  margin: 0;
 }
 .cat-frame::before,
 .cat-frame::after {
   content: '';
   position: absolute;
-  top: -40px;
-  width: 78px;
-  height: 56px;
+  z-index: 0;
+  top: -18px;
+  width: 26%;
+  aspect-ratio: 78 / 64;
   background: var(--ink);
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
   transform-origin: 50% 100%;
@@ -622,16 +621,16 @@ a:has(> .icon),
   transition: rotate 0.25s ease;
 }
 .cat-frame::before {
-  left: 22px;
-  rotate: -14deg;
+  left: 6%;
+  rotate: -26deg;
 }
 .cat-frame::after {
-  right: 22px;
-  rotate: 14deg;
+  right: 6%;
+  rotate: 26deg;
   animation-delay: 0.3s;
 }
 .cat-frame:hover::after {
-  rotate: 26deg;
+  rotate: 38deg;
 }
 @keyframes ear-up {
   from {
@@ -643,19 +642,23 @@ a:has(> .icon),
 }
 .cat-frame img {
   position: relative;
+  z-index: 1;
   display: block;
+  box-sizing: border-box;
   width: 100%;
   height: auto;
-  aspect-ratio: 1 / 1.05;
+  aspect-ratio: 1;
   object-fit: cover;
-  border-radius: 16px;
+  object-position: 50% 30%;
+  border: 12px solid var(--ink);
+  border-radius: 50%;
   background: var(--mint);
 }
 .cat-frame figcaption {
-  padding: 0.55rem 0.4rem 0 0;
-  font-size: 0.85rem;
-  color: var(--paper);
-  text-align: right;
+  margin-top: 0.8rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  text-align: center;
 }
 .pet-polaroid {
   position: absolute;
@@ -2203,4 +2206,7 @@ a:has(> .icon),
 }
 .lightbox-next {
   right: 0.5rem;
+}
+.about-hero-art .cat-frame figcaption {
+  text-align: right;
 }

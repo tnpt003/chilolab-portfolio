@@ -104,26 +104,27 @@ interface Profile {
 
 export const profile: Record<Locale, Profile> = {
   vi: {
-    pageTitle: 'Về tôi',
+    pageTitle: 'Về mình',
     metaDescription:
       'Nguyễn Tấn Phát: BA/QC tại WeebPal từ 08/2025, tốt nghiệp Công nghệ thông tin tại HUFLIT, tự làm và phát hành phần mềm Windows tại ChiloLab. Kinh nghiệm, kỹ năng, hành trình và liên hệ.',
-    heading: 'Tôi là Phát. Tôi làm BA/QC và tự làm phần mềm nhỏ.',
-    lead: 'Tôi học Công nghệ thông tin tại HUFLIT. Ban ngày tôi làm BA/QC, làm rõ yêu cầu với khách hàng nước ngoài và kiểm thử sản phẩm trước khi bàn giao. Ngoài giờ, tôi tự viết, phát hành và sửa các ứng dụng trên trang này.',
+    heading:
+      'Mình là Phát. Mình làm BA/QC, và thích tự làm những phần mềm nhỏ.',
+    lead: 'Mình học Công nghệ thông tin ở HUFLIT. Trong giờ làm, mình là BA/QC: trao đổi với khách hàng nước ngoài cho tới khi yêu cầu thật rõ, rồi kiểm thử sản phẩm trước khi bàn giao. Ngoài giờ, mình tự viết, phát hành và sửa dần các app bạn thấy trên trang này.',
     teaser:
-      'Tôi làm BA/QC tại WeebPal và tốt nghiệp Công nghệ thông tin tại HUFLIT. Kinh nghiệm, kỹ năng và hành trình của tôi nằm ở trang riêng.',
-    readMore: 'Đọc thêm về tôi',
+      'Mình đang làm BA/QC ở WeebPal và tốt nghiệp ngành Công nghệ thông tin ở HUFLIT. Kinh nghiệm, kỹ năng và chặng đường của mình nằm ở trang riêng.',
+    readMore: 'Tìm hiểu thêm về mình',
     facts: [
       { icon: 'briefcase', text: 'BA/QC tại WeebPal' },
       { icon: 'graduation', text: 'Tốt nghiệp CNTT, HUFLIT' },
       { icon: 'globe', text: 'Làm việc bằng tiếng Anh' },
     ],
-    emailMe: 'Gửi email cho tôi',
+    emailMe: 'Gửi email cho mình',
     seeProjects: 'Xem các dự án',
     github: 'GitHub',
     portraitCaption: 'Nguyễn Tấn Phát',
     petAlt:
       'Chú mèo đội mũ phù thủy của Pet Desktop ngồi ở mép dưới màn hình Windows, cạnh một con slime xanh.',
-    petCaption: 'Pet Desktop trên máy tôi, ảnh chụp thật',
+    petCaption: 'Pet Desktop trên máy mình, ảnh chụp thật',
     experienceTitle: 'Kinh nghiệm',
     role: 'BA/QC',
     company: 'WeebPal',
@@ -138,13 +139,13 @@ export const profile: Record<Locale, Profile> = {
     education:
       'Ngành Công nghệ thông tin, Trường Đại học Ngoại ngữ – Tin học TP.HCM (HUFLIT)',
     educationPeriod: 'Tốt nghiệp 2026',
-    howTitle: 'Cách tôi làm việc',
-    howIntro: 'Một yêu cầu đi qua tay tôi theo bốn bước.',
+    howTitle: 'Mình làm việc thế nào',
+    howIntro: 'Một yêu cầu thường qua tay mình theo bốn bước.',
     steps: [
       {
         icon: 'message',
         title: 'Làm rõ yêu cầu',
-        text: 'Hỏi lại khách hàng đến khi phạm vi rõ ràng, ghi lại điều đã thống nhất.',
+        text: 'Hỏi lại khách hàng tới khi phạm vi thật rõ, rồi ghi lại những gì hai bên đã chốt.',
       },
       {
         icon: 'testing',
@@ -154,17 +155,17 @@ export const profile: Record<Locale, Profile> = {
       {
         icon: 'code',
         title: 'Kiểm thử',
-        text: 'Kiểm thử chức năng và API trên bản dựng thật, ghi lại cách tái hiện lỗi.',
+        text: 'Kiểm thử chức năng và API trên bản build thật, ghi rõ từng bước để tái hiện lỗi.',
       },
       {
         icon: 'history',
         title: 'Theo dõi đến khi đóng',
-        text: 'Bám từng lỗi đến khi sửa xong và kiểm tra lại, rồi mới bàn giao.',
+        text: 'Theo từng lỗi tới khi được sửa và kiểm tra lại xong, rồi mới bàn giao.',
       },
     ],
     skillsTitle: 'Kỹ năng',
     skillsIntro:
-      'Những gì tôi đã dùng trong công việc, đồ án và các ứng dụng của mình.',
+      'Những thứ mình đã dùng trong công việc, đồ án ở trường và các app của mình.',
     skills: [
       {
         icon: 'testing',
@@ -213,7 +214,7 @@ export const profile: Record<Locale, Profile> = {
         items: ['Arduino', 'ESP32', 'ThingSpeak', 'Firebase'],
       },
     ],
-    journeyTitle: 'Nhật ký của tôi',
+    journeyTitle: 'Nhật ký của mình',
     journeyKinds: { study: 'Học', work: 'Công việc', release: 'Phát hành' },
     journey: [
       {
@@ -239,28 +240,28 @@ export const profile: Record<Locale, Profile> = {
       'Quản trị mã nguồn mở Linux Master',
     ],
     coursesNote: 'Chứng nhận hoàn thành khóa học do Trung tâm Athena cấp.',
-    builtTitle: 'Tôi tự làm',
+    builtTitle: 'Mình tự làm',
     builtIntro:
-      'Hai ứng dụng tôi tự viết từ đầu, đang phát hành và nhận góp ý tại đây.',
+      'Hai app mình tự viết từ đầu, đang phát hành và sửa dần theo góp ý ở đây.',
     languagesTitle: 'Ngoại ngữ',
     english:
-      'Tiếng Anh: dùng hằng ngày trong công việc với khách hàng nước ngoài.',
+      'Tiếng Anh: mình dùng hằng ngày khi làm việc với khách hàng nước ngoài.',
     toeicLabel: 'TOEIC',
     toeicAlt:
       'Ảnh chứng chỉ TOEIC của Nguyễn Tấn Phát, đã che thông tin cá nhân',
     toeicOpen: 'Xem ảnh chứng chỉ cỡ lớn',
-    contactTitle: 'Nói chuyện với tôi',
+    contactTitle: 'Nói chuyện với mình',
     contactText:
-      'Muốn trao đổi công việc, hỏi về một dự án hay góp ý cho các ứng dụng? Gửi email cho tôi, tôi đọc hết.',
+      'Muốn trao đổi công việc, hỏi về một dự án hay góp ý cho app? Cứ gửi email cho mình nhé, thư nào mình cũng đọc.',
   },
   en: {
     pageTitle: 'About me',
     metaDescription:
       'Nguyễn Tấn Phát: BA/QC at WeebPal since August 2025, Information Technology graduate of HUFLIT, and maker of the Windows software released on ChiloLab. Experience, skills, journey and contact.',
-    heading: 'I’m Phát. I work as a BA/QC and build small software.',
-    lead: 'I studied Information Technology at HUFLIT University. By day I work as a BA/QC, clarifying requirements with overseas clients and testing products before handover. After hours I write, release and keep fixing the apps on this site.',
+    heading: 'Hi, I’m Phát. I work as a BA/QC, and I love building small apps.',
+    lead: 'I studied Information Technology at HUFLIT. At work I’m a BA/QC: I talk with overseas clients until the requirements are clear, then test the product before it’s handed over. After hours I write, release and keep improving the apps you see here.',
     teaser:
-      'I work as a BA/QC at WeebPal and graduated in Information Technology from HUFLIT. My experience, skills and journey have their own page.',
+      'I’m a BA/QC at WeebPal and an Information Technology graduate from HUFLIT. My experience, skills and the road so far have their own page.',
     readMore: 'More about me',
     facts: [
       { icon: 'briefcase', text: 'BA/QC at WeebPal' },
@@ -289,7 +290,7 @@ export const profile: Record<Locale, Profile> = {
       'Information Technology, Ho Chi Minh City University of Foreign Languages – Information Technology (HUFLIT)',
     educationPeriod: 'Graduated 2026',
     howTitle: 'How I work',
-    howIntro: 'A requirement passes through my hands in four steps.',
+    howIntro: 'Here’s how a requirement usually goes through my hands.',
     steps: [
       {
         icon: 'message',
@@ -313,7 +314,7 @@ export const profile: Record<Locale, Profile> = {
       },
     ],
     skillsTitle: 'Skills',
-    skillsIntro: 'What I have used at work, in coursework and in my own apps.',
+    skillsIntro: 'Things I’ve used at work, at university and in my own apps.',
     skills: [
       {
         icon: 'testing',
@@ -391,15 +392,15 @@ export const profile: Record<Locale, Profile> = {
       'Course completion certificates from the Athena training center.',
     builtTitle: 'Things I built',
     builtIntro:
-      'Two apps I wrote from scratch, released here and shaped by feedback.',
+      'Two apps I wrote from scratch, released here and improved with your feedback.',
     languagesTitle: 'Languages',
-    english: 'English: used every day at work with overseas clients.',
+    english: 'English: I use it every day working with overseas clients.',
     toeicLabel: 'TOEIC',
     toeicAlt:
       'Nguyễn Tấn Phát’s TOEIC certificate, with personal details blurred',
     toeicOpen: 'Open the full-size certificate',
     contactTitle: 'Let’s talk',
     contactText:
-      'Want to talk about work, ask about a project or send feedback on the apps? Email me; I read everything.',
+      'Want to talk about work, ask about a project or share feedback on the apps? Drop me an email; I read every one.',
   },
 };

@@ -88,10 +88,10 @@ export function alwaysLatest(url: string) {
 export const versionCopy = {
   vi: {
     heading: 'Phiên bản',
-    intro: 'Những thay đổi, tính năng mới và ghi chú cập nhật của sản phẩm.',
+    intro: 'Mỗi bản cập nhật có gì mới, sửa gì, mình ghi lại ở đây.',
     all: 'Tất cả phiên bản',
     read: 'Xem chi tiết phiên bản',
-    empty: 'Chưa có bài viết phiên bản. Các bản cập nhật sẽ xuất hiện tại đây.',
+    empty: 'Chưa có bài nào về phiên bản. Có bản cập nhật là mình đăng ở đây.',
     back: 'Về trang sản phẩm',
     source: 'Tài liệu nguồn',
     downloadLatest: 'Tải bản mới nhất',
@@ -110,10 +110,10 @@ export const versionCopy = {
   },
   en: {
     heading: 'Versions',
-    intro: 'Changes, new features, and update notes for this product.',
+    intro: 'What’s new and what’s fixed in each update, written down here.',
     all: 'All versions',
     read: 'Read version details',
-    empty: 'No version posts yet. Future updates will appear here.',
+    empty: 'No version posts yet. I’ll post here when an update comes out.',
     back: 'Back to product',
     source: 'Source documentation',
     downloadLatest: 'Download the latest version',

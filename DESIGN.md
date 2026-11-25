@@ -112,7 +112,7 @@ Distinctiveness comes from real product assets, never from invented visuals: scr
 - One signature moment: the desk, the taskbar and the walking cat.
 - Heavy, tight headings; plain, readable body; no decoration standing in for content.
 - Cool teal-ink palette with three soft tints reserved for product surfaces and labels.
-- Personality from the cat and the owner's first-person voice.
+- Personality from the cat and the owner's first-person voice: Vietnamese uses the friendly "mình", English a warm "I" (owner’s choice, 2026-11-25). Meta descriptions, job duties and the privacy page stay neutral.
 
 ## Colors
 
@@ -210,7 +210,7 @@ Mostly flat, tonal layering (paper, desk, window). Shadows are structural and ap
 
 ## Shapes
 
-Windows have gently rounded corners (12px) and a 1.5px ink outline. Buttons and the language switch use 0.5rem; badges and labels 0.4rem. The brand frame (portrait, contact panel) is the one large-radius shape (28px) and carries the triangular cat ears, which rise once on load and twitch on hover. No pills, and no geometric masks around photos.
+Windows have gently rounded corners (12px) and a 1.5px ink outline. Buttons and the language switch use 0.5rem; badges and labels 0.4rem. The contact panel is the one large-radius shape (28px). The portrait is the one round photo (owner’s choice, 2026-11-25): a circle with a 12px ink ring, the triangular cat ears behind it, and the caption below in muted text. Both carry the ears, which rise once on load and twitch on hover. No pills, and no other geometric masks around photos.
 
 The brand mark is a desktop window with cat ears and two eyes, drawn in `src/components/Logo.astro` and mirrored in `public/favicon.svg`; keep both in sync. Its eyes carry `class="eye"` and blink every few seconds.
 
