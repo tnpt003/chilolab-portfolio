@@ -33,7 +33,12 @@ for (const file of pages) {
 }
 for (const locale of ['vi', 'en']) {
   const base = locale === 'vi' ? '' : '/en';
-  for (const slug of ['', '/pet-desktop', '/pagespeed-auth-auditor']) {
+  for (const slug of [
+    '',
+    '/about',
+    '/pet-desktop',
+    '/pagespeed-auth-auditor',
+  ]) {
     const route = `${base}${slug}` || '/';
     const html = routes.get(route);
     assert.ok(html, `Missing route: ${route}`);

@@ -1,5 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
+import Logo from './Logo.astro';
 import { pathFor, type Locale } from '../lib/content';
 import { privacyPath, userCopy, userPath } from '../lib/community';
 interface Props {
@@ -34,9 +35,7 @@ const siteKey: string =
     {mode === 'account' && <h1>{title}</h1>}
     {mode === 'login' ? (
       <section class="login-card" aria-labelledby="login-heading">
-        <span class="brand-mark login-mark" aria-hidden="true">
-          c.
-        </span>
+        <Logo class="login-mark" />
         <h1 id="login-heading">{t.loginHeading}</h1>
         <p class="login-intro">{t.loginIntro}</p>
         <p class="form-status" data-error role="alert" />

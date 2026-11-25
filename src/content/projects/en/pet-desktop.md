@@ -2,9 +2,10 @@
 title: Pet Desktop
 slug: pet-desktop
 locale: en
-description: An animated Windows desktop cat, with companion interactions and optional adventures.
+description: An animated cat that lives on your Windows desktop. Pick it up, pet it, feed it and dress it up; when you feel like it, take it on adventures against slimes. Installed copies update themselves.
 kind: pet
 order: 1
+stack: ['C#', 'WPF', '.NET 10', 'Python']
 featuredVersion: '1.5.2'
 preview:
   image: ../../../assets/pet-battle-hub.png

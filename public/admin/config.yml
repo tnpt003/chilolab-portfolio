@@ -288,6 +288,11 @@ collections:
         widget: select
         options: [pet, auditor]
       - { label: Thứ tự, name: order, widget: number, value_type: int }
+      - label: Công nghệ
+        name: stack
+        widget: list
+        required: false
+        hint: Mỗi dòng một công nghệ thật sự dùng trong dự án. Giữ giống bản tiếng Anh.
       - {
           label: Nháp,
           name: draft,
@@ -350,6 +355,11 @@ collections:
           options: [pet, auditor],
         }
       - { label: Order, name: order, widget: number, value_type: int }
+      - label: Stack
+        name: stack
+        widget: list
+        required: false
+        hint: One technology per line, actually used in the project. Keep it identical to the Vietnamese page.
       - {
           label: Draft,
           name: draft,

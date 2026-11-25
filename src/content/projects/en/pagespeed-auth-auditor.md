@@ -2,9 +2,14 @@
 title: PageSpeed-Auth-Auditor
 slug: pagespeed-auth-auditor
 locale: en
-description: A Windows QA application for site health checks, performance audits, and Excel reports.
+description: A website QA app for Windows. Check URL health, crawl a whole site, run PageSpeed or Lighthouse audits (including pages behind a login) and export everything to Excel.
 kind: auditor
 order: 2
+stack: ['Electron', 'Node.js', 'Lighthouse', 'Puppeteer', 'ExcelJS']
+preview:
+  image: ../../../assets/auditor-main-screen.png
+  alt: PageSpeed-Auth-Auditor main screen with four numbered steps - open the login browser, enter URLs, choose desktop or mobile, run the audit.
+  caption: Actual main-screen capture, taken from the app's user guide.
 ---
 
 ## PageSpeed-Auth-Auditor

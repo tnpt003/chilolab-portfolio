@@ -1,0 +1,49 @@
+---
+// ChiloLab mark: a desktop window with cat ears. Small Windows software,
+// and the cat that lives on the screen. Keep in sync with public/favicon.svg.
+interface Props {
+  class?: string;
+}
+const { class: className = '' } = Astro.props;
+---
+
+<svg
+  class:list={['brand-mark', className]}
+  viewBox="0 0 40 40"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path
+    fill="currentColor"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linejoin="round"
+    d="M5 15 9.5 3 17 10h6l7.5-7L35 15v14a8 8 0 0 1-8 8H13a8 8 0 0 1-8-8Z"
+  ></path>
+  <rect
+    x="10"
+    y="16"
+    width="20"
+    height="14"
+    rx="3"
+    fill="var(--paper, #f9fbfc)"
+  ></rect>
+  <rect
+    class="eye"
+    x="14"
+    y="20"
+    width="3"
+    height="6"
+    rx="1.5"
+    fill="currentColor"
+  ></rect>
+  <rect
+    class="eye"
+    x="23"
+    y="20"
+    width="3"
+    height="6"
+    rx="1.5"
+    fill="currentColor"
+  ></rect>
+</svg>

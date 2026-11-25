@@ -1,0 +1,351 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
+import Logo from './Logo.astro';
+import portrait from '../assets/phat-portrait.jpg';
+import petOnDesktop from '../assets/pet-on-desktop.png';
+import { copy, listProjects, pathFor, type Locale } from '../lib/content';
+import { listVersions, versionPath } from '../lib/versions';
+import {
+  athenaUrl,
+  email,
+  githubUrl,
+  journeyIcons,
+  profile,
+  toeic,
+  toeicImage,
+  type JourneyEntry,
+} from '../lib/profile';
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const p = profile[locale];
+const t = copy[locale];
+const projects = await listProjects(locale);
+const toeicText = [toeic.score, toeic.year && `(${toeic.year})`]
+  .filter(Boolean)
+  .join(' ');
+const showToeic = Boolean(toeic.score || toeicImage);
+const tints = ['mint', 'lavender', 'apricot'] as const;
+
+// Release milestones come from the published version notes, never by hand.
+const released = (await listVersions(locale, 'pet-desktop'))
+  .filter(({ data }) => data.status === 'released' && data.releasedAt)
+  .sort((a, b) => a.data.releasedAt!.localeCompare(b.data.releasedAt!));
+const formatDay = (iso: string) =>
+  new Date(`${iso}T00:00:00Z`).toLocaleDateString(
+    locale === 'vi' ? 'vi-VN' : 'en-GB',
+    {
+      day: locale === 'vi' ? '2-digit' : 'numeric',
+      month: locale === 'vi' ? '2-digit' : 'short',
+      year: 'numeric',
+      timeZone: 'UTC',
+    },
+  );
+const milestones = [released[0], released.at(-1)]
+  .filter((entry, index, list) => entry && list.indexOf(entry) === index)
+  .map((entry, index, list): JourneyEntry => {
+    const { version, title, releasedAt } = entry!.data;
+    const last = index === list.length - 1 && released.length > 1;
+    return {
+      kind: 'release',
+      year: Number(releasedAt!.slice(0, 4)),
+      date: releasedAt,
+      label: formatDay(releasedAt!),
+      title: p.releaseTitle
+        .replace('{version}', version)
+        .replace('{title}', title),
+      text: last
+        ? p.releaseCount.replace('{count}', String(released.length))
+        : undefined,
+      href: versionPath(locale, 'pet-desktop', version),
+    };
+  });
+// Newest first, as the owner asked; undated entries close their year.
+const entries = [...p.journey, ...milestones].sort(
+  (a, b) =>
+    b.year - a.year ||
+    Number(Boolean(b.date)) - Number(Boolean(a.date)) ||
+    (b.date ?? '').localeCompare(a.date ?? ''),
+);
+const years = [...new Set(entries.map((entry) => entry.year))].map((year) => ({
+  year,
+  entries: entries.filter((entry) => entry.year === year),
+}));
+const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
+---
+
+<Base
+  title={p.pageTitle}
+  description={p.metaDescription}
+  locale={locale}
+  slug="about"
+>
+  <section class="about-hero wrap">
+    <div class="about-hero-copy">
+      <h1>{p.heading}</h1>
+      <p class="lead">{p.lead}</p>
+      <ul class="fact-list">
+        {p.facts.map((fact) => (
+          <li>
+            <Icon name={fact.icon} />
+            {fact.text}
+          </li>
+        ))}
+      </ul>
+      <div class="actions">
+        <a class="button" href={`mailto:${email}`}>
+          <Icon name="mail" />
+          {p.emailMe}
+        </a>
+        <a class="button button-quiet" href={`${pathFor(locale)}#projects`}>
+          <Icon name="folder" />
+          {p.seeProjects}
+        </a>
+        <a class="button button-quiet" href={githubUrl}>
+          <Icon name="branch" />
+          {p.github}
+        </a>
+      </div>
+    </div>
+    <div class="about-hero-art">
+      <figure class="cat-frame">
+        <Image
+          src={portrait}
+          alt={t.portraitAlt}
+          widths={[300, 420]}
+          sizes="(max-width: 720px) 70vw, 380px"
+          format="webp"
+          loading="eager"
+        />
+        <figcaption>{p.portraitCaption}</figcaption>
+      </figure>
+      <figure class="pet-polaroid">
+        <Image
+          src={petOnDesktop}
+          alt={p.petAlt}
+          widths={[200, 400]}
+          sizes="200px"
+          format="webp"
+          loading="eager"
+        />
+        <figcaption>{p.petCaption}</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="about-block wrap" aria-labelledby="experience-title">
+    <h2 id="experience-title">{p.experienceTitle}</h2>
+    <div class="job">
+      <span class="tile-icon mint">
+        <Icon name="briefcase" size={26} />
+      </span>
+      <div>
+        <p class="job-title">
+          <strong>{p.role}</strong>
+          <span>{p.company}</span>
+          <span class="badge">{p.current}</span>
+        </p>
+        <p class="job-period">{p.jobPeriod}</p>
+        <ul class="job-duties">
+          {p.duties.map((duty) => (
+            <li>{duty}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+    <div class="job">
+      <span class="tile-icon lavender">
+        <Icon name="graduation" size={26} />
+      </span>
+      <div>
+        <h3>{p.educationTitle}</h3>
+        <p class="job-period">{p.educationPeriod}</p>
+        <p>{p.education}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about-block wrap" aria-labelledby="how-title">
+    <div class="section-heading">
+      <h2 id="how-title">{p.howTitle}</h2>
+      <p>{p.howIntro}</p>
+    </div>
+    <ol class="steps">
+      {p.steps.map((step, index) => (
+        <li>
+          <span class="step-head">
+            <span class="step-number">{index + 1}</span>
+            <Icon name={step.icon} size={22} />
+          </span>
+          <h3>{step.title}</h3>
+          <p>{step.text}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="about-block wrap" aria-labelledby="skills-title">
+    <div class="section-heading">
+      <h2 id="skills-title">{p.skillsTitle}</h2>
+      <p>{p.skillsIntro}</p>
+    </div>
+    <ul class="skill-grid">
+      {p.skills.map((group, index) => (
+        <li>
+          <span class:list={['tile-icon', tints[index % tints.length]]}>
+            <Icon name={group.icon} size={24} />
+          </span>
+          <h3>{group.name}</h3>
+          <ul class="tags">
+            {group.items.map((item) => (
+              <li>{item}</li>
+            ))}
+          </ul>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="about-block wrap" aria-labelledby="journey-title">
+    <h2 id="journey-title">{p.journeyTitle}</h2>
+    <div class="journey">
+      {/* The ChiloLab cat rides down the rail as the reader scrolls. */}
+      <div class="journey-rail" aria-hidden="true">
+        <span class="journey-cat">
+          <Logo />
+        </span>
+      </div>
+      <ol class="journey-years">
+        {years.map(({ year, entries }) => (
+          <li>
+            <h3 class="journey-year">{year}</h3>
+            <ol class="journey-list">
+              {entries.map((entry) => (
+                <li class="journey-entry">
+                  <p class="journey-meta">
+                    <span class:list={['kind', kindTint[entry.kind]]}>
+                      <Icon name={journeyIcons[entry.kind]} size={16} />
+                      {p.journeyKinds[entry.kind]}
+                    </span>
+                    {entry.date && entry.label && (
+                      <time datetime={entry.date}>{entry.label}</time>
+                    )}
+                  </p>
+                  <h4>
+                    {entry.href ? (
+                      <a href={entry.href}>{entry.title}</a>
+                    ) : (
+                      entry.title
+                    )}
+                  </h4>
+                  {entry.text && <p>{entry.text}</p>}
+                </li>
+              ))}
+            </ol>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <section class="about-block wrap" aria-labelledby="courses-title">
+    <h2 id="courses-title">{p.coursesTitle}</h2>
+    <ul class="course-list">
+      {p.courses.map((course, index) => (
+        <li>
+          <span class:list={['tile-icon', tints[index % tints.length]]}>
+            <Icon name="award" size={24} />
+          </span>
+          <span class="course-name">{course}</span>
+          <a class="course-provider" href={athenaUrl}>
+            Athena
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p class="course-note">
+      {p.coursesNote} <a href={athenaUrl}>athena.edu.vn</a>
+    </p>
+  </section>
+
+  <section class="about-block wrap" aria-labelledby="built-title">
+    <div class="section-heading">
+      <h2 id="built-title">{p.builtTitle}</h2>
+      <p>{p.builtIntro}</p>
+    </div>
+    <ul class="built-grid">
+      {projects.map(({ data }) => (
+        <li>
+          <a href={pathFor(locale, data.slug)}>
+            {data.preview && (
+              <Image
+                src={data.preview.image}
+                alt={data.preview.alt}
+                widths={[400, 700]}
+                sizes="(max-width: 720px) 100vw, 50vw"
+                format="webp"
+                loading="lazy"
+              />
+            )}
+            <span class="built-title">
+              <Icon name={data.kind === 'pet' ? 'cat' : 'testing'} />
+              {data.title}
+            </span>
+            <span class="built-text">{data.description}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="about-block wrap" aria-labelledby="languages-title">
+    <h2 id="languages-title">{p.languagesTitle}</h2>
+    <div class="job">
+      <span class="tile-icon apricot">
+        <Icon name="globe" size={26} />
+      </span>
+      <div>
+        <p>{p.english}</p>
+        {showToeic && (
+          <div class="profile-toeic">
+            <p>
+              <strong>{p.toeicLabel}</strong>
+              {toeicText && ` ${toeicText}`}
+            </p>
+            {toeicImage && (
+              <a href={toeicImage.src} aria-label={p.toeicOpen}>
+                <Image
+                  src={toeicImage}
+                  alt={p.toeicAlt}
+                  widths={[360, 720]}
+                  sizes="(max-width: 720px) 100vw, 360px"
+                  format="webp"
+                />
+              </a>
+            )}
+          </div>
+        )}
+      </div>
+    </div>
+  </section>
+
+  <section class="contact wrap" aria-labelledby="contact-title">
+    <div class="contact-panel">
+      <h2 id="contact-title">{p.contactTitle}</h2>
+      <p>{p.contactText}</p>
+      <div class="actions">
+        <a class="button contact-email" href={`mailto:${email}`}>
+          <Icon name="mail" />
+          {email}
+        </a>
+        <a class="contact-link" href={githubUrl}>
+          <Icon name="branch" />
+          github.com/tnpt003
+        </a>
+      </div>
+    </div>
+  </section>
+</Base>

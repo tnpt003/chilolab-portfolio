@@ -24,7 +24,7 @@ Source move (decided 2026-11-18): Pet Desktop is now "all rights reserved" (1.5.
 
 PageSpeed-Auth-Auditor is local at `C:/Project VS/PageSpeed-Auth-Auditor`, not uploaded according to the owner. Its README describes an Electron Windows QA app with manual URL health checks, crawling, PageSpeed/Lighthouse audits and Excel reports. It requires Windows 10+ and Chrome. Do not expose its .env, audit reports or session data. A GitHub release destination in package metadata does not establish a public source repo or available downloads.
 
-Biography and contact email are still unconfirmed. Pet media are real app captures of the 1.5 development preview; the Auditor visual remains a labeled concept until a real screenshot is supplied.
+Biography (confirmed 2026-11-18, lives in src/lib/profile.ts): HUFLIT, Information Technology, graduated 2026 (degree title not given); BA/QC at WeebPal since 08/2025. Do not name WeebPal's clients or client contacts on the site (NDA); describe them by kind. The three Athena certificates (ACBN 07–08/2022, CCNA programme 01–03/2023, Linux Master 04–08/2023) are course completions from a training center, not Cisco/LPI vendor certifications; never publish the PDFs (date of birth, portrait, QR). Do not show course dates on the site (owner's request); link Athena to https://athena.edu.vn/. TOEIC score and image are pending from the owner. Contact email tnpt003@gmail.com is approved for the About page. Pet media are real app captures of the 1.5 development preview; the Auditor image is a real main-screen capture from its user guide.
 
 ## Scope
 

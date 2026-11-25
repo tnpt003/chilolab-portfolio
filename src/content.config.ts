@@ -16,6 +16,8 @@ const projects = defineCollection({
       description: z.string(),
       kind: z.enum(['pet', 'auditor']),
       order: z.number(),
+      // Technologies shown as tags on the homepage and About page.
+      stack: z.array(z.string().min(1)).default([]),
       draft: z.boolean().default(false),
       preview: z
         .object({

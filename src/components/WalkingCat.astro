@@ -1,0 +1,76 @@
+---
+// The ChiloLab cat strolls along a line once, stops and says hello.
+// Decorative only (aria-hidden); CSS-only, still under reduced motion.
+interface Props {
+  hello: string;
+}
+const { hello } = Astro.props;
+---
+
+<div class="cat-floor" aria-hidden="true">
+  <div class="walker">
+    <span class="walker-bubble">{hello}</span>
+    <svg class="walker-cat" viewBox="0 0 96 66" focusable="false">
+      <path
+        class="walker-tail"
+        d="M18 34C8 31 4 20 10 10"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="6"
+        stroke-linecap="round"
+      ></path>
+      <rect
+        class="leg leg-a"
+        x="20"
+        y="42"
+        width="7"
+        height="20"
+        rx="3.5"
+      ></rect>
+      <rect
+        class="leg leg-b"
+        x="31"
+        y="42"
+        width="7"
+        height="20"
+        rx="3.5"
+      ></rect>
+      <rect
+        class="leg leg-b"
+        x="52"
+        y="42"
+        width="7"
+        height="20"
+        rx="3.5"
+      ></rect>
+      <rect
+        class="leg leg-a"
+        x="63"
+        y="42"
+        width="7"
+        height="20"
+        rx="3.5"
+      ></rect>
+      <rect x="16" y="26" width="58" height="24" rx="12"></rect>
+      <path d="M58 14 61 0l9 10h4l9-10 3 14v10a14 14 0 0 1-28 0Z"></path>
+      <rect
+        class="walker-eye"
+        x="66"
+        y="17"
+        width="3.5"
+        height="7"
+        rx="1.75"
+        fill="var(--paper)"
+      ></rect>
+      <rect
+        class="walker-eye"
+        x="76"
+        y="17"
+        width="3.5"
+        height="7"
+        rx="1.75"
+        fill="var(--paper)"
+      ></rect>
+    </svg>
+  </div>
+</div>

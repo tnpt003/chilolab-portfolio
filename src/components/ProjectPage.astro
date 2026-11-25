@@ -3,6 +3,7 @@ import { render, type CollectionEntry } from 'astro:content';
 import { getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import ProjectVisual from './ProjectVisual.astro';
+import Icon from './Icon.astro';
 import { copy, pathFor } from '../lib/content';
 import {
   alwaysLatest,
@@ -67,6 +68,7 @@ const poster =
             href={alwaysLatest(latest.downloadUrl!)}
             data-download={`${data.slug}/${latest.version}/setup`}
           >
+            <Icon name="download" />
             {v.latestInstaller.replace('{project}', data.title)}
           </a>
           {latest.portableUrl && (
@@ -74,13 +76,18 @@ const poster =
               href={alwaysLatest(latest.portableUrl)}
               data-download={`${data.slug}/${latest.version}/portable`}
             >
+              <Icon name="archive" />
               {v.portable}
             </a>
           )}
           <a href={versionPath(data.locale, data.slug, latest.version)}>
+            <Icon name="history" />
             {v.latestNotes}
           </a>
-          <a href={feedbackPath(data.locale, data.slug)}>{v.feedback}</a>
+          <a href={feedbackPath(data.locale, data.slug)}>
+            <Icon name="message" />
+            {v.feedback}
+          </a>
         </div>
       </section>
     ) : null}

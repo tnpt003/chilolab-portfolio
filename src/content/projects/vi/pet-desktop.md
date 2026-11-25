@@ -2,9 +2,10 @@
 title: Pet Desktop
 slug: pet-desktop
 locale: vi
-description: Một chú mèo hoạt hình trên desktop Windows, với tương tác chăm sóc và những chuyến phiêu lưu tùy chọn.
+description: Một chú mèo hoạt hình sống trên desktop Windows. Bế, vuốt ve, cho ăn, thay đồ cho mèo; khi muốn thì đưa mèo đi phiêu lưu đánh slime. Bản cài tự cập nhật.
 kind: pet
 order: 1
+stack: ['C#', 'WPF', '.NET 10', 'Python']
 featuredVersion: '1.5.2'
 preview:
   image: ../../../assets/pet-battle-hub.png

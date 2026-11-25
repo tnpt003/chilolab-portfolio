@@ -204,14 +204,11 @@ h3 {
   letter-spacing: -0.03em;
 }
 .brand-mark {
-  display: grid;
-  place-items: center;
+  display: block;
+  flex: none;
   width: 2.4rem;
   height: 2.4rem;
-  border-radius: 0.8rem;
-  background: var(--ink);
-  color: white;
-  font-size: 1.6rem;
+  color: var(--ink);
 }
 nav {
   display: flex;
@@ -463,6 +460,536 @@ nav a:hover {
 .audit-lines span:nth-child(3) {
   width: 85%;
 }
+/* Icons */
+.icon {
+  flex: none;
+}
+a:has(> .icon),
+.fact-list li,
+.built-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+.button-quiet {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.button-quiet:hover {
+  background: var(--mint);
+}
+.tile-icon {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 0.75rem;
+  color: var(--ink);
+}
+.tile-icon.mint {
+  background: var(--mint);
+}
+.tile-icon.lavender {
+  background: var(--lavender);
+}
+.tile-icon.apricot {
+  background: color-mix(in srgb, var(--apricot) 55%, white);
+}
+.fact-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.4rem;
+  margin: 1.6rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-weight: 500;
+}
+.fact-list .icon {
+  color: var(--muted);
+}
+/* Logo: the cat on the screen blinks now and then. */
+.brand-mark .eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 7s infinite;
+}
+@keyframes blink {
+  0%,
+  95%,
+  100% {
+    transform: scaleY(1);
+  }
+  97% {
+    transform: scaleY(0.1);
+  }
+}
+/* Homepage teaser */
+.me-teaser {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+  padding-block: 5rem;
+  margin-top: 3rem;
+  border-top: 1px solid var(--line);
+}
+.me-teaser p {
+  max-width: 48ch;
+  margin-top: 1rem;
+  font-size: 1.2rem;
+  color: var(--muted);
+}
+.me-teaser .fact-list {
+  flex-direction: column;
+  margin: 0 0 1.8rem;
+}
+/* About page */
+.about-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 5rem);
+  padding-block: 4.5rem 5rem;
+}
+.about-hero h1 {
+  max-width: 15ch;
+  font-size: clamp(2.3rem, 5vw, 4.3rem);
+}
+.about-hero .lead {
+  max-width: 56ch;
+  margin-top: 1.5rem;
+}
+.about-hero-art {
+  position: relative;
+  justify-self: center;
+  width: min(100%, 360px);
+  padding: 2.4rem 0 3.5rem;
+}
+/* The portrait sits in the ChiloLab mark: a window with cat ears. */
+.cat-frame {
+  position: relative;
+  padding: 14px 14px 10px;
+  background: var(--ink);
+  border-radius: 28px;
+}
+.cat-frame::before,
+.cat-frame::after {
+  content: '';
+  position: absolute;
+  top: -40px;
+  width: 78px;
+  height: 56px;
+  background: var(--ink);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  transform-origin: 50% 100%;
+  animation: ear-up 0.7s cubic-bezier(0.3, 1.5, 0.5, 1) 0.15s both;
+  transition: rotate 0.25s ease;
+}
+.cat-frame::before {
+  left: 22px;
+  rotate: -14deg;
+}
+.cat-frame::after {
+  right: 22px;
+  rotate: 14deg;
+  animation-delay: 0.3s;
+}
+.cat-frame:hover::after {
+  rotate: 26deg;
+}
+@keyframes ear-up {
+  from {
+    translate: 0 46px;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+.cat-frame img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1.05;
+  object-fit: cover;
+  border-radius: 16px;
+  background: var(--mint);
+}
+.cat-frame figcaption {
+  padding: 0.55rem 0.4rem 0 0;
+  font-size: 0.85rem;
+  color: var(--paper);
+  text-align: right;
+}
+.pet-polaroid {
+  position: absolute;
+  bottom: 0;
+  left: -3rem;
+  width: 200px;
+  padding: 8px 8px 10px;
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgb(24 75 88 / 0.16);
+  rotate: -4deg;
+}
+.pet-polaroid img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+}
+.pet-polaroid figcaption {
+  margin-top: 0.4rem;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--muted);
+}
+.about-block {
+  padding-block: 4rem;
+  border-top: 1px solid var(--line);
+}
+.about-block > h2 {
+  margin-bottom: 1.8rem;
+}
+.job {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.25rem;
+  padding-block: 1.25rem;
+}
+.job + .job {
+  border-top: 1px solid var(--line);
+}
+.job h3 {
+  margin-bottom: 0.4rem;
+  font-size: 1.2rem;
+}
+.job p,
+.job-duties {
+  max-width: 70ch;
+  color: var(--muted);
+}
+.job .job-title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.8rem;
+  margin-bottom: 0.7rem;
+  font-size: 1.2rem;
+  color: var(--ink);
+}
+.job-title strong {
+  font-size: 1.4rem;
+}
+.badge {
+  padding: 0.15rem 0.55rem;
+  border-radius: 0.4rem;
+  background: var(--mint);
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.job-duties {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding-left: 1.1rem;
+}
+.skill-grid,
+.tags,
+.built-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.skill-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+  gap: 2.5rem;
+}
+.skill-grid > li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  column-gap: 1rem;
+}
+.skill-grid h3 {
+  font-size: 1.15rem;
+}
+.tags {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.9rem;
+}
+.tags li {
+  padding: 0.3rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  background: white;
+  font-size: 0.9rem;
+}
+.job-period {
+  margin-bottom: 0.6rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+/* How I work: a four-step pipeline; the top bar fills in as work moves on. */
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr));
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.steps li {
+  display: grid;
+  align-content: start;
+  gap: 0.6rem;
+  padding-top: 1.1rem;
+  border-top: 4px solid var(--mint);
+}
+.steps li:nth-child(2) {
+  border-top-color: var(--lavender);
+}
+.steps li:nth-child(3) {
+  border-top-color: var(--apricot);
+}
+.steps li:nth-child(4) {
+  border-top-color: var(--ink);
+}
+.step-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--muted);
+}
+.step-number {
+  font-size: 1.7rem;
+  font-weight: 700;
+  line-height: 1;
+  color: var(--ink);
+}
+.steps h3 {
+  font-size: 1.15rem;
+}
+.steps p {
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+/* Journey: release notes of the owner, with the brand cat riding the rail. */
+.journey {
+  display: grid;
+  grid-template-columns: 3.5rem minmax(0, 1fr);
+  gap: 0 1.5rem;
+}
+.journey-rail {
+  position: relative;
+}
+.journey-rail::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  translate: -1px 0;
+  background: repeating-linear-gradient(
+    var(--line) 0 8px,
+    transparent 8px 14px
+  );
+}
+.journey-cat {
+  position: sticky;
+  top: 45vh;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border: 2px solid var(--line);
+  border-radius: 50%;
+  background: var(--paper);
+  color: var(--ink);
+}
+.journey-cat .brand-mark {
+  width: 2.1rem;
+  height: 2.1rem;
+}
+.journey-years,
+.journey-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.journey-years > li + li {
+  margin-top: 2.2rem;
+}
+.journey-year {
+  margin-bottom: 0.4rem;
+  font-size: clamp(2.2rem, 4.5vw, 3.4rem);
+  color: color-mix(in srgb, var(--ink) 28%, var(--paper));
+}
+.journey-entry {
+  display: grid;
+  gap: 0.45rem;
+  max-width: 64ch;
+  padding-block: 1.1rem;
+  border-top: 1px solid var(--line);
+}
+.journey-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.kind {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+.kind.mint {
+  background: var(--mint);
+}
+.kind.lavender {
+  background: var(--lavender);
+}
+.kind.apricot {
+  background: color-mix(in srgb, var(--apricot) 55%, white);
+}
+.journey-entry h4 {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+}
+.journey-entry h4 a {
+  color: inherit;
+  text-underline-offset: 0.2em;
+}
+.journey-entry > p:last-child:not(.journey-meta) {
+  color: var(--muted);
+}
+.course-note {
+  max-width: 70ch;
+  margin-top: 1.8rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+/* Contact: the brand window again, big enough to talk through. */
+.contact {
+  padding-block: 5rem 3rem;
+}
+.contact-panel {
+  position: relative;
+  padding: clamp(2rem, 5vw, 3.5rem);
+  border-radius: 28px;
+  background: var(--ink);
+  color: var(--paper);
+}
+.contact-panel::before,
+.contact-panel::after {
+  content: '';
+  position: absolute;
+  top: -46px;
+  width: 96px;
+  height: 64px;
+  background: var(--ink);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+  transform-origin: 50% 100%;
+  transition: rotate 0.25s ease;
+}
+.contact-panel::before {
+  left: 48px;
+  rotate: -12deg;
+}
+.contact-panel::after {
+  right: 48px;
+  rotate: 12deg;
+}
+.contact-panel:hover::before {
+  rotate: -22deg;
+}
+.contact-panel h2 {
+  color: var(--paper);
+}
+.contact-panel p {
+  max-width: 52ch;
+  margin-top: 0.8rem;
+  font-size: 1.15rem;
+  color: color-mix(in srgb, var(--paper) 82%, var(--ink));
+}
+.contact-panel .button.contact-email {
+  background: var(--mint);
+  color: var(--ink);
+}
+.contact-panel .button.contact-email:hover {
+  background: white;
+}
+.contact-link {
+  color: var(--paper);
+}
+.contact-panel a:focus-visible {
+  outline-color: var(--mint);
+}
+.built-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2rem;
+}
+.built-grid a {
+  display: grid;
+  gap: 0.6rem;
+  color: inherit;
+  text-decoration: none;
+}
+.built-grid img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+  object-fit: contain;
+  padding: 0.75rem;
+  border-radius: 14px;
+  background: var(--mint);
+}
+.built-grid li:nth-child(even) img {
+  background: var(--lavender);
+}
+.built-title {
+  margin-top: 0.4rem;
+  font-size: 1.3rem;
+  font-weight: 700;
+}
+.built-text {
+  color: var(--muted);
+}
+.built-grid a:hover .built-title {
+  text-decoration: underline;
+}
+.profile-toeic {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+.profile-toeic a {
+  justify-self: start;
+}
+.profile-toeic img {
+  display: block;
+  width: min(100%, 360px);
+  height: auto;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
 .about {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -614,6 +1141,9 @@ nav a:hover {
     height: 270px;
   }
   .about,
+  .me-teaser,
+  .about-hero,
+  .built-grid,
   .detail-body {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -637,6 +1167,47 @@ nav a:hover {
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
+  }
+  .brand-mark .eye,
+  .cat-frame::before,
+  .cat-frame::after,
+  .contact-panel::before,
+  .contact-panel::after {
+    animation: none;
+    transition: none;
+  }
+}
+@media (max-width: 720px) {
+  .about-hero {
+    padding-block: 3rem;
+  }
+  .about-hero-art {
+    width: min(78%, 300px);
+  }
+  .pet-polaroid {
+    left: -1.5rem;
+    width: 150px;
+  }
+  .about-block {
+    padding-block: 3rem;
+  }
+  .journey {
+    grid-template-columns: 2.75rem minmax(0, 1fr);
+    gap: 0 1rem;
+  }
+  .journey-cat {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+  .journey-cat .brand-mark {
+    width: 1.7rem;
+    height: 1.7rem;
+  }
+  .contact-panel::before {
+    left: 24px;
+  }
+  .contact-panel::after {
+    right: 24px;
   }
 }
 .community-form {
@@ -1006,9 +1577,8 @@ nav a:hover {
   margin: 0.4rem 0 0;
 }
 .login-mark {
-  width: 3rem;
-  height: 3rem;
-  font-size: 1.4rem;
+  width: 3.2rem;
+  height: 3.2rem;
 }
 .login-intro {
   color: var(--muted);
@@ -1109,4 +1679,239 @@ nav a:hover {
   justify-content: space-between;
   gap: 1rem;
   font-size: 0.9rem;
+}
+/* Courses: undated on purpose (owner's choice), so a plain list, not a line. */
+.course-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.course-list li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.25rem 1rem;
+}
+.course-name {
+  font-weight: 700;
+  line-height: 1.35;
+}
+.course-provider {
+  grid-column: 2;
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+.course-list .tile-icon {
+  grid-row: span 2;
+}
+/* Homepage hero: portfolio first, the brand window around the portrait. */
+.home-hero {
+  padding-block: 2.5rem 0.5rem;
+}
+.home-hero h1 {
+  max-width: 19ch;
+  font-size: clamp(2.2rem, 3.7vw, 3.5rem);
+}
+.home-hero .lead {
+  max-width: 56ch;
+  margin-top: 1.4rem;
+}
+.home-frame {
+  justify-self: end;
+  width: min(100%, 340px);
+  margin-top: 2.5rem;
+}
+/* The walking cat: one stroll on load, then it stays, blinks and waves its tail. */
+.cat-floor {
+  position: relative;
+  height: 104px;
+  margin-bottom: 3.5rem;
+  border-bottom: 1px solid var(--line);
+  overflow-x: clip;
+}
+.walker {
+  position: absolute;
+  bottom: 0;
+  left: 68%;
+  width: 96px;
+  animation: stroll 7s linear 0.8s both;
+}
+@keyframes stroll {
+  from {
+    left: -110px;
+  }
+  to {
+    left: 68%;
+  }
+}
+.walker-cat {
+  display: block;
+  width: 96px;
+  height: 66px;
+  color: var(--ink);
+  fill: currentColor;
+}
+.walker .leg {
+  transform-box: fill-box;
+  transform-origin: 50% 0;
+  animation: step 0.35s ease-in-out 0.8s 20 alternate;
+}
+.walker .leg-b {
+  animation-direction: alternate-reverse;
+}
+@keyframes step {
+  from {
+    transform: rotate(16deg);
+  }
+  to {
+    transform: rotate(-16deg);
+  }
+}
+.walker-tail {
+  transform-box: view-box;
+  transform-origin: 18px 34px;
+  animation: tail 1.6s ease-in-out infinite alternate;
+}
+@keyframes tail {
+  from {
+    transform: rotate(-8deg);
+  }
+  to {
+    transform: rotate(12deg);
+  }
+}
+.walker-eye {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 5s 8s infinite;
+}
+.walker-bubble {
+  position: absolute;
+  bottom: 74px;
+  left: 30px;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 0.6rem;
+  background: white;
+  font-size: 0.85rem;
+  font-weight: 500;
+  white-space: nowrap;
+  color: var(--ink);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  animation: bubble 3.4s ease 7.9s;
+}
+.walker-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -6px;
+  left: 30px;
+  width: 10px;
+  height: 10px;
+  border-right: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  background: white;
+  transform: rotate(45deg);
+}
+.walker:hover .walker-bubble {
+  opacity: 1;
+}
+@keyframes bubble {
+  0% {
+    opacity: 0;
+    translate: 0 6px;
+  }
+  12%,
+  82% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+/* Project rows: real state from version notes, and the stack used. */
+.project-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+.status-dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--apricot);
+}
+.project-status.released .status-dot {
+  background: color-mix(in srgb, var(--mint) 35%, var(--ink));
+}
+.project-copy h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+.project-copy .tags {
+  margin-top: 1.1rem;
+}
+.skills-heading {
+  margin-bottom: 1.1rem;
+  font-size: 1.15rem;
+}
+.skill-mini {
+  display: grid;
+  gap: 0.9rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.skill-mini li {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+.skill-mini .tile-icon {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 0.6rem;
+}
+.skill-mini strong,
+.skill-mini-items {
+  display: block;
+}
+.skill-mini-items {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+@media (max-width: 720px) {
+  .home-frame {
+    justify-self: center;
+    width: min(70%, 280px);
+  }
+  .walker {
+    left: 52%;
+  }
+  @keyframes stroll {
+    from {
+      left: -110px;
+    }
+    to {
+      left: 52%;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .walker,
+  .walker .leg,
+  .walker-tail,
+  .walker-eye,
+  .walker-bubble {
+    animation: none;
+  }
 }
