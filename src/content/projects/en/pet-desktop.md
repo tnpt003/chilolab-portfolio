@@ -7,7 +7,7 @@ kind: pet
 order: 1
 stack: ['C#', 'WPF', '.NET 10', 'Python']
 featuredVersion: '1.5.2'
-downloadNote: The first time you run the installer, Windows may say "Windows protected your PC" because it is not code-signed yet. Click More info → Run anyway to install. No admin rights needed.
+downloadNote: 'The installer is not code-signed yet, so you may see two warnings. When downloading, if your browser says the file is not commonly downloaded, choose Keep / Keep anyway (in Edge: … → Keep → Show more → Keep anyway). When running it, if Windows says "Windows protected your PC", click More info → Run anyway. No admin rights needed.'
 preview:
   image: ../../../assets/pet-battle-hub.png
   alt: Pet Desktop interface for choosing adventure and battle modes.
@@ -36,9 +36,10 @@ Battle Mode is an extra you can take or leave: your desktop turns into an advent
 
 ## Installing
 
-1. Download `PetComputer-win-Setup.exe` with the button above and run it; no admin rights needed.
-2. If Windows SmartScreen says "Windows protected your PC", click **More info → Run anyway**. The installer is not code-signed yet.
-3. The cat opens by itself. Installed copies update themselves, so there's no need to download again for new versions.
+1. Download `PetComputer-win-Setup.exe` with the button above.
+2. If your browser says the file is not commonly downloaded and asks whether to keep it, choose **Keep** (Chrome) or **… → Keep → Show more → Keep anyway** (Edge). The installer is not code-signed yet, so browsers do not recognise it.
+3. Open the downloaded file; no admin rights needed. If Windows SmartScreen says "Windows protected your PC", click **More info → Run anyway**.
+4. The cat opens by itself. Installed copies update themselves, so there's no need to download again for new versions.
 
 The Portable build (.zip) is for running from a folder without installing.
 

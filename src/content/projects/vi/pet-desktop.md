@@ -7,7 +7,7 @@ kind: pet
 order: 1
 stack: ['C#', 'WPF', '.NET 10', 'Python']
 featuredVersion: '1.5.2'
-downloadNote: Lần đầu chạy bộ cài, Windows có thể báo "Windows protected your PC" vì bộ cài chưa được ký số. Bấm More info → Run anyway là cài được. Không cần quyền admin.
+downloadNote: 'Bộ cài chưa được ký số nên có thể gặp hai cảnh báo. Khi tải, nếu trình duyệt báo file ít người tải, bấm Keep / Keep anyway (trên Edge: bấm … → Keep → Show more → Keep anyway). Khi chạy, nếu Windows báo "Windows protected your PC", bấm More info → Run anyway. Không cần quyền admin.'
 preview:
   image: ../../../assets/pet-battle-hub.png
   alt: Giao diện chọn chế độ phiêu lưu và chiến đấu trong Pet Desktop.
@@ -36,9 +36,10 @@ Chế độ chiến đấu là phần thêm, chơi hay không tùy bạn: deskto
 
 ## Cài đặt
 
-1. Tải bộ cài `PetComputer-win-Setup.exe` ở nút phía trên rồi chạy; không cần quyền admin.
-2. Nếu Windows SmartScreen báo "Windows protected your PC", bấm **More info → Run anyway**. Bộ cài chưa được ký số.
-3. Mèo tự mở ra. Bản đã cài tự cập nhật, nên không cần tải lại khi có bản mới.
+1. Tải bộ cài `PetComputer-win-Setup.exe` ở nút phía trên.
+2. Nếu trình duyệt báo file này ít người tải và hỏi có giữ lại không, bấm **Keep** (Chrome) hoặc **… → Keep → Show more → Keep anyway** (Edge). Bộ cài chưa được ký số nên trình duyệt chưa "quen" file này.
+3. Mở file vừa tải; không cần quyền admin. Nếu Windows SmartScreen báo "Windows protected your PC", bấm **More info → Run anyway**.
+4. Mèo tự mở ra. Bản đã cài tự cập nhật, nên không cần tải lại khi có bản mới.
 
 Bản Portable (.zip) dành cho người muốn chạy từ thư mục mà không cài đặt.
 
