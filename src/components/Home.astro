@@ -3,6 +3,7 @@ import Base from '../layouts/Base.astro';
 import { Image } from 'astro:assets';
 import ProjectVisual from './ProjectVisual.astro';
 import Icon from './Icon.astro';
+import Logo from './Logo.astro';
 import WalkingCat from './WalkingCat.astro';
 import DownloadStat from './DownloadStat.astro';
 import { email, profile } from '../lib/profile';
@@ -17,7 +18,6 @@ const t = copy[locale];
 const v = versionCopy[locale];
 const projects = await listProjects(locale);
 const me = profile[locale];
-const tints = ['mint', 'lavender', 'apricot'] as const;
 
 // Each row shows the project's real state, read from its newest version note.
 const rows = await Promise.all(
@@ -27,9 +27,8 @@ const rows = await Promise.all(
     )[0];
     return {
       project,
-      status: newest
-        ? `v${newest.data.version} · ${v[newest.data.status]}`
-        : undefined,
+      version: newest ? `v${newest.data.version}` : undefined,
+      status: newest ? v[newest.data.status] : undefined,
       released: newest?.data.status === 'released',
     };
   }),
@@ -37,84 +36,90 @@ const rows = await Promise.all(
 ---
 
 <Base title={t.homeTitle} description={t.metaDescription} locale={locale}>
-  <section class="hero home-hero wrap">
-    <div class="hero-copy">
-      <h1>{t.title}</h1>
-      <p class="lead">{t.intro}</p>
-      <ul class="fact-list">
-        {me.facts.map((fact) => (
-          <li>
-            <Icon name={fact.icon} />
-            {fact.text}
-          </li>
-        ))}
-      </ul>
-      <div class="actions">
-        <a class="button" href="#projects">
-          <Icon name="folder" />
-          {t.explore}
-        </a>
-        <a class="button button-quiet" href={pathFor(locale, 'about')}>
-          <Icon name="user" />
-          {t.aboutCta}
-        </a>
-        <a class="button button-quiet" href={`mailto:${email}`}>
-          <Icon name="mail" />
-          Email
-        </a>
+  {/* The hero is a desktop: the portrait window sits on it, and the
+      ChiloLab cat walks along the taskbar, as Pet Desktop does. */}
+  <section class="desk">
+    <div class="hero home-hero wrap">
+      <div class="hero-copy">
+        <h1>{t.title}</h1>
+        <p class="lead">{t.intro}</p>
+        <ul class="fact-list">
+          {me.facts.map((fact) => (
+            <li>{fact.text}</li>
+          ))}
+        </ul>
+        <div class="actions">
+          <a class="button" href="#projects">
+            {t.explore}
+          </a>
+          <a class="button button-quiet" href={pathFor(locale, 'about')}>
+            {t.aboutCta}
+          </a>
+          <a class="text-link" href={`mailto:${email}`}>
+            {email}
+          </a>
+        </div>
       </div>
+      <figure class="cat-frame home-frame">
+        <Image
+          src={portrait}
+          alt={t.portraitAlt}
+          widths={[280, 390]}
+          sizes="(max-width: 720px) 70vw, 340px"
+          format="webp"
+          loading="eager"
+        />
+        <figcaption>{t.portraitCaption}</figcaption>
+      </figure>
     </div>
-    <figure class="cat-frame home-frame">
-      <Image
-        src={portrait}
-        alt={t.portraitAlt}
-        widths={[280, 390]}
-        sizes="(max-width: 720px) 70vw, 340px"
-        format="webp"
-        loading="eager"
-      />
-      <figcaption>{t.portraitCaption}</figcaption>
-    </figure>
+    <div class="wrap">
+      <WalkingCat hello={t.hello} />
+    </div>
+    <nav class="taskbar" aria-label={t.projects}>
+      <a class="taskbar-start" href={pathFor(locale)} aria-label="ChiloLab">
+        <Logo />
+      </a>
+      {projects.map(({ data }) => (
+        <a href={`#${data.slug}`}>
+          <Icon name={data.kind === 'pet' ? 'cat' : 'testing'} size={18} />
+          {data.title}
+        </a>
+      ))}
+    </nav>
   </section>
-  <div class="wrap">
-    <WalkingCat hello={t.hello} />
-  </div>
+
   <section class="projects wrap" id="projects" aria-labelledby="projects-title">
     <div class="section-heading">
       <h2 id="projects-title">{t.projects}</h2>
       <p>{t.selected}</p>
     </div>
     <div class="project-list">
-      {rows.map(({ project: { data }, status, released }) => (
-        <article class="project">
+      {rows.map(({ project: { data }, version, status, released }) => (
+        <article class="project" id={data.slug}>
           <a class="project-link" href={pathFor(locale, data.slug)}>
             <ProjectVisual
               kind={data.kind}
               label={t.preview}
+              title={data.title}
+              meta={version}
               preview={data.preview}
             />
             <div class="project-copy">
               {status && (
                 <p class:list={['project-status', { released }]}>
                   <span class="status-dot" aria-hidden="true"></span>
-                  {status}
+                  <strong>{version}</strong>
+                  <span>{status}</span>
                   <DownloadStat project={data.slug} locale={locale} />
                 </p>
               )}
-              <h3>
-                <Icon
-                  name={data.kind === 'pet' ? 'cat' : 'testing'}
-                  size={26}
-                />
-                {data.title}
-              </h3>
+              <h3>{data.title}</h3>
               <p>{data.description}</p>
               {data.stack.length > 0 && (
-                <ul class="tags" aria-label={t.stack}>
-                  {data.stack.map((item) => (
-                    <li>{item}</li>
-                  ))}
-                </ul>
+                <p class="stack">
+                  <span>{t.stack}</span>
+                  {data.stack.join(', ')}
+                </p>
               )}
               <span class="text-link">{t.detail}</span>
             </div>
@@ -123,36 +128,30 @@ const rows = await Promise.all(
       ))}
     </div>
   </section>
+
   <section class="me-teaser wrap" aria-labelledby="me-title">
     <div>
       <h2 id="me-title">{t.me}</h2>
       <p>{me.teaser}</p>
       <div class="actions">
         <a class="button" href={pathFor(locale, 'about')}>
-          <Icon name="user" />
           {me.readMore}
         </a>
       </div>
     </div>
     <div>
       <h3 class="skills-heading">{t.skillsHeading}</h3>
-      <ul class="skill-mini">
-        {me.skills.map((group, index) => (
-          <li>
-            <span class:list={['tile-icon', tints[index % tints.length]]}>
-              <Icon name={group.icon} />
-            </span>
-            <span>
-              <strong>{group.name}</strong>
-              <span class="skill-mini-items">
-                {group.items.slice(0, 3).join(', ')}
-              </span>
-            </span>
-          </li>
+      <dl class="skill-mini">
+        {me.skills.map((group) => (
+          <div>
+            <dt>{group.name}</dt>
+            <dd>{group.items.slice(0, 3).join(', ')}</dd>
+          </div>
         ))}
-      </ul>
+      </dl>
     </div>
   </section>
+
   <section class="about wrap" id="about">
     <h2>{t.about}</h2>
     <p>{t.aboutText}</p>

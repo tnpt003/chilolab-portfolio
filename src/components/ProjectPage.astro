@@ -4,6 +4,7 @@ import { getImage } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import ProjectVisual from './ProjectVisual.astro';
 import Icon from './Icon.astro';
+import WindowBar from './WindowBar.astro';
 import { copy, pathFor } from '../lib/content';
 import {
   alwaysLatest,
@@ -45,7 +46,7 @@ const poster =
 >
   <div class="project-detail wrap">
     <a class="back" href={`${pathFor(data.locale)}#projects`}>
-      ← {t.back}
+      {t.back}
     </a>
     <header class="detail-heading">
       <h1>{data.title}</h1>
@@ -78,18 +79,13 @@ const poster =
               href={alwaysLatest(latest.portableUrl)}
               data-download={`${data.slug}/${latest.version}/portable`}
             >
-              <Icon name="archive" />
               {v.portable}
             </a>
           )}
           <a href={versionPath(data.locale, data.slug, latest.version)}>
-            <Icon name="history" />
             {v.latestNotes}
           </a>
-          <a href={feedbackPath(data.locale, data.slug)}>
-            <Icon name="message" />
-            {v.feedback}
-          </a>
+          <a href={feedbackPath(data.locale, data.slug)}>{v.feedback}</a>
         </div>
       </section>
     ) : null}
@@ -98,28 +94,36 @@ const poster =
       <ProjectVisual
         kind={data.kind}
         label={t.preview}
+        title={data.title}
+        meta={latest ? `v${latest.version}` : undefined}
         preview={data.preview}
       />
     )}
     {data.video && (
       <figure class="project-video">
-        <video
-          poster={poster}
-          controls
-          preload="none"
-          width="1280"
-          height="720"
-          aria-label={
-            data.locale === 'vi'
-              ? 'Video giới thiệu Pet Desktop'
-              : 'Pet Desktop introduction video'
-          }
-        >
-          <source src={data.video} type="video/mp4" />
-          <a href={data.video}>
-            {data.locale === 'vi' ? 'Mở video' : 'Open video'}
-          </a>
-        </video>
+        <div class="window">
+          <WindowBar
+            title={data.title}
+            meta={latest ? `v${latest.version}` : undefined}
+          />
+          <video
+            poster={poster}
+            controls
+            preload="none"
+            width="1280"
+            height="720"
+            aria-label={
+              data.locale === 'vi'
+                ? 'Video giới thiệu Pet Desktop'
+                : 'Pet Desktop introduction video'
+            }
+          >
+            <source src={data.video} type="video/mp4" />
+            <a href={data.video}>
+              {data.locale === 'vi' ? 'Mở video' : 'Open video'}
+            </a>
+          </video>
+        </div>
         <figcaption>
           {data.locale === 'vi'
             ? 'Video không âm thanh, 32 giây. Bản phát triển 1.5; bản phát hành có thể khác.'

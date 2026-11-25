@@ -1,0 +1,26 @@
+---
+// Title bar of a Windows app window: the ChiloLab mark, the app's name and
+// the minimise / maximise / close glyphs on the right, as on Windows.
+// Decorative chrome around real product media; the controls do nothing,
+// so they are hidden from assistive technology.
+import Logo from './Logo.astro';
+interface Props {
+  title: string;
+  meta?: string;
+}
+const { title, meta } = Astro.props;
+---
+
+<div class="window-bar" aria-hidden="true">
+  <Logo />
+  <span class="window-title">{title}</span>
+  {meta && <span class="window-meta">{meta}</span>}
+  <svg
+    class="window-controls"
+    viewBox="0 0 84 12"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <path d="M2 6h10M37 1h10v10H37ZM73 1l10 10M83 1 73 11"></path>
+  </svg>
+</div>

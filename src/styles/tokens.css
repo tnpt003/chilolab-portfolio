@@ -1,11 +1,16 @@
 :root {
-  --paper: #f9fbfc;
+  --paper: #f5f8f7;
+  --window: #ffffff;
+  --desk: #dbe7e4;
   --ink: #184b58;
+  --ink-deep: #113843;
   --muted: #496570;
   --mint: #c6e8de;
   --lavender: #e3dff3;
   --apricot: #ffbd8d;
-  --line: #d5e0e4;
+  --line: #cddbdc;
+  --shadow-window:
+    0 1px 2px rgb(17 56 67 / 0.12), 0 14px 32px -12px rgb(17 56 67 / 0.32);
   --font-body:
     'Be Vietnam Pro', 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
 }

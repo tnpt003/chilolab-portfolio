@@ -2,6 +2,7 @@
 import '@fontsource/be-vietnam-pro/400.css';
 import '@fontsource/be-vietnam-pro/500.css';
 import '@fontsource/be-vietnam-pro/700.css';
+import '@fontsource/be-vietnam-pro/800.css';
 import '../styles/global.css';
 import { copy, listProjects, pathFor, type Locale } from '../lib/content';
 import { feedbackPath, privacyPath, userPath } from '../lib/community';
@@ -9,7 +10,6 @@ import { versionPath } from '../lib/versions';
 import { getImage } from 'astro:assets';
 import shareImage from '../assets/pet-battle-hub.png';
 import Logo from '../components/Logo.astro';
-import Icon from '../components/Icon.astro';
 interface Props {
   title: string;
   description: string;
@@ -144,10 +144,7 @@ const ogAlt =
           <ul>
             {projects.map(({ data }) => (
               <li>
-                <a href={pathFor(locale, data.slug)}>
-                  <Icon name={data.kind === 'pet' ? 'cat' : 'testing'} />
-                  {data.title}
-                </a>
+                <a href={pathFor(locale, data.slug)}>{data.title}</a>
               </li>
             ))}
           </ul>
@@ -157,21 +154,14 @@ const ogAlt =
           <ul>
             <li>
               <a href={`${pathFor(locale, 'pet-desktop')}#download-heading`}>
-                <Icon name="download" />
                 {f.download}
               </a>
             </li>
             <li>
-              <a href={versionPath(locale, 'pet-desktop')}>
-                <Icon name="history" />
-                {f.versions}
-              </a>
+              <a href={versionPath(locale, 'pet-desktop')}>{f.versions}</a>
             </li>
             <li>
-              <a href={feedbackPath(locale, 'pet-desktop')}>
-                <Icon name="message" />
-                {f.feedback}
-              </a>
+              <a href={feedbackPath(locale, 'pet-desktop')}>{f.feedback}</a>
             </li>
           </ul>
         </nav>
@@ -179,34 +169,22 @@ const ogAlt =
           <p class="footer-title">ChiloLab</p>
           <ul>
             <li>
-              <a href={pathFor(locale, 'about')}>
-                <Icon name="user" />
-                {t.me}
-              </a>
+              <a href={pathFor(locale, 'about')}>{t.me}</a>
             </li>
             <li>
-              <a href={`${pathFor(locale)}#about`}>
-                <Icon name="sparkle" />
-                {t.about}
-              </a>
+              <a href={`${pathFor(locale)}#about`}>{t.about}</a>
             </li>
             <li>
-              <a href={privacyPath(locale)}>
-                <Icon name="shield" />
-                {f.privacy}
-              </a>
+              <a href={privacyPath(locale)}>{f.privacy}</a>
             </li>
             <li>
-              <a href={userPath(locale, 'login')}>
-                <Icon name="login" />
-                {f.account}
-              </a>
+              <a href={userPath(locale, 'login')}>{f.account}</a>
             </li>
           </ul>
         </nav>
       </div>
       <div class="wrap footer-bottom">
-        <span>© {new Date().getFullYear()} Nguyễn Tấn Phát · ChiloLab</span>
+        <span>© {new Date().getFullYear()} Nguyễn Tấn Phát, ChiloLab</span>
       </div>
     </footer>
     <script>

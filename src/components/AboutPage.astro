@@ -1,8 +1,8 @@
 ---
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
-import Icon from './Icon.astro';
 import Logo from './Logo.astro';
+import WindowBar from './WindowBar.astro';
 import portrait from '../assets/phat-portrait.jpg';
 import petOnDesktop from '../assets/pet-on-desktop.png';
 import { copy, listProjects, pathFor, type Locale } from '../lib/content';
@@ -11,7 +11,6 @@ import {
   athenaUrl,
   email,
   githubUrl,
-  journeyIcons,
   profile,
   toeic,
   toeicImage,
@@ -28,7 +27,6 @@ const toeicText = [toeic.score, toeic.year && `(${toeic.year})`]
   .filter(Boolean)
   .join(' ');
 const showToeic = Boolean(toeic.score || toeicImage);
-const tints = ['mint', 'lavender', 'apricot'] as const;
 
 // Release milestones come from the published version notes, never by hand.
 const released = (await listVersions(locale, 'pet-desktop'))
@@ -83,65 +81,58 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
   locale={locale}
   slug="about"
 >
-  <section class="about-hero wrap">
-    <div class="about-hero-copy">
-      <h1>{p.heading}</h1>
-      <p class="lead">{p.lead}</p>
-      <ul class="fact-list">
-        {p.facts.map((fact) => (
-          <li>
-            <Icon name={fact.icon} />
-            {fact.text}
-          </li>
-        ))}
-      </ul>
-      <div class="actions">
-        <a class="button" href={`mailto:${email}`}>
-          <Icon name="mail" />
-          {p.emailMe}
-        </a>
-        <a class="button button-quiet" href={`${pathFor(locale)}#projects`}>
-          <Icon name="folder" />
-          {p.seeProjects}
-        </a>
-        <a class="button button-quiet" href={githubUrl}>
-          <Icon name="branch" />
-          {p.github}
-        </a>
+  <div class="desk">
+    <section class="about-hero wrap">
+      <div class="about-hero-copy">
+        <h1>{p.heading}</h1>
+        <p class="lead">{p.lead}</p>
+        <ul class="fact-list">
+          {p.facts.map((fact) => (
+            <li>{fact.text}</li>
+          ))}
+        </ul>
+        <div class="actions">
+          <a class="button" href={`mailto:${email}`}>
+            {p.emailMe}
+          </a>
+          <a class="button button-quiet" href={`${pathFor(locale)}#projects`}>
+            {p.seeProjects}
+          </a>
+          <a class="button button-quiet" href={githubUrl}>
+            {p.github}
+          </a>
+        </div>
       </div>
-    </div>
-    <div class="about-hero-art">
-      <figure class="cat-frame">
-        <Image
-          src={portrait}
-          alt={t.portraitAlt}
-          widths={[300, 420]}
-          sizes="(max-width: 720px) 70vw, 380px"
-          format="webp"
-          loading="eager"
-        />
-        <figcaption>{p.portraitCaption}</figcaption>
-      </figure>
-      <figure class="pet-polaroid">
-        <Image
-          src={petOnDesktop}
-          alt={p.petAlt}
-          widths={[200, 400]}
-          sizes="200px"
-          format="webp"
-          loading="eager"
-        />
-        <figcaption>{p.petCaption}</figcaption>
-      </figure>
-    </div>
-  </section>
+      <div class="about-hero-art">
+        <figure class="cat-frame">
+          <Image
+            src={portrait}
+            alt={t.portraitAlt}
+            widths={[300, 420]}
+            sizes="(max-width: 720px) 70vw, 380px"
+            format="webp"
+            loading="eager"
+          />
+          <figcaption>{p.portraitCaption}</figcaption>
+        </figure>
+        <figure class="pet-polaroid">
+          <Image
+            src={petOnDesktop}
+            alt={p.petAlt}
+            widths={[200, 400]}
+            sizes="200px"
+            format="webp"
+            loading="eager"
+          />
+          <figcaption>{p.petCaption}</figcaption>
+        </figure>
+      </div>
+    </section>
+  </div>
 
   <section class="about-block wrap" aria-labelledby="experience-title">
     <h2 id="experience-title">{p.experienceTitle}</h2>
     <div class="job">
-      <span class="tile-icon mint">
-        <Icon name="briefcase" size={26} />
-      </span>
       <div>
         <p class="job-title">
           <strong>{p.role}</strong>
@@ -157,9 +148,6 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
       </div>
     </div>
     <div class="job">
-      <span class="tile-icon lavender">
-        <Icon name="graduation" size={26} />
-      </span>
       <div>
         <h3>{p.educationTitle}</h3>
         <p class="job-period">{p.educationPeriod}</p>
@@ -176,10 +164,7 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
     <ol class="steps">
       {p.steps.map((step, index) => (
         <li>
-          <span class="step-head">
-            <span class="step-number">{index + 1}</span>
-            <Icon name={step.icon} size={22} />
-          </span>
+          <span class="step-number">{index + 1}</span>
           <h3>{step.title}</h3>
           <p>{step.text}</p>
         </li>
@@ -192,21 +177,14 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
       <h2 id="skills-title">{p.skillsTitle}</h2>
       <p>{p.skillsIntro}</p>
     </div>
-    <ul class="skill-grid">
-      {p.skills.map((group, index) => (
-        <li>
-          <span class:list={['tile-icon', tints[index % tints.length]]}>
-            <Icon name={group.icon} size={24} />
-          </span>
-          <h3>{group.name}</h3>
-          <ul class="tags">
-            {group.items.map((item) => (
-              <li>{item}</li>
-            ))}
-          </ul>
-        </li>
+    <dl class="skill-grid">
+      {p.skills.map((group) => (
+        <div>
+          <dt>{group.name}</dt>
+          <dd>{group.items.join(', ')}</dd>
+        </div>
       ))}
-    </ul>
+    </dl>
   </section>
 
   <section class="about-block wrap" aria-labelledby="journey-title">
@@ -227,7 +205,6 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
                 <li class="journey-entry">
                   <p class="journey-meta">
                     <span class:list={['kind', kindTint[entry.kind]]}>
-                      <Icon name={journeyIcons[entry.kind]} size={16} />
                       {p.journeyKinds[entry.kind]}
                     </span>
                     {entry.date && entry.label && (
@@ -254,11 +231,8 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
   <section class="about-block wrap" aria-labelledby="courses-title">
     <h2 id="courses-title">{p.coursesTitle}</h2>
     <ul class="course-list">
-      {p.courses.map((course, index) => (
+      {p.courses.map((course) => (
         <li>
-          <span class:list={['tile-icon', tints[index % tints.length]]}>
-            <Icon name="award" size={24} />
-          </span>
           <span class="course-name">{course}</span>
           <a class="course-provider" href={athenaUrl}>
             Athena
@@ -281,19 +255,19 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
         <li>
           <a href={pathFor(locale, data.slug)}>
             {data.preview && (
-              <Image
-                src={data.preview.image}
-                alt={data.preview.alt}
-                widths={[400, 700]}
-                sizes="(max-width: 720px) 100vw, 50vw"
-                format="webp"
-                loading="lazy"
-              />
+              <div class="window">
+                <WindowBar title={data.title} />
+                <Image
+                  src={data.preview.image}
+                  alt={data.preview.alt}
+                  widths={[400, 700]}
+                  sizes="(max-width: 720px) 100vw, 50vw"
+                  format="webp"
+                  loading="lazy"
+                />
+              </div>
             )}
-            <span class="built-title">
-              <Icon name={data.kind === 'pet' ? 'cat' : 'testing'} />
-              {data.title}
-            </span>
+            <span class="built-title">{data.title}</span>
             <span class="built-text">{data.description}</span>
           </a>
         </li>
@@ -304,9 +278,6 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
   <section class="about-block wrap" aria-labelledby="languages-title">
     <h2 id="languages-title">{p.languagesTitle}</h2>
     <div class="job">
-      <span class="tile-icon apricot">
-        <Icon name="globe" size={26} />
-      </span>
       <div>
         <p>{p.english}</p>
         {showToeic && (
@@ -338,11 +309,9 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
       <p>{p.contactText}</p>
       <div class="actions">
         <a class="button contact-email" href={`mailto:${email}`}>
-          <Icon name="mail" />
           {email}
         </a>
         <a class="contact-link" href={githubUrl}>
-          <Icon name="branch" />
           github.com/tnpt003
         </a>
       </div>
