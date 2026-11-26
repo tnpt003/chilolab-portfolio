@@ -33,8 +33,9 @@ Nội dung giao diện và giới thiệu nằm trong `src/lib/content.ts`; sử
 
 1. `npm.cmd run format`.
 2. `npm.cmd run verify`.
-3. `npm.cmd run test:browser` nếu đã cài Chromium bằng `npx.cmd playwright install chromium`.
-4. Xem lại cả bản Việt/Anh và màn hình điện thoại.
-5. Sau khi đã kết nối GitHub và Cloudflare, commit/push sẽ kích hoạt CI và build Pages.
+3. `npm.cmd run test:worker` nếu đã sửa `worker/` hoặc `migrations/` (docs/DATABASE.md).
+4. `npm.cmd run test:browser` nếu đã cài Chromium bằng `npx.cmd playwright install chromium`.
+5. Xem lại cả bản Việt/Anh và màn hình điện thoại.
+6. Sau khi đã kết nối GitHub và Cloudflare, commit/push sẽ kích hoạt CI và build Pages.
 
 Có thể chỉnh Markdown ngay trên GitHub. Khi commit, CI và Cloudflare vẫn kiểm tra/build lại. Website có thể chưa cập nhật ngay vì phải chờ build thành công.
