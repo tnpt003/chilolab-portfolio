@@ -4,6 +4,8 @@ import AxeBuilder from '@axe-core/playwright';
 const routes = [
   '/',
   '/en',
+  '/about',
+  '/en/about',
   '/pet-desktop',
   '/en/pet-desktop',
   '/pagespeed-auth-auditor',
