@@ -15,6 +15,7 @@ updated: 2026-11-26
 - **Feedback and bug reports:** what you send, the app version, the Windows version, a contact if you add one, and a screenshot if you attach one. Only the site owner can read or see them. Screenshots are kept in private Cloudflare R2 storage and deleted together with the feedback.
 - **New version emails:** only if you choose them on your account page. The website stores the projects you picked, the email language and when you signed up. Emails go to your account's address. The website records who received each email so nobody gets it twice, and deletes that record 30 days after sending finishes.
 - **Downloads:** only a daily counter per file, with no information about who downloaded.
+- **Sign-in protection:** hourly counters of sign-in events (codes sent, wrong codes, failed checks, new accounts), with no email, account or IP address, kept for 90 days to spot attacks on the sign-in page.
 
 ## Cookies
 
@@ -26,7 +27,7 @@ Comment text is checked automatically (a word list and an AI model on Cloudflare
 
 ## Processors
 
-- **Cloudflare:** hosting, database and backups, spam protection for the feedback form (Turnstile), comment moderation (Workers AI), page view statistics (Web Analytics — no cookies, no tracking of individuals).
+- **Cloudflare:** hosting, database and backups, spam protection for the feedback form and email sign-in (Turnstile), comment moderation (Workers AI), page view statistics (Web Analytics — no cookies, no tracking of individuals).
 - **Google:** confirms your identity when you choose “Continue with Google”.
 - **Resend:** delivers the email with your sign-in code to the address you enter, and new version emails if you signed up for them.
 

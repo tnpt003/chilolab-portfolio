@@ -88,12 +88,38 @@ Trang dự án Pet Desktop và trang chủ hiện số lượt tải, lấy từ
 - Worker chỉ chạy cho `/api/*`, `/admin/manage*`, `/manage*` (chỉ để chuyển hướng), `/user`, `/en/user`; trang khác là file tĩnh.
 - Dải "Chế độ chủ site": `/admin/manage` và `/api/me` đặt cookie đọc được `__Host-chilolab_admin=1` cho owner; website chỉ gọi `/api/me` khi có cookie này và chỉ hiện dải khi API trả `owner: true`. Cookie không cấp quyền gì; đăng xuất hoặc tài khoản không phải owner sẽ xóa nó.
 - `/admin/manage` chỉ mở khi có phiên đăng nhập của tài khoản `role = 'owner'` (hoặc `ADMIN_DEV_BYPASS=1` trên localhost). Ngoài ra luôn từ chối. Cloudflare Access đã bỏ ngày 2026-11-25. Mọi thao tác ghi là form POST cùng origin; trang không có JavaScript.
-- Ai chiếm được hộp thư hoặc tài khoản Google của owner sẽ vào được trang quản trị: bật xác minh 2 bước cho cả hai. Đây là lớp khóa duy nhất từ khi bỏ Cloudflare Access.
+- Tài khoản owner chỉ đăng nhập bằng Google, không nhận mã email (xem "Bảo vệ đăng nhập" bên dưới). Ai chiếm được tài khoản Google của owner sẽ vào được trang quản trị: bật xác minh 2 bước cho Google. Đây là lớp khóa duy nhất từ khi bỏ Cloudflare Access.
 - Mọi request ghi phải cùng origin; body ≤ 16 KB; nội dung luôn hiển thị dạng text.
 - Phiên: cookie `__Host-chilolab_session` (HttpOnly, Secure, SameSite=Lax); D1 chỉ giữ SHA-256 của token. Khách: 30 ngày. Owner: 7 ngày (`OWNER_DAYS` trong `worker/session.ts`), tính từ lúc đăng nhập và kiểm ở mỗi request, nên cả phiên owner cũ hơn 7 ngày cũng hết hiệu lực; hết hạn thì đăng nhập lại ở `/user/login`.
 - Google: OAuth code flow + PKCE + `state`; kiểm `iss`, `aud`, `exp`, `email_verified`.
 - `WRITE_LIMIT`: 10 lần ghi/phút mỗi tài khoản hoặc IP (bộ lọc thô). Góp ý ẩn danh còn có Turnstile.
 - Không có mật khẩu: khách đăng nhập bằng Google hoặc mã 6 số qua email. (Băm mật khẩu đủ mạnh vượt giới hạn 10 ms CPU của gói Free.) Cột `users.password_hash` để trống.
+
+## Bảo vệ đăng nhập
+
+Thêm ngày 2026-11-26, sau một đợt tấn công vào trang đăng nhập của một site khác (`worker/security.ts`, migration 0009).
+
+- **Owner chỉ đăng nhập bằng Google.** Khi ai đó xin mã email cho địa chỉ của owner, không có mã nào được tạo. Địa chỉ đó nhận một email báo "dùng Google", với cùng giới hạn (1 lần mỗi phút, 5 lần mỗi giờ), và form trả lời giống hệt với mọi địa chỉ khác, nên không ai dò ra được email nào là của owner.
+- **Email báo mỗi lần owner đăng nhập.** Mỗi phiên owner mới gửi email tới chính tài khoản đó, kèm giờ, quốc gia/thành phố do Cloudflare đoán và trình duyệt. Không lưu gì vào D1. Email lỗi thì vẫn cho đăng nhập.
+- **Số liệu theo giờ** trong bảng `auth_stats`: mã đã gửi, nhập sai mã, mã bị khóa, không qua Turnstile, đăng nhập Google thất bại, tài khoản mới, thử đăng nhập owner bằng email. Chỉ có giờ (UTC), loại và số đếm: không email, tài khoản hay IP. Xem ở `/admin/manage/status#auth`. Khi một loại chạm ngưỡng trong một giờ (`ALERT_AT`, ví dụ 20 lần nhập sai mã), owner nhận một email. Xóa sau 90 ngày.
+- **Đăng xuất mọi thiết bị khác:** nút ở `/admin/manage/status#sessions`, giữ lại đúng phiên đang dùng.
+
+Nếu nhận email đăng nhập mà không phải mình: đổi mật khẩu Google, kiểm tra xác minh 2 bước, rồi bấm "Đăng xuất mọi thiết bị khác". Nếu không vào được trang quản trị (ví dụ Google sign-in hỏng), xóa mọi phiên của owner bằng SQL rồi đăng nhập lại:
+
+```sh
+npx wrangler d1 execute chilolab --remote --command "DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE role = 'owner')"
+```
+
+Lớp chặn trên Cloudflare (dashboard, gói Free, không cần sửa code):
+
+1. Security → Bots: bật **Bot Fight Mode**. Bot bị chặn trước khi tới Worker.
+2. Security → WAF → Rate limiting rules → Create rule (gói Free có 1 rule):
+   - Tên: `Sign-in`
+   - If incoming requests match: URI Path starts with `/api/auth/`
+   - Characteristics: IP
+   - Rate: 10 requests / 10 seconds (gói Free chỉ có chu kỳ 10 giây)
+   - Then: Block, duration 10 seconds (gói Free cố định)
+3. Nếu bị tấn công từ dải IP máy chủ thuê như Vultr hay Contabo, có thể thêm custom rule chặn theo ASN, nhưng sẽ chặn cả người dùng thật dùng VPN trên các dải đó. Chỉ bật khi đang bị tấn công.
 
 ## Chạy trên máy
 
@@ -123,6 +149,7 @@ Mỗi file test một phần:
 - `subscriptions`: hủy đăng ký một chạm.
 - `releases`: giới hạn 80 email mỗi ngày.
 - `maintenance`: dọn dẹp hằng ngày, backup R2 (bỏ `sessions` và `email_codes`, giữ 12 bản), email báo owner khi lỗi.
+- `security`: owner chỉ đăng nhập bằng Google, email báo khi owner đăng nhập, số liệu đăng nhập không nhận diện được ai, email báo khi vượt ngưỡng, nút đăng xuất mọi thiết bị khác.
 
 Khi thêm migration hoặc trang quản trị mới, test "every panel page renders" sẽ báo nếu code và schema lệch nhau.
 

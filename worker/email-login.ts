@@ -9,6 +9,7 @@ import {
   type Env,
 } from './env';
 import { mailEnabled, sendMail } from './mail';
+import { countAuth } from './security';
 import { createSession } from './session';
 import { getSettings } from './settings';
 import { human } from './turnstile';
@@ -17,6 +18,11 @@ import { human } from './turnstile';
 // Codes are stored hashed, expire after 10 minutes and allow 5 attempts.
 // Sending needs Turnstile and is limited to one code per minute and five
 // per hour for each address, so the form cannot be used to flood inboxes.
+// Owner accounts never get a code: they sign in with Google only (and its
+// 2-step verification), so a leaked inbox cannot open /admin/manage. The
+// owner gets a short notice instead, sent under the same limits, and the
+// answer is the same as for anyone else, so the form never tells whether an
+// address belongs to the owner.
 
 const EMAIL = /^[^\s@]{1,64}@[^\s@]{1,190}\.[a-z]{2,}$/i;
 const TTL_MS = 10 * 60_000;
@@ -40,6 +46,25 @@ function sameHash(a: string, b: string) {
 
 const readEmail = (value: unknown) =>
   typeof value === 'string' ? value.trim().toLowerCase() : '';
+
+const ownerNotice = {
+  vi: {
+    subject: 'Đăng nhập ChiloLab: dùng Google',
+    lines: [
+      'Có yêu cầu gửi mã đăng nhập tới địa chỉ này. Tài khoản chủ site ChiloLab chỉ đăng nhập bằng Google, nên không có mã nào được gửi.',
+      'Hãy mở chilolab.com/user/login và chọn "Tiếp tục với Google".',
+      'Nếu không phải bạn yêu cầu, có người đang thử đăng nhập bằng email của bạn. Họ không vào được; không cần làm gì.',
+    ],
+  },
+  en: {
+    subject: 'ChiloLab sign-in: use Google',
+    lines: [
+      'Someone asked for a sign-in code for this address. The ChiloLab owner account signs in with Google only, so no code was sent.',
+      'Open chilolab.com/en/user/login and choose "Continue with Google".',
+      'If this was not you, someone is trying to sign in with your email. They cannot get in; you need not do anything.',
+    ],
+  },
+};
 
 const mail = {
   vi: (code: string) => ({
@@ -83,8 +108,10 @@ async function start(request: Request, env: Env) {
     !(await underLimit(env, `mail:${email}`))
   )
     return json({ error: 'rate_limited' }, 429);
-  if (!(await human(request, env, body?.token)))
+  if (!(await human(request, env, body?.token))) {
+    await countAuth(env, 'turnstile_failed');
     return json({ error: 'verification_failed' }, 403);
+  }
 
   const recent = await env.DB.prepare(
     `SELECT COUNT(*) AS n, MAX(created_at) AS last FROM email_codes
@@ -98,6 +125,11 @@ async function start(request: Request, env: Env) {
   )
     return json({ error: 'rate_limited' }, 429);
 
+  const owner = await env.DB.prepare(
+    "SELECT 1 FROM users WHERE email = ? AND role = 'owner'",
+  )
+    .bind(email)
+    .first();
   const code = newCode();
   await env.DB.batch([
     env.DB.prepare('DELETE FROM email_codes WHERE expires_at < ?').bind(
@@ -107,11 +139,21 @@ async function start(request: Request, env: Env) {
       'INSERT INTO email_codes (email, code_hash, created_at, expires_at) VALUES (?, ?, ?, ?)',
     ).bind(
       email,
-      await sha256(`${email}:${code}`),
+      // For the owner the row only counts toward the limits above: no
+      // SHA-256 hex digest equals this, so no code can match it.
+      owner ? 'owner-uses-google' : await sha256(`${email}:${code}`),
       stamp(),
       stamp(Date.now() + TTL_MS),
     ),
   ]);
+  if (owner) {
+    await countAuth(env, 'owner_email_refused');
+    const notice = ownerNotice[locale];
+    if (!(await sendMail(env, email, notice.subject, notice.lines)))
+      return json({ error: 'mail_failed' }, 502);
+    return json({ status: 'sent' });
+  }
+  await countAuth(env, 'code_sent');
   const message = mail[locale](code);
   if (!(await sendMail(env, email, message.subject, message.lines)))
     return json({ error: 'mail_failed' }, 502);
@@ -146,6 +188,10 @@ async function verify(request: Request, env: Env) {
     )
       .bind(row.id)
       .run();
+    await countAuth(
+      env,
+      row.attempts + 1 >= MAX_ATTEMPTS ? 'code_locked' : 'code_wrong',
+    );
     return json({ error: 'invalid_code' }, 400);
   }
 
@@ -154,24 +200,29 @@ async function verify(request: Request, env: Env) {
     .run();
   const now = stamp();
   let user = await env.DB.prepare(
-    'SELECT id, blocked_at FROM users WHERE email = ?',
+    'SELECT id, blocked_at, role FROM users WHERE email = ?',
   )
     .bind(email)
-    .first<{ id: number; blocked_at?: string | null }>();
+    .first<{ id: number; blocked_at?: string | null; role?: string }>();
   if (user?.blocked_at) return json({ error: 'blocked' }, 403);
+  // Promoted to owner after the code was sent: still Google only.
+  if (user?.role === 'owner') return json({ error: 'invalid_code' }, 400);
   if (user)
     await env.DB.prepare('UPDATE users SET last_login_at = ? WHERE id = ?')
       .bind(now, user.id)
       .run();
   else if (!settings.signups)
     return json({ error: 'registration_closed' }, 403);
-  else
+  else {
     user = await env.DB.prepare(
       `INSERT INTO users (email, display_name, last_login_at) VALUES (?, ?, ?) RETURNING id`,
     )
       .bind(email, text(email.split('@')[0], 1, 40) ?? 'Người dùng', now)
       .first<{ id: number }>();
+    await countAuth(env, 'signup');
+  }
   if (!user) return json({ error: 'server_error' }, 500);
+  await countAuth(env, 'signin_email');
   return json(
     {
       status: 'signed_in',

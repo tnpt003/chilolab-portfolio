@@ -15,6 +15,7 @@ updated: 2026-11-26
 - **Góp ý và báo lỗi:** nội dung bạn gửi, phiên bản ứng dụng, phiên bản Windows, cách liên hệ nếu bạn tự điền, và ảnh chụp màn hình nếu bạn đính kèm. Chỉ chủ website đọc và xem được. Ảnh lưu trong kho riêng tư của Cloudflare R2 và bị xóa cùng góp ý.
 - **Email báo bản mới:** chỉ khi bạn tự chọn trong trang tài khoản. Website lưu dự án bạn chọn, ngôn ngữ của email và thời điểm đăng ký. Email gửi tới địa chỉ của tài khoản. Website ghi lại ai đã nhận mỗi email để không gửi trùng, và xóa ghi chép đó 30 ngày sau khi gửi xong.
 - **Lượt tải:** chỉ một bộ đếm theo ngày cho từng tệp, không kèm thông tin về người tải.
+- **Bảo vệ đăng nhập:** bộ đếm theo giờ các sự kiện đăng nhập (mã đã gửi, nhập sai mã, không qua kiểm tra chống spam, tài khoản mới), không kèm email, tài khoản hay địa chỉ IP, giữ 90 ngày để phát hiện tấn công vào trang đăng nhập.
 
 ## Cookie
 
@@ -26,7 +27,7 @@ Nội dung bình luận được kiểm tra tự động (danh sách từ và m�
 
 ## Bên xử lý dữ liệu
 
-- **Cloudflare:** lưu trữ website, cơ sở dữ liệu và bản sao lưu, chống spam cho form góp ý (Turnstile), kiểm duyệt bình luận (Workers AI), thống kê lượt xem trang (Web Analytics — không dùng cookie, không theo dõi từng người).
+- **Cloudflare:** lưu trữ website, cơ sở dữ liệu và bản sao lưu, chống spam cho form góp ý và đăng nhập bằng email (Turnstile), kiểm duyệt bình luận (Workers AI), thống kê lượt xem trang (Web Analytics — không dùng cookie, không theo dõi từng người).
 - **Google:** xác minh đăng nhập khi bạn chọn “Tiếp tục với Google”.
 - **Resend:** gửi email chứa mã đăng nhập tới địa chỉ bạn nhập, và email báo bản mới nếu bạn đăng ký.
 
