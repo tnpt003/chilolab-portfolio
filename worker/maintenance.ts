@@ -1,10 +1,15 @@
 import type { Env } from './env';
 import { notifyOwner } from './mail';
+import { deliverNotices } from './releases';
 import { OWNER_DAYS } from './session';
 
 // Scheduled upkeep (wrangler.jsonc "triggers"), run once a day:
 // - cleanup(): deletes rows that no longer do anything (expired sessions and
 //   sign-in codes, owner sessions past the 7-day limit, admin log > 1 year).
+// - cleanupPhase2(): crash reports after 90 days, and the list of who got a
+//   release email 30 days after that notice finished.
+// - deliverNotices() (worker/releases.ts): the rest of any release email
+//   that did not fit in an earlier day's sending budget.
 // - backup(): once a week, a gzipped JSON copy of the visitor data in the
 //   private R2 bucket bound as BACKUPS. Skipped while that binding is absent.
 // - Alerts: if a step fails, the backup is skipped, or (checked each Tuesday
@@ -37,6 +42,24 @@ export async function cleanup(env: Env) {
     (result) => result.meta.changes ?? 0,
   );
   return { sessions: sessions + ownerSessions, codes, log };
+}
+
+/** Tables from migrations/0007; kept apart so cleanup() runs without them. */
+export async function cleanupPhase2(env: Env) {
+  const [crashes, deliveries] = await env.DB.batch([
+    env.DB.prepare(
+      `DELETE FROM crash_reports WHERE created_at < strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-90 days')`,
+    ),
+    env.DB.prepare(
+      `DELETE FROM notice_deliveries WHERE notice_id IN (
+         SELECT id FROM release_notices
+          WHERE finished_at < strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-30 days'))`,
+    ),
+  ]);
+  return {
+    crashes: crashes!.meta.changes ?? 0,
+    deliveries: deliveries!.meta.changes ?? 0,
+  };
 }
 
 // Short-lived rows are left out: a restored site signs everyone in again.
@@ -133,6 +156,21 @@ export async function scheduled(controller: ScheduledController, env: Env) {
     console.log('cleanup', await cleanup(env));
   } catch (error) {
     await alert(env, `Dọn dữ liệu hằng ngày thất bại: ${describe(error)}`);
+  }
+  try {
+    console.log('cleanup phase 2', await cleanupPhase2(env));
+    const notices = await deliverNotices(env);
+    console.log('release notices', notices);
+    if ('failed' in notices)
+      await alert(
+        env,
+        `Resend từ chối gửi email báo bản mới (thông báo #${notices.failed}); sẽ thử lại ở lần chạy sau.`,
+      );
+  } catch (error) {
+    await alert(
+      env,
+      `Dọn báo lỗi app hoặc gửi email bản mới thất bại (đã chạy migration 0007 chưa?): ${describe(error)}`,
+    );
   }
   if (when.getUTCDay() === 0) {
     try {

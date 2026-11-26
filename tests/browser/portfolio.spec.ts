@@ -22,6 +22,8 @@ const routes = [
   '/en/pet-desktop/feedback',
   '/user/login',
   '/en/user/login',
+  '/user/unsubscribe',
+  '/en/user/unsubscribe',
   '/privacy',
   '/en/privacy',
 ];

@@ -162,6 +162,19 @@ user:
   deleteConfirm: Permanently delete your account and all your comments?
   deleted: Your account was deleted.
   failed: That did not work, please try again.
+updates:
+  projectLink: Email me about new versions
+  title: New version emails
+  intro: Choose the projects you want an email about when a new version is released. Emails go to this account's address, in the language of the page you are on when you choose.
+  note: Every email has an unsubscribe link. Unticking a project here also stops them at once.
+  saved: Saved.
+  failed: That did not save, please try again.
+  unsubscribeTitle: Stop new version emails
+  unsubscribeIntro: Press the button below to stop getting new version emails for the project in the email you received.
+  unsubscribeButton: Unsubscribe
+  unsubscribed: Done. You will not get new version emails for {project} any more.
+  unsubscribeInvalid: This unsubscribe link is wrong or has already been used.
+  manage: Manage new version emails on your account page
 downloads:
   count: '{n} downloads'
   source: Installer and portable downloads from GitHub Releases, updated every minute.

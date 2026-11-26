@@ -1,15 +1,23 @@
 ---
 import Base from '../layouts/Base.astro';
 import Logo from './Logo.astro';
-import { getUi, pathFor, type Locale } from '../lib/content';
+import { getUi, listProjects, pathFor, type Locale } from '../lib/content';
 import { privacyPath, userPath } from '../lib/community';
 interface Props {
   locale: Locale;
-  mode: 'login' | 'account';
+  mode: 'login' | 'account' | 'unsubscribe';
 }
 const { locale, mode } = Astro.props;
-const t = (await getUi(locale)).user;
-const title = mode === 'login' ? t.loginTitle : t.accountTitle;
+const ui = await getUi(locale);
+const t = ui.user;
+const u = ui.updates;
+const title =
+  mode === 'login'
+    ? t.loginTitle
+    : mode === 'unsubscribe'
+      ? u.unsubscribeTitle
+      : t.accountTitle;
+const projects = await listProjects(locale);
 // Public by design; the matching secret lives in the Worker.
 const siteKey: string =
   import.meta.env.PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
@@ -30,10 +38,21 @@ const siteKey: string =
     data-account={userPath(locale, 'account')}
     data-home={pathFor(locale)}
     data-sitekey={siteKey}
-    data-copy={JSON.stringify(t)}
+    data-copy={JSON.stringify({ ...t, updates: u })}
   >
-    {mode === 'account' && <h1>{title}</h1>}
-    {mode === 'login' ? (
+    {mode !== 'login' && <h1>{title}</h1>}
+    {mode === 'unsubscribe' ? (
+      <section class="user-card" data-unsubscribe>
+        <p>{u.unsubscribeIntro}</p>
+        <button class="button" type="button" data-unsubscribe-button>
+          {u.unsubscribeButton}
+        </button>
+        <p class="form-status" data-unsubscribe-status role="status" />
+        <p>
+          <a href={userPath(locale, 'account')}>{u.manage}</a>
+        </p>
+      </section>
+    ) : mode === 'login' ? (
       <section class="login-card" aria-labelledby="login-heading">
         <Logo class="login-mark" />
         <h1 id="login-heading">{t.loginHeading}</h1>
@@ -145,6 +164,25 @@ const siteKey: string =
             {t.signOut}
           </button>
         </section>
+        <section
+          class="user-card"
+          id="updates"
+          aria-labelledby="updates-heading"
+        >
+          <h2 id="updates-heading">{u.title}</h2>
+          <p>{u.intro}</p>
+          <fieldset class="update-list" data-updates disabled>
+            <legend class="sr-only">{u.title}</legend>
+            {projects.map(({ data }) => (
+              <label>
+                <input type="checkbox" value={data.slug} />
+                {data.title}
+              </label>
+            ))}
+          </fieldset>
+          <p class="field-hint">{u.note}</p>
+          <p class="form-status" data-updates-status role="status" />
+        </section>
         <section class="user-card danger-zone" aria-labelledby="delete-heading">
           <h2 id="delete-heading">{t.deleteTitle}</h2>
           <p>{t.deleteIntro}</p>
@@ -164,6 +202,7 @@ const siteKey: string =
     type Copy = { [key: string]: string } & {
       errors: Record<string, string>;
       emailErrors: Record<string, string>;
+      updates: Record<string, string>;
     };
     const copy = JSON.parse(root.dataset.copy ?? '{}') as Copy;
     const locale = root.dataset.locale!;
@@ -175,7 +214,43 @@ const siteKey: string =
       .then((response) => (response.ok ? response.json() : { user: null }))
       .catch(() => ({ user: null, providers: {} }));
 
-    if (root.dataset.userPage === 'login') {
+    if (root.dataset.userPage === 'unsubscribe') {
+      const button = root.querySelector<HTMLButtonElement>(
+        '[data-unsubscribe-button]',
+      )!;
+      const status = root.querySelector<HTMLElement>(
+        '[data-unsubscribe-status]',
+      )!;
+      // From the email link /user/unsubscribe#<token>; the part after # is
+      // never sent to the server or to page analytics.
+      const token = decodeURIComponent(location.hash.slice(1));
+      if (!token) {
+        button.hidden = true;
+        status.textContent = copy.updates.unsubscribeInvalid;
+      }
+      button.addEventListener('click', async () => {
+        button.disabled = true;
+        const response = await fetch('/api/subscriptions/unsubscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, locale }),
+        }).catch(() => null);
+        const data = response ? await response.json().catch(() => ({})) : {};
+        if (response?.ok) {
+          button.hidden = true;
+          status.textContent = copy.updates.unsubscribed.replace(
+            '{project}',
+            data.title ?? '',
+          );
+        } else if (response?.status === 404 || response?.status === 400) {
+          button.hidden = true;
+          status.textContent = copy.updates.unsubscribeInvalid;
+        } else {
+          button.disabled = false;
+          status.textContent = copy.updates.failed;
+        }
+      });
+    } else if (root.dataset.userPage === 'login') {
       const error = root.querySelector<HTMLElement>('[data-error]')!;
       const google = root.querySelector<HTMLAnchorElement>('[data-google]')!;
       const code = params.get('error');
@@ -333,13 +408,55 @@ const siteKey: string =
       const input = form.querySelector<HTMLInputElement>('input')!;
       const status = form.querySelector<HTMLElement>('[data-status]')!;
       me.then((data) => {
-        if (!data.user) return location.replace(root.dataset.login!);
+        if (!data.user)
+          return location.replace(
+            `${root.dataset.login}?${new URLSearchParams({ return: location.pathname + location.hash })}`,
+          );
         root.querySelector('[data-email]')!.textContent = data.user.email;
         input.value = data.user.displayName;
         if (data.user.owner)
           root.querySelector<HTMLElement>('[data-admin]')!.hidden = false;
         body.hidden = false;
+        setupUpdates();
       });
+
+      // New version emails: one checkbox per project, saved on change.
+      async function setupUpdates() {
+        const list =
+          root!.querySelector<HTMLFieldSetElement>('[data-updates]')!;
+        const status = root!.querySelector<HTMLElement>(
+          '[data-updates-status]',
+        )!;
+        const response = await fetch('/api/subscriptions').catch(() => null);
+        if (!response?.ok) {
+          status.textContent = copy.updates.failed;
+          return;
+        }
+        const { projects } = (await response.json()) as { projects: string[] };
+        for (const box of list.querySelectorAll<HTMLInputElement>('input'))
+          box.checked = projects.includes(box.value);
+        list.disabled = false;
+        list.addEventListener('change', async (event) => {
+          const box = event.target as HTMLInputElement;
+          box.disabled = true;
+          const saved = await fetch('/api/subscriptions', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              project: box.value,
+              subscribed: box.checked,
+              locale,
+            }),
+          }).catch(() => null);
+          if (!saved?.ok) box.checked = !box.checked;
+          status.textContent = saved?.ok
+            ? copy.updates.saved
+            : copy.updates.failed;
+          box.disabled = false;
+        });
+        if (location.hash === '#updates')
+          root!.querySelector('#updates')?.scrollIntoView();
+      }
       form.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (!form.checkValidity()) return form.reportValidity();

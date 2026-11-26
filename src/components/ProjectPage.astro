@@ -17,7 +17,7 @@ import {
 } from '../lib/versions';
 import VersionList from './VersionList.astro';
 import Comments from './Comments.astro';
-import { feedbackPath } from '../lib/community';
+import { feedbackPath, userPath } from '../lib/community';
 import DownloadCounter from './DownloadCounter.astro';
 import DownloadStat from './DownloadStat.astro';
 interface Props {
@@ -25,7 +25,8 @@ interface Props {
 }
 const { project } = Astro.props;
 const { data } = project;
-const t = (await getUi(data.locale)).site;
+const ui = await getUi(data.locale);
+const t = ui.site;
 const versions = await listVersions(data.locale, data.slug);
 const v = versionCopy[data.locale];
 const latest = (
@@ -93,6 +94,10 @@ const poster =
           <a href={feedbackPath(data.locale, data.slug)}>
             <Icon name="message" />
             {v.feedback}
+          </a>
+          <a href={`${userPath(data.locale, 'account')}#updates`}>
+            <Icon name="mail" />
+            {ui.updates.projectLink}
           </a>
         </div>
         {data.downloadNote && (

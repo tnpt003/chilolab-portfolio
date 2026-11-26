@@ -1,307 +1,34 @@
 ---
+import { render } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import type { Locale } from '../lib/content';
-import { feedbackPath, userPath } from '../lib/community';
+import { getPrivacy, type Locale } from '../lib/content';
 interface Props {
   locale: Locale;
 }
 const { locale } = Astro.props;
-const vi = locale === 'vi';
-const updated = '2026-11-18';
-const feedback = feedbackPath(locale, 'pet-desktop');
-const account = userPath(locale, 'account');
+// Text lives in src/content/privacy/<locale>/{site,app}.md (CMS: Quyền riêng tư).
+const { site, app } = await getPrivacy(locale);
+const { Content: SiteContent } = await render(site);
+const { Content: AppContent } = await render(app);
+const { data } = site;
 ---
 
 <Base
-  title={vi ? 'Chính sách quyền riêng tư' : 'Privacy policy'}
-  description={
-    vi
-      ? 'ChiloLab và ứng dụng Desktop Pet thu thập dữ liệu gì, vì sao, lưu ở đâu và cách xóa.'
-      : 'What ChiloLab and the Desktop Pet app collect, why, where it is stored and how to delete it.'
-  }
+  title={data.title}
+  description={data.description!}
   locale={locale}
   slug="privacy"
 >
   <article class="wrap prose privacy-page">
-    <h1>{vi ? 'Chính sách quyền riêng tư' : 'Privacy policy'}</h1>
-    <p class="lead">
-      {vi
-        ? 'ChiloLab là website cá nhân của Nguyễn Tấn Phát. Trang này mô tả đúng những gì website lưu lại, và cách ứng dụng Desktop Pet dùng dữ liệu.'
-        : 'ChiloLab is the personal website of Nguyễn Tấn Phát. This page describes exactly what the website stores, and how the Desktop Pet app handles data.'}
-    </p>
+    <h1>{data.title}</h1>
+    <p class="lead">{data.lead}</p>
     <p>
-      {vi ? 'Cập nhật lần cuối:' : 'Last updated:'}
-      <time datetime={updated}>{updated}</time>
+      {data.updatedLabel}
+      <time datetime={data.updated}>{data.updated}</time>
     </p>
-
-    {vi ? (
-      <>
-        <h2>Dữ liệu được lưu</h2>
-        <ul>
-          <li>
-            <strong>Tài khoản:</strong> khi đăng nhập bằng Google, website nhận
-            mã tài khoản Google, email và tên của bạn. Tên hiển thị có thể đổi
-            trong trang tài khoản. Website không nhận mật khẩu Google. Khi đăng
-            nhập bằng email, website lưu email của bạn; mã 6 số chỉ được lưu
-            dạng mã băm và hết hạn sau 10 phút. Website không dùng mật khẩu.
-          </li>
-          <li>
-            <strong>Bình luận:</strong> nội dung, thời gian, trang hoặc phiên
-            bản bạn bình luận. Bình luận hiện công khai kèm tên hiển thị; email
-            không bao giờ hiện công khai.
-          </li>
-          <li>
-            <strong>Góp ý và báo lỗi:</strong> nội dung bạn gửi, phiên bản ứng
-            dụng, phiên bản Windows và cách liên hệ nếu bạn tự điền. Chỉ chủ
-            website đọc được.
-          </li>
-          <li>
-            <strong>Lượt tải:</strong> chỉ một bộ đếm theo ngày cho từng tệp,
-            không kèm thông tin về người tải.
-          </li>
-        </ul>
-        <h2>Cookie</h2>
-        <p>
-          Website chỉ dùng cookie để giữ đăng nhập: một cookie phiên (30 ngày)
-          khi bạn đăng nhập và một cookie tạm (10 phút) trong lúc đăng nhập bằng
-          Google. Không có cookie quảng cáo hay theo dõi.
-        </p>
-        <h2>Kiểm duyệt tự động</h2>
-        <p>
-          Nội dung bình luận được kiểm tra tự động (danh sách từ và mô hình AI
-          của Cloudflare Workers AI) để phát hiện ngôn từ xúc phạm, spam. Bình
-          luận bị phát hiện được giữ lại cho chủ website xem xét trước khi hiện.
-        </p>
-        <h2>Bên xử lý dữ liệu</h2>
-        <ul>
-          <li>
-            <strong>Cloudflare:</strong> lưu trữ website và cơ sở dữ liệu, chống
-            spam cho form góp ý (Turnstile), kiểm duyệt bình luận (Workers AI),
-            thống kê lượt xem trang (Web Analytics — không dùng cookie, không
-            theo dõi từng người).
-          </li>
-          <li>
-            <strong>Google:</strong> xác minh đăng nhập khi bạn chọn “Tiếp tục
-            với Google”.
-          </li>
-          <li>
-            <strong>Resend:</strong> gửi email chứa mã đăng nhập tới địa chỉ bạn
-            nhập.
-          </li>
-        </ul>
-        <p>
-          Địa chỉ IP được dùng tạm thời để giới hạn số lần gửi và chống spam;
-          ChiloLab không lưu địa chỉ IP vào cơ sở dữ liệu.
-        </p>
-        <h2>Thời gian lưu và cách xóa</h2>
-        <ul>
-          <li>Bạn có thể sửa hoặc xóa bình luận của mình bất cứ lúc nào.</li>
-          <li>
-            Xóa tài khoản trong <a href={account}>trang tài khoản</a> sẽ xóa
-            tên, email và nội dung mọi bình luận của bạn ngay lập tức.
-          </li>
-          <li>
-            Góp ý được giữ đến khi chủ website xử lý xong rồi xóa. Muốn xóa sớm
-            hoặc có câu hỏi, hãy gửi qua <a href={feedback}>trang góp ý</a>.
-          </li>
-        </ul>
-
-        <h2 id="desktop-pet">Ứng dụng Desktop Pet</h2>
-        <p>
-          Phần này nói về ứng dụng Desktop Pet cài trên máy Windows, không phải
-          website. Điều khoản đầy đủ nằm trong tệp EULA.txt cạnh DesktopPet.exe.
-        </p>
-        <h3>Ở lại trên máy</h3>
-        <ul>
-          <li>
-            Cài đặt, tên mèo, nông trại, nhật ký và tiến trình trận lưu ở
-            <code>%LOCALAPPDATA%\DesktopPet</code>. Không có tài khoản, quảng
-            cáo hay analytics.
-          </li>
-          <li>
-            Phần AI là chương trình Python chạy ngay trên máy, không gửi gì ra
-            ngoài.
-          </li>
-          <li>
-            Mèo đi trên cửa sổ chỉ đọc vị trí và kích thước cửa sổ, không đọc
-            nội dung. Thời tiết chỉ đọc màu của ảnh nền thu nhỏ, không lưu và
-            không gửi đi.
-          </li>
-        </ul>
-        <h3>Kiểm tra cập nhật</h3>
-        <p>
-          Bản cài hỏi GitHub Releases xem có bản mới không. GitHub nhận được địa
-          chỉ IP của máy như mọi lượt tải trang web. Bạn có thể tắt tự cập nhật
-          trong Cài đặt → Chung.
-        </p>
-        <h3>Chơi qua mạng (Epic Online Services)</h3>
-        <p>Áp dụng cho các bản có tính năng Chơi qua mạng.</p>
-        <ul>
-          <li>Chỉ kết nối khi bạn bấm “Mời bạn” hoặc “Vào phòng”.</li>
-          <li>
-            Chỉ gửi: mã phòng, phiên bản game, tên và màu lông mèo, dữ liệu Trận
-            chung (vũ khí, kỹ năng, thao tác, vị trí mèo trong trận).
-          </li>
-          <li>
-            Không bao giờ gửi: tên người dùng Windows, nội dung hay danh sách
-            cửa sổ, ảnh nền, tệp, nông trại, cài đặt.
-          </li>
-          <li>
-            Đăng nhập bằng mã thiết bị ẩn danh của EOS (Device ID), không cần
-            tài khoản Epic. Mặc định đi qua máy chủ chuyển tiếp của Epic nên hai
-            máy không thấy IP của nhau.
-          </li>
-          <li>
-            Thư viện EOS gửi cho Epic số liệu chất lượng dịch vụ (mã phiên ngẫu
-            nhiên, số lần gọi, độ trễ, mã lỗi); dữ liệu có thể được xử lý ở Hoa
-            Kỳ. Xem{' '}
-            <a href="https://www.epicgames.com/site/privacypolicy">
-              chính sách quyền riêng tư của Epic
-            </a>
-            .
-          </li>
-        </ul>
-        <p>
-          Câu hỏi về ứng dụng: gửi qua <a href={feedback}>trang góp ý</a>.
-        </p>
-      </>
-    ) : (
-      <>
-        <h2>What is stored</h2>
-        <ul>
-          <li>
-            <strong>Account:</strong> when you sign in with Google, the website
-            receives your Google account ID, email and name. You can change your
-            display name on the account page. The website never sees your Google
-            password. When you sign in by email, the website stores your email;
-            the 6-digit code is stored only as a hash and expires after 10
-            minutes. There are no passwords.
-          </li>
-          <li>
-            <strong>Comments:</strong> the text, time, and the page or version
-            you commented on. Comments are public with your display name; your
-            email is never shown.
-          </li>
-          <li>
-            <strong>Feedback and bug reports:</strong> what you send, the app
-            version, the Windows version and a contact if you add one. Only the
-            site owner can read them.
-          </li>
-          <li>
-            <strong>Downloads:</strong> only a daily counter per file, with no
-            information about who downloaded.
-          </li>
-        </ul>
-        <h2>Cookies</h2>
-        <p>
-          Cookies are used only to keep you signed in: a session cookie (30
-          days) once you sign in and a temporary cookie (10 minutes) during
-          Google sign-in. There are no advertising or tracking cookies.
-        </p>
-        <h2>Automatic moderation</h2>
-        <p>
-          Comment text is checked automatically (a word list and an AI model on
-          Cloudflare Workers AI) for abusive language and spam. Flagged comments
-          are held for the site owner to review before they appear.
-        </p>
-        <h2>Processors</h2>
-        <ul>
-          <li>
-            <strong>Cloudflare:</strong> hosting and database, spam protection
-            for the feedback form (Turnstile), comment moderation (Workers AI),
-            page view statistics (Web Analytics — no cookies, no tracking of
-            individuals).
-          </li>
-          <li>
-            <strong>Google:</strong> confirms your identity when you choose
-            “Continue with Google”.
-          </li>
-          <li>
-            <strong>Resend:</strong> delivers the email with your sign-in code
-            to the address you enter.
-          </li>
-        </ul>
-        <p>
-          IP addresses are used briefly to limit how often you can post and to
-          stop spam; ChiloLab does not store IP addresses in its database.
-        </p>
-        <h2>Retention and deletion</h2>
-        <ul>
-          <li>You can edit or delete your comments at any time.</li>
-          <li>
-            Deleting your account on the <a href={account}>account page</a>{' '}
-            immediately removes your name, email and the text of all your
-            comments.
-          </li>
-          <li>
-            Feedback is kept until the owner has handled and deleted it. To have
-            it removed sooner, or for any question, use the{' '}
-            <a href={feedback}>feedback page</a>.
-          </li>
-        </ul>
-
-        <h2 id="desktop-pet">The Desktop Pet app</h2>
-        <p>
-          This section covers the Desktop Pet app installed on Windows, not the
-          website. The full terms are in EULA.txt beside DesktopPet.exe.
-        </p>
-        <h3>Stays on your computer</h3>
-        <ul>
-          <li>
-            Settings, the cat's name, the farm, the diary and battle progress
-            are kept in <code>%LOCALAPPDATA%\DesktopPet</code>. No accounts, ads
-            or analytics.
-          </li>
-          <li>
-            The AI is a Python program running on your computer; it sends
-            nothing out.
-          </li>
-          <li>
-            Walking on windows reads only window positions and sizes, never
-            their contents. The weather reads only the colours of a small copy
-            of the wallpaper, never stored or sent.
-          </li>
-        </ul>
-        <h3>Update checks</h3>
-        <p>
-          The installed app asks GitHub Releases for a newer version; GitHub
-          sees your IP address as with any web request. Automatic updates can be
-          switched off in Settings → General.
-        </p>
-        <h3>Playing online (Epic Online Services)</h3>
-        <p>Applies to releases that include online play.</p>
-        <ul>
-          <li>
-            The app connects only when you press “Invite a friend” or “Join”.
-          </li>
-          <li>
-            Only these are sent: the room code, the game version, the cat's name
-            and coat, and the co-op battle's data (weapon, skills, what you do,
-            where your cat is in the battle).
-          </li>
-          <li>
-            Never sent: your Windows user name, window contents or lists,
-            wallpaper, files, the farm, settings.
-          </li>
-          <li>
-            Sign-in uses an anonymous EOS device identifier (Device ID); no Epic
-            account is needed. By default traffic goes through Epic's relay, so
-            neither side sees the other's IP address.
-          </li>
-          <li>
-            The EOS library sends Epic service-quality data (a random session
-            id, call counts, latency, error codes); data may be processed in the
-            United States. See{' '}
-            <a href="https://www.epicgames.com/site/privacypolicy">
-              Epic's privacy policy
-            </a>
-            .
-          </li>
-        </ul>
-        <p>
-          Questions about the app: use the <a href={feedback}>feedback page</a>.
-        </p>
-      </>
-    )}
+    <SiteContent />
+    {/* The app's EULA links to this anchor; keep the id. */}
+    <h2 id="desktop-pet">{app.data.title}</h2>
+    <AppContent />
   </article>
 </Base>

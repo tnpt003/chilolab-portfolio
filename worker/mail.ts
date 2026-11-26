@@ -14,6 +14,46 @@ const escape = (value: string) =>
 
 export const mailEnabled = (env: Env) => Boolean(env.RESEND_API_KEY);
 
+const toHtml = (lines: string[]) =>
+  `<div style="font:15px/1.6 system-ui,sans-serif;color:#184b58">${lines
+    .map((line) => `<p>${escape(line).replace(/\n/g, '<br>')}</p>`)
+    .join('')}</div>`;
+
+export type Mail = {
+  to: string;
+  subject: string;
+  lines: string[];
+  headers?: Record<string, string>;
+};
+
+/**
+ * Up to 100 separate emails in one Resend call (each recipient sees only
+ * their own address). All or nothing: false means none was sent.
+ */
+export async function sendBatch(env: Env, mails: Mail[]) {
+  if (!env.RESEND_API_KEY || !mails.length || mails.length > 100) return false;
+  const response = await fetch('https://api.resend.com/emails/batch', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${env.RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(
+      mails.map((mail) => ({
+        from: env.MAIL_FROM,
+        to: [mail.to],
+        subject: mail.subject,
+        text: mail.lines.join('\n\n'),
+        html: toHtml(mail.lines),
+        ...(mail.headers && { headers: mail.headers }),
+      })),
+    ),
+  });
+  if (!response.ok)
+    console.error('batch mail failed', response.status, await response.text());
+  return response.ok;
+}
+
 export async function sendMail(
   env: Env,
   to: string,
@@ -21,9 +61,7 @@ export async function sendMail(
   lines: string[],
 ) {
   if (!env.RESEND_API_KEY) return false;
-  const html = `<div style="font:15px/1.6 system-ui,sans-serif;color:#184b58">${lines
-    .map((line) => `<p>${escape(line).replace(/\n/g, '<br>')}</p>`)
-    .join('')}</div>`;
+  const html = toHtml(lines);
   const response = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {

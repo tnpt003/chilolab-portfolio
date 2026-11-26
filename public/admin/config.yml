@@ -1012,6 +1012,84 @@ collections:
           - { label: Tiêu đề mục Liên hệ, name: contactTitle, widget: string }
           - { label: Lời mời liên hệ, name: contactText, widget: text }
 
+  # ---------- Chính sách quyền riêng tư (/privacy) ----------
+  - name: privacy
+    label: Quyền riêng tư / Privacy
+    description: 'Trang /privacy và /en/privacy. Phần "Website" và phần "Ứng dụng" (hiện dưới mục #desktop-pet, nơi EULA của app trỏ tới). Sửa nội dung thì đổi "Ngày cập nhật" ở cả hai ngôn ngữ cho giống nhau. Thu thập loại dữ liệu mới thì cập nhật trang này trước (docs/DATA-ROADMAP.md).'
+    files:
+      - name: privacy_site_vi
+        label: Website (VI)
+        file: /src/content/privacy/vi/site.md
+        fields:
+          - { name: locale, widget: hidden, default: vi }
+          - { name: part, widget: hidden, default: site }
+          - { label: Tiêu đề trang, name: title, widget: string }
+          - {
+              label: Mô tả cho Google (meta description),
+              name: description,
+              widget: text,
+            }
+          - { label: Đoạn mở đầu, name: lead, widget: text }
+          - {
+              label: 'Chữ trước ngày cập nhật',
+              name: updatedLabel,
+              widget: string,
+            }
+          - label: Ngày cập nhật
+            name: updated
+            widget: datetime
+            type: date
+            picker_utc: true
+            hint: Giống nhau ở bản VI và EN; build báo lỗi nếu khác.
+          - { label: Nội dung, name: body, widget: markdown }
+      - name: privacy_app_vi
+        label: Ứng dụng Desktop Pet (VI)
+        file: /src/content/privacy/vi/app.md
+        fields:
+          - { name: locale, widget: hidden, default: vi }
+          - { name: part, widget: hidden, default: app }
+          - {
+              label: Tiêu đề mục,
+              name: title,
+              widget: string,
+              hint: 'Hiện như một mục lớn có neo #desktop-pet. Phần này phải khớp với EULA.txt trong app.',
+            }
+          - { label: Nội dung, name: body, widget: markdown }
+      - name: privacy_site_en
+        label: Website (EN)
+        file: /src/content/privacy/en/site.md
+        fields:
+          - { name: locale, widget: hidden, default: en }
+          - { name: part, widget: hidden, default: site }
+          - { label: Page title, name: title, widget: string }
+          - { label: Meta description, name: description, widget: text }
+          - { label: Intro, name: lead, widget: text }
+          - {
+              label: 'Text before the date',
+              name: updatedLabel,
+              widget: string,
+            }
+          - label: Last updated
+            name: updated
+            widget: datetime
+            type: date
+            picker_utc: true
+            hint: Same as the VI file; the build fails if they differ.
+          - { label: Body, name: body, widget: markdown }
+      - name: privacy_app_en
+        label: Desktop Pet app (EN)
+        file: /src/content/privacy/en/app.md
+        fields:
+          - { name: locale, widget: hidden, default: en }
+          - { name: part, widget: hidden, default: app }
+          - {
+              label: Section title,
+              name: title,
+              widget: string,
+              hint: 'Shown as a section with the #desktop-pet anchor. Must match EULA.txt in the app.',
+            }
+          - { label: Body, name: body, widget: markdown }
+
   # ---------- Chữ giao diện: trang chủ, menu, footer, bình luận, góp ý ----------
   - name: ui
     label: Chữ giao diện
@@ -1975,6 +2053,83 @@ collections:
                   name: 'failed',
                   widget: string,
                   hint: 'VD (VI): Chưa thực hiện được, vui lòng thử lại.',
+                }
+          - label: 'Email báo bản mới, hủy nhận'
+            name: updates
+            widget: object
+            collapsed: true
+            fields:
+              - {
+                  label: 'projectLink',
+                  name: 'projectLink',
+                  widget: string,
+                  hint: 'VD (VI): Nhận email khi có bản mới',
+                }
+              - {
+                  label: 'title',
+                  name: 'title',
+                  widget: string,
+                  hint: 'VD (VI): Email báo bản mới',
+                }
+              - {
+                  label: 'intro',
+                  name: 'intro',
+                  widget: text,
+                  hint: 'VD (VI): Chọn dự án bạn muốn nhận email khi có bản phát hành mới. Email gửi tới địa chỉ của tài khoản này, bằng ngôn ngữ của trang bạn đang xem lúc chọn.',
+                }
+              - {
+                  label: 'note',
+                  name: 'note',
+                  widget: text,
+                  hint: 'VD (VI): Mỗi email có link hủy nhận. Bỏ chọn ở đây cũng hủy ngay.',
+                }
+              - {
+                  label: 'saved',
+                  name: 'saved',
+                  widget: string,
+                  hint: 'VD (VI): Đã lưu lựa chọn.',
+                }
+              - {
+                  label: 'failed',
+                  name: 'failed',
+                  widget: string,
+                  hint: 'VD (VI): Chưa lưu được, vui lòng thử lại.',
+                }
+              - {
+                  label: 'unsubscribeTitle',
+                  name: 'unsubscribeTitle',
+                  widget: string,
+                  hint: 'VD (VI): Hủy nhận email bản mới',
+                }
+              - {
+                  label: 'unsubscribeIntro',
+                  name: 'unsubscribeIntro',
+                  widget: text,
+                  hint: 'VD (VI): Bấm nút dưới đây để không nhận email báo bản mới của dự án trong email bạn vừa nhận nữa.',
+                }
+              - {
+                  label: 'unsubscribeButton',
+                  name: 'unsubscribeButton',
+                  widget: string,
+                  hint: 'VD (VI): Hủy nhận email',
+                }
+              - {
+                  label: 'unsubscribed',
+                  name: 'unsubscribed',
+                  widget: text,
+                  hint: 'VD (VI): Đã hủy. Bạn sẽ không nhận email báo bản mới của {project} nữa.',
+                }
+              - {
+                  label: 'unsubscribeInvalid',
+                  name: 'unsubscribeInvalid',
+                  widget: string,
+                  hint: 'VD (VI): Link hủy không đúng hoặc đã được dùng rồi.',
+                }
+              - {
+                  label: 'manage',
+                  name: 'manage',
+                  widget: string,
+                  hint: 'VD (VI): Quản lý email bản mới trong trang tài khoản',
                 }
           - label: 'Số lượt tải'
             name: downloads
@@ -2951,6 +3106,83 @@ collections:
                   name: 'failed',
                   widget: string,
                   hint: 'VD (VI): Chưa thực hiện được, vui lòng thử lại.',
+                }
+          - label: 'Email báo bản mới, hủy nhận'
+            name: updates
+            widget: object
+            collapsed: true
+            fields:
+              - {
+                  label: 'projectLink',
+                  name: 'projectLink',
+                  widget: string,
+                  hint: 'VD (VI): Nhận email khi có bản mới',
+                }
+              - {
+                  label: 'title',
+                  name: 'title',
+                  widget: string,
+                  hint: 'VD (VI): Email báo bản mới',
+                }
+              - {
+                  label: 'intro',
+                  name: 'intro',
+                  widget: text,
+                  hint: 'VD (VI): Chọn dự án bạn muốn nhận email khi có bản phát hành mới. Email gửi tới địa chỉ của tài khoản này, bằng ngôn ngữ của trang bạn đang xem lúc chọn.',
+                }
+              - {
+                  label: 'note',
+                  name: 'note',
+                  widget: text,
+                  hint: 'VD (VI): Mỗi email có link hủy nhận. Bỏ chọn ở đây cũng hủy ngay.',
+                }
+              - {
+                  label: 'saved',
+                  name: 'saved',
+                  widget: string,
+                  hint: 'VD (VI): Đã lưu lựa chọn.',
+                }
+              - {
+                  label: 'failed',
+                  name: 'failed',
+                  widget: string,
+                  hint: 'VD (VI): Chưa lưu được, vui lòng thử lại.',
+                }
+              - {
+                  label: 'unsubscribeTitle',
+                  name: 'unsubscribeTitle',
+                  widget: string,
+                  hint: 'VD (VI): Hủy nhận email bản mới',
+                }
+              - {
+                  label: 'unsubscribeIntro',
+                  name: 'unsubscribeIntro',
+                  widget: text,
+                  hint: 'VD (VI): Bấm nút dưới đây để không nhận email báo bản mới của dự án trong email bạn vừa nhận nữa.',
+                }
+              - {
+                  label: 'unsubscribeButton',
+                  name: 'unsubscribeButton',
+                  widget: string,
+                  hint: 'VD (VI): Hủy nhận email',
+                }
+              - {
+                  label: 'unsubscribed',
+                  name: 'unsubscribed',
+                  widget: text,
+                  hint: 'VD (VI): Đã hủy. Bạn sẽ không nhận email báo bản mới của {project} nữa.',
+                }
+              - {
+                  label: 'unsubscribeInvalid',
+                  name: 'unsubscribeInvalid',
+                  widget: string,
+                  hint: 'VD (VI): Link hủy không đúng hoặc đã được dùng rồi.',
+                }
+              - {
+                  label: 'manage',
+                  name: 'manage',
+                  widget: string,
+                  hint: 'VD (VI): Quản lý email bản mới trong trang tài khoản',
                 }
           - label: 'Số lượt tải'
             name: downloads

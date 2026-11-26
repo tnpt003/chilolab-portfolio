@@ -402,6 +402,20 @@ const ui = defineCollection({
       deleted: line,
       failed: line,
     }),
+    updates: z.object({
+      projectLink: line,
+      title: line,
+      intro: line,
+      note: line,
+      saved: line,
+      failed: line,
+      unsubscribeTitle: line,
+      unsubscribeIntro: line,
+      unsubscribeButton: line,
+      unsubscribed: line,
+      unsubscribeInvalid: line,
+      manage: line,
+    }),
     downloads: z.object({
       count: line,
       source: line,
@@ -409,4 +423,40 @@ const ui = defineCollection({
   }),
 });
 
-export const collections = { projects, versions, profile, ui };
+// The privacy policy (/privacy), edited in the CMS: per locale a site part
+// (title, intro, date) and an app part shown under #desktop-pet, the section
+// the app's EULA points to. src/content/privacy/<locale>/<part>.md.
+const privacy = defineCollection({
+  loader: glob({
+    pattern: '**/*.md',
+    base: './src/content/privacy',
+    generateId: ({ entry }) => entry.replace(/\.md$/, ''),
+  }),
+  schema: z
+    .object({
+      locale: z.enum(['vi', 'en']),
+      part: z.enum(['site', 'app']),
+      title: line,
+      description: line.optional(),
+      lead: line.optional(),
+      updatedLabel: line.optional(),
+      updated: z.preprocess(
+        (value) =>
+          value instanceof Date ? value.toISOString().slice(0, 10) : value,
+        z.iso.date().optional(),
+      ),
+    })
+    .superRefine((data, ctx) => {
+      if (
+        data.part === 'site' &&
+        !(data.description && data.lead && data.updatedLabel && data.updated)
+      )
+        ctx.addIssue({
+          code: 'custom',
+          message:
+            'The site part needs description, lead, updatedLabel and updated.',
+        });
+    }),
+});
+
+export const collections = { projects, versions, profile, ui, privacy };

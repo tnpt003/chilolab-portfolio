@@ -4,14 +4,16 @@ Thiết lập Cloudflare, Google, Resend, Email Routing từng bước: [SETUP-C
 
 Nội dung do chủ site viết (dự án, phiên bản) vẫn là Markdown và sửa qua CMS ([CMS.md](CMS.md)). D1 chỉ chứa dữ liệu **khách truy cập** tạo ra:
 
-| Tính năng                | Bảng                | Ở đâu                                                         |
-| ------------------------ | ------------------- | ------------------------------------------------------------- |
-| Tài khoản khách (Google) | `users`, `sessions` | `/user/login`, `/user/account` (`/user` → `/user/login`)      |
-| Bình luận theo luồng     | `comments`          | Mỗi trang phiên bản; trang dự án gộp tất cả                   |
-| Góp ý / báo lỗi          | `feedback`          | `/<dự-án>/feedback`; đọc ở `/admin/manage/feedback`           |
-| Lượt bấm tải             | `downloads`         | Chỉ ở `/admin/manage/downloads`; một bộ đếm mỗi file mỗi ngày |
-| Nhật ký quản trị         | `admin_log`         | `/admin/manage/log` (chỉ chủ site)                            |
-| Cài đặt site             | `settings`          | `/admin/manage/settings` (chỉ chủ site)                       |
+| Tính năng                | Bảng                                                    | Ở đâu                                                          |
+| ------------------------ | ------------------------------------------------------- | -------------------------------------------------------------- |
+| Tài khoản khách (Google) | `users`, `sessions`                                     | `/user/login`, `/user/account` (`/user` → `/user/login`)       |
+| Bình luận theo luồng     | `comments`                                              | Mỗi trang phiên bản; trang dự án gộp tất cả                    |
+| Góp ý / báo lỗi          | `feedback`                                              | `/<dự-án>/feedback`; đọc ở `/admin/manage/feedback`            |
+| Lượt bấm tải             | `downloads`                                             | Chỉ ở `/admin/manage/downloads`; một bộ đếm mỗi file mỗi ngày  |
+| Nhật ký quản trị         | `admin_log`                                             | `/admin/manage/log` (chỉ chủ site)                             |
+| Cài đặt site             | `settings`                                              | `/admin/manage/settings` (chỉ chủ site)                        |
+| Email báo bản mới        | `subscriptions`, `release_notices`, `notice_deliveries` | Chọn ở `/user/account#updates`; gửi ở `/admin/manage/releases` |
+| Báo lỗi app (đang tắt)   | `crash_reports`                                         | `POST /api/crash-reports`; đọc ở `/admin/manage/crashes`       |
 
 Không lưu IP, user agent hay mật khẩu Google. Chính sách công khai: `/privacy`.
 
@@ -44,6 +46,8 @@ Giao diện cố ý khác hẳn trang khách: nền tối, điểm nhấn hổ p
 | `/admin/manage/feedback`       | Chưa xử lý / Đang xử lý / Đã xử lý; lọc dự án, loại; đổi trạng thái hàng loạt; ghi chú nội bộ; xóa                         |
 | `/admin/manage/users`          | Danh sách, tìm kiếm, tab Đã khóa                                                                                           |
 | `/admin/manage/users/<id>`     | Thông tin, bình luận, góp ý của một người; đăng xuất mọi nơi, khóa / mở khóa, xóa (không áp dụng cho owner)                |
+| `/admin/manage/releases`       | Email báo bản mới: số người đăng ký mỗi dự án, gửi email cho một bản đã phát hành, xem tiến độ, dừng gửi                   |
+| `/admin/manage/crashes`        | Báo lỗi app: chưa xem / đã xem, lọc dự án, xem stack trace, xóa                                                            |
 | `/admin/manage/downloads`      | Lượt tải thật từ GitHub Releases và lượt bấm tải trên site (theo phiên bản, 30 ngày)                                       |
 | `/admin/manage/settings?tab=…` | Tab Bình luận (bật/tắt, kiểm duyệt, từ chặn, độ dài tối đa, số bình luận/giờ), Góp ý, Tài khoản, Email thông báo           |
 | `/admin/manage/log`            | Nhật ký quản trị (bảng `admin_log`): ai làm gì, lúc nào; không lưu IP; tự xóa sau một năm                                  |
@@ -55,6 +59,18 @@ Thao tác xóa / gỡ / khóa luôn qua trang xác nhận liệt kê các mục 
 Cài đặt (`worker/settings.ts`, bảng `settings`): thiếu dòng hoặc chưa chạy migration → dùng mặc định (mọi thứ bật, kiểm duyệt AI, 2000 ký tự, không giới hạn theo giờ, email báo bình luận bị giữ bật, email báo góp ý tắt). Kiểm duyệt "Giữ tất cả" gắn lý do `manual`; từ bị chặn thêm gắn lý do `blocked`. Tắt "tài khoản mới" thì Google và mã email đều từ chối email chưa có tài khoản (`registration_closed`). Giới hạn độ dài và số bình luận/giờ không áp dụng cho owner (lỗi API: `too_long`, `hourly_limit`).
 
 Khóa tài khoản (`users.blocked_at`): xóa mọi phiên, đăng nhập bị từ chối (`blocked`), phiên cũ không còn hợp lệ; bình luận và góp ý vẫn giữ. Owner không khóa hay xóa được từ trang quản trị, và quyền owner chỉ đặt bằng lệnh SQL ở trên.
+
+## Email báo bản mới
+
+- Chỉ người đã đăng nhập mới đăng ký được (email đã được Google hoặc mã 6 số xác minh), ở `/user/account#updates`: mỗi dự án một ô chọn, lưu ngay. Trang dự án có link "Nhận email khi có bản mới" tới đó. Ngôn ngữ email là ngôn ngữ của trang lúc chọn.
+- Chủ site gửi ở `/admin/manage/releases`: chỉ bản `status: released`, không nháp (đọc từ `/releases.json`, tạo lúc build). Một bản chỉ gửi được một lần (`release_notices` có `UNIQUE (project, version)`).
+- Gửi qua Resend batch API, mỗi người một email riêng, tối đa **80 email/ngày** (`NOTICE_DAILY` trong `worker/releases.ts`; 20 còn lại của hạn mức 100/ngày để dành cho mã đăng nhập và cảnh báo). Phần còn lại được cron 02:00 gửi tiếp hôm sau. `notice_deliveries` ghi ai đã nhận, nên gửi lại không bị trùng; bảng này tự xóa 30 ngày sau khi gửi xong.
+- Mỗi email có link `/user/unsubscribe#<token>` (token sau dấu `#` nên không vào log hay thống kê) và header `List-Unsubscribe` + `List-Unsubscribe-Post` để Gmail/Outlook hiện nút hủy một chạm (`POST /api/subscriptions/unsubscribe?token=…`). Token chỉ hủy được đúng một đăng ký, không đăng nhập được.
+- Xóa tài khoản (tự xóa hoặc chủ site xóa) xóa luôn đăng ký. Tài khoản bị khóa không nhận email.
+
+## Báo lỗi app
+
+Phía server đã có, **đang tắt** (setting `crashReports`). Giao thức cho app, điều kiện để bật và bản nháp cho /privacy + EULA: [CRASH-REPORTS.md](CRASH-REPORTS.md).
 
 ## Lượt tải công khai (GitHub)
 
@@ -89,6 +105,8 @@ Thêm file mới trong `migrations/`, không sửa file cũ. Áp dụng **ngay t
 ```sh
 npm run db:migrate:remote
 ```
+
+Migration `0007_releases_crashes.sql` (email bản mới, báo lỗi app) cần chạy trước khi deploy code ngày 2026-11-26; `/admin/manage/status` cho biết đã chạy chưa.
 
 ## Cấu hình Cloudflare đã làm
 

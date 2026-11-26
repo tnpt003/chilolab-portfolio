@@ -67,3 +67,27 @@ export async function getUi(locale: Locale) {
   compare(byLocale('vi'), byLocale('en'), 'ui');
   return byLocale(locale);
 }
+
+/**
+ * The privacy policy for a locale (src/content/privacy/<locale>/site.md and
+ * app.md). Both languages must carry the same `updated` date.
+ */
+export async function getPrivacy(locale: Locale) {
+  const entries = await getCollection('privacy');
+  const find = (language: Locale, part: 'site' | 'app') => {
+    const found = entries.filter(
+      ({ data }) => data.locale === language && data.part === part,
+    );
+    if (found.length !== 1)
+      throw new Error(
+        `Privacy policy needs exactly one ${language} ${part} part.`,
+      );
+    return found[0];
+  };
+  for (const language of locales) find(language, 'app');
+  if (find('vi', 'site').data.updated !== find('en', 'site').data.updated)
+    throw new Error(
+      'Privacy policy: the updated date must match in vi and en.',
+    );
+  return { site: find(locale, 'site'), app: find(locale, 'app') };
+}

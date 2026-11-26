@@ -2,6 +2,7 @@ import { devIdentity } from './access';
 import { auth } from './auth';
 import { cmsAuth, cmsPage } from './cms';
 import { comments } from './comments';
+import { addCrashReport } from './crashes';
 import {
   asLocale,
   baseHeaders,
@@ -19,6 +20,7 @@ import { notifyFeedback } from './mail';
 import { manage } from './manage';
 import { scheduled } from './maintenance';
 import { media } from './media';
+import { subscriptions } from './releases';
 import { human } from './turnstile';
 import { currentUser } from './session';
 import { getSettings } from './settings';
@@ -170,6 +172,25 @@ export default {
     if (path === '/api/cms/auth' && request.method === 'GET')
       return cmsAuth(request, env);
 
+    // Answered before the same-origin check: the desktop app has no Origin,
+    // and mail apps post one-click unsubscribes from their own servers.
+    try {
+      if (path === '/api/crash-reports' && request.method === 'POST')
+        return await addCrashReport(
+          request,
+          env,
+          (await allowed(request, env)).projects,
+        );
+      if (
+        path === '/api/subscriptions/unsubscribe' &&
+        request.method === 'POST'
+      )
+        return (await subscriptions(request, env, path))!;
+    } catch (error) {
+      console.error(request.method, path, error);
+      return json({ error: 'server_error' }, 500);
+    }
+
     if (
       request.method !== 'GET' &&
       request.method !== 'HEAD' &&
@@ -187,7 +208,8 @@ export default {
       };
       const response =
         (await auth(request, env, path)) ??
-        (await comments(request, env, ctx, path, isAllowed));
+        (await comments(request, env, ctx, path, isAllowed)) ??
+        (await subscriptions(request, env, path));
       if (response) return response;
       if (path === '/api/feedback' && request.method === 'POST')
         return await addFeedback(request, env, ctx);

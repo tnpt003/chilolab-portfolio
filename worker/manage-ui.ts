@@ -184,7 +184,7 @@ export function barChart(
 
 // ---------- layout ----------
 
-export type Badges = { held: number; newFeedback: number };
+export type Badges = { held: number; newFeedback: number; newCrashes: number };
 
 type Item = [href: string, label: string, badge?: keyof Badges];
 const menu: [group: string, items: Item[]][] = [
@@ -194,9 +194,16 @@ const menu: [group: string, items: Item[]][] = [
     [
       ['/admin/manage/comments', 'Bình luận', 'held'],
       ['/admin/manage/feedback', 'Góp ý', 'newFeedback'],
+      ['/admin/manage/crashes', 'Báo lỗi app', 'newCrashes'],
     ],
   ],
-  ['Cộng đồng', [['/admin/manage/users', 'Người dùng']]],
+  [
+    'Cộng đồng',
+    [
+      ['/admin/manage/users', 'Người dùng'],
+      ['/admin/manage/releases', 'Email bản mới'],
+    ],
+  ],
   ['Thống kê', [['/admin/manage/downloads', 'Lượt tải']]],
   [
     'Hệ thống',
@@ -274,6 +281,7 @@ tr.held td{background:#2a2310}
 tr.done td{opacity:.6}
 td.pick,th.pick{width:2rem}
 td.body{white-space:pre-wrap;overflow-wrap:anywhere;min-width:16rem;max-width:52ch}
+td.body pre{white-space:pre-wrap;font-size:.8rem;max-height:24rem;overflow:auto;margin:.4rem 0 0}
 td.ops{white-space:nowrap}
 .tag{display:inline-block;white-space:nowrap;background:#45201b;color:#ffc2b8;border-radius:.3rem;padding:0 .4rem;font-size:.76rem;font-weight:700}
 .tag.ok{background:#173b29;color:var(--ok)}

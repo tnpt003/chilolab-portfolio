@@ -24,6 +24,8 @@ export type Settings = {
   notifyFeedback: boolean;
   /** The anonymous feedback / bug report form. */
   feedbackOpen: boolean;
+  /** Crash reports sent by the desktop apps (worker/crashes.ts). */
+  crashReports: boolean;
   /** Sign-in with a 6-digit email code (still needs RESEND_API_KEY). */
   emailLogin: boolean;
   /** First sign-in creates an account; off = existing accounts only. */
@@ -39,6 +41,7 @@ export const defaults: Settings = {
   notifyHeld: true,
   notifyFeedback: false,
   feedbackOpen: true,
+  crashReports: false,
   emailLogin: true,
   signups: true,
 };
@@ -111,6 +114,7 @@ export async function getSettings(env: Env): Promise<Settings> {
     notifyHeld: flag(map.notifyHeld, defaults.notifyHeld),
     notifyFeedback: flag(map.notifyFeedback, defaults.notifyFeedback),
     feedbackOpen: flag(map.feedbackOpen, defaults.feedbackOpen),
+    crashReports: flag(map.crashReports, defaults.crashReports),
     emailLogin: flag(map.emailLogin, defaults.emailLogin),
     signups: flag(map.signups, defaults.signups),
   };

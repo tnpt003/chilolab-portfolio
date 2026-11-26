@@ -1566,8 +1566,32 @@ a:has(> .icon),
   opacity: 0.5;
   pointer-events: none;
 }
-.danger-zone h2 {
+.danger-zone h2,
+#updates-heading {
   font-size: 1.3rem;
+}
+.update-list {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.update-list label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.update-list input {
+  inline-size: 1.15rem;
+  block-size: 1.15rem;
+  accent-color: var(--ink-deep);
+}
+.update-list:disabled label {
+  opacity: 0.6;
+  cursor: default;
 }
 .danger-button {
   border: 0;

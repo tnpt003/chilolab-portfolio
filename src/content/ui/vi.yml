@@ -162,6 +162,19 @@ user:
   deleteConfirm: Xóa vĩnh viễn tài khoản và mọi bình luận của bạn?
   deleted: Tài khoản đã được xóa.
   failed: Chưa thực hiện được, vui lòng thử lại.
+updates:
+  projectLink: Nhận email khi có bản mới
+  title: Email báo bản mới
+  intro: Chọn dự án bạn muốn nhận email khi có bản phát hành mới. Email gửi tới địa chỉ của tài khoản này, bằng ngôn ngữ của trang bạn đang xem lúc chọn.
+  note: Mỗi email có link hủy nhận. Bỏ chọn ở đây cũng hủy ngay.
+  saved: Đã lưu lựa chọn.
+  failed: Chưa lưu được, vui lòng thử lại.
+  unsubscribeTitle: Hủy nhận email bản mới
+  unsubscribeIntro: Bấm nút dưới đây để không nhận email báo bản mới của dự án trong email bạn vừa nhận nữa.
+  unsubscribeButton: Hủy nhận email
+  unsubscribed: Đã hủy. Bạn sẽ không nhận email báo bản mới của {project} nữa.
+  unsubscribeInvalid: Link hủy không đúng hoặc đã được dùng rồi.
+  manage: Quản lý email bản mới trong trang tài khoản
 downloads:
   count: '{n} lượt tải'
   source: Số lần tải bộ cài và bản portable từ GitHub Releases, cập nhật mỗi phút.

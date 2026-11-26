@@ -222,6 +222,13 @@ async function me(request: Request, env: Env) {
     await deleteUserComments(env, user.id);
     await env.DB.batch([
       env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(user.id),
+      // Also removed by ON DELETE CASCADE; explicit so it never depends on it.
+      env.DB.prepare('DELETE FROM subscriptions WHERE user_id = ?').bind(
+        user.id,
+      ),
+      env.DB.prepare('DELETE FROM notice_deliveries WHERE user_id = ?').bind(
+        user.id,
+      ),
       env.DB.prepare('DELETE FROM users WHERE id = ?').bind(user.id),
     ]);
     return json({ status: 'deleted' }, 200, {

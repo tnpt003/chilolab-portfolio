@@ -2,6 +2,8 @@ import { deleteUserComments, removeComment } from './comments';
 import { redirect, sameOrigin, text, type Env } from './env';
 import { getStats, statsProjects } from './github';
 import { mailEnabled } from './mail';
+import { crashesPage, releasesPage } from './manage-phase2';
+import { catalog, deliverNotices } from './releases';
 import {
   barChart,
   bulkBar,
@@ -66,8 +68,20 @@ const notices: Record<string, string> = {
   'user-delete': 'Đã xóa tài khoản và bình luận của người đó.',
   'nothing-selected': 'Chưa chọn mục nào hoặc chưa chọn thao tác.',
   'reply-empty': 'Nội dung trả lời trống hoặc quá dài.',
+  'notice-send':
+    'Đã bắt đầu gửi email báo bản mới. Tải lại trang sau ít phút để xem số đã gửi.',
+  'notice-exists': 'Bản này đã được gửi hoặc đang gửi.',
+  'notice-stop': 'Đã dừng gửi email cho bản này.',
+  'crash-done': 'Đã đánh dấu báo lỗi là đã xem.',
+  'crash-new': 'Đã đánh dấu báo lỗi là chưa xem.',
+  'crash-delete': 'Đã xóa báo lỗi.',
 };
-const warnings = new Set(['nothing-selected', 'reply-empty', 'unchanged']);
+const warnings = new Set([
+  'nothing-selected',
+  'reply-empty',
+  'unchanged',
+  'notice-exists',
+]);
 
 // ---------- admin log ----------
 
@@ -84,6 +98,11 @@ const actionLabels: Record<string, string> = {
   'user-block': 'Khóa tài khoản',
   'user-unblock': 'Mở khóa tài khoản',
   'user-delete': 'Xóa tài khoản',
+  'notice-send': 'Gửi email báo bản mới',
+  'notice-stop': 'Dừng gửi email bản mới',
+  'crash-done': 'Báo lỗi app → đã xem',
+  'crash-new': 'Báo lỗi app → chưa xem',
+  'crash-delete': 'Xóa báo lỗi app',
   settings: 'Đổi cài đặt',
   export: 'Xuất CSV',
 };
@@ -158,9 +177,16 @@ async function badges(env: Env): Promise<Badges> {
     `SELECT (SELECT COUNT(*) FROM comments WHERE status = 'held') AS held,
             (SELECT COUNT(*) FROM feedback WHERE status = 'new') AS newFeedback`,
   ).first<Badges>();
+  // Before migration 0007 the table is missing; the panel still opens.
+  const crashes = await env.DB.prepare(
+    "SELECT COUNT(*) AS n FROM crash_reports WHERE status = 'new'",
+  )
+    .first<{ n: number }>()
+    .catch(() => null);
   return {
     held: Number(row?.held ?? 0),
     newFeedback: Number(row?.newFeedback ?? 0),
+    newCrashes: Number(crashes?.n ?? 0),
   };
 }
 
@@ -689,6 +715,7 @@ ${number('commentsPerHour', 'Số bình luận tối đa mỗi người trong m�
 </fieldset>`,
     feedback: `<fieldset><legend>Góp ý và báo lỗi</legend>
 ${check('feedbackOpen', 'Nhận góp ý qua form', 'Tắt thì form <code>/&lt;dự-án&gt;/feedback</code> báo đang tạm đóng.')}
+${check('crashReports', 'Nhận báo lỗi tự động từ app', 'Chỉ bật khi bản app có hỏi ý người dùng đã phát hành, và /privacy cùng EULA đã mô tả việc này (docs/CRASH-REPORTS.md). Tắt thì server từ chối mọi báo lỗi.')}
 </fieldset>`,
     accounts: `<fieldset><legend>Đăng nhập và tài khoản</legend>
 ${check('emailLogin', 'Cho đăng nhập bằng mã email', 'Cần secret RESEND_API_KEY. Tắt thì chỉ còn Google. Nếu bạn đăng nhập bằng mã email, hãy chắc chắn còn đăng nhập được bằng Google trước khi tắt.')}
@@ -751,7 +778,8 @@ async function statusPage(env: Env, ctx: ExecutionContext) {
     `SELECT (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'settings') AS settings,
             (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'admin_log') AS adminLog,
             (SELECT COUNT(*) FROM pragma_table_info('users') WHERE name = 'blocked_at') AS blocked,
-            (SELECT COUNT(*) FROM pragma_table_info('feedback') WHERE name = 'note') AS note`,
+            (SELECT COUNT(*) FROM pragma_table_info('feedback') WHERE name = 'note') AS note,
+            (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('subscriptions', 'release_notices', 'notice_deliveries', 'crash_reports')) AS phase2`,
   ).first<Row>();
   const migrated = (value: unknown) => Number(value) > 0;
   const github = await getStats('pet-desktop', ctx);
@@ -784,6 +812,7 @@ async function statusPage(env: Env, ctx: ExecutionContext) {
     [
       `<tr><td>0005 · Cài đặt site</td><td>${migrated(schema?.settings) ? '<span class="tag ok">Đã chạy</span>' : '<span class="tag">Chưa chạy</span>'}</td></tr>`,
       `<tr><td>0006 · Khóa tài khoản, ghi chú góp ý, nhật ký</td><td>${migrated(schema?.adminLog) && migrated(schema?.blocked) && migrated(schema?.note) ? '<span class="tag ok">Đã chạy</span>' : '<span class="tag">Chưa chạy</span>'}</td></tr>`,
+      `<tr><td>0007 · Email bản mới, báo lỗi app</td><td>${Number(schema?.phase2) === 4 ? '<span class="tag ok">Đã chạy</span>' : '<span class="tag">Chưa chạy</span>'}</td></tr>`,
     ],
     '',
   )}<p class="hint">Chưa chạy thì: <code>npm run db:migrate:remote</code>.</p></section>`;
@@ -862,7 +891,43 @@ const setFeedback =
     return done.meta.changes ? `góp ý #${id}` : null;
   };
 
+const setCrash = (status: 'new' | 'done') => async (env: Env, id: number) => {
+  const done = await env.DB.prepare(
+    'UPDATE crash_reports SET status = ? WHERE id = ? AND status <> ?',
+  )
+    .bind(status, id, status)
+    .run();
+  return done.meta.changes ? `báo lỗi #${id}` : null;
+};
+
 const ops: Record<string, Op> = {
+  'notice-stop': {
+    label: 'Dừng gửi email bản mới',
+    run: async (env, id) => {
+      const row = await env.DB.prepare(
+        `UPDATE release_notices SET finished_at = ? WHERE id = ? AND finished_at IS NULL
+         RETURNING project, version`,
+      )
+        .bind(stamp(), id)
+        .first<{ project: string; version: string }>();
+      return row ? `${row.project} v${row.version}` : null;
+    },
+  },
+  'crash-done': { label: 'Đánh dấu đã xem', bulk: true, run: setCrash('done') },
+  'crash-new': { label: 'Đánh dấu chưa xem', bulk: true, run: setCrash('new') },
+  'crash-delete': {
+    label: 'Xóa vĩnh viễn báo lỗi',
+    destructive: true,
+    bulk: true,
+    run: async (env, id) => {
+      const done = await env.DB.prepare(
+        'DELETE FROM crash_reports WHERE id = ?',
+      )
+        .bind(id)
+        .run();
+      return done.meta.changes ? `báo lỗi #${id}` : null;
+    },
+  },
   approve: {
     label: 'Cho hiện bình luận',
     bulk: true,
@@ -963,6 +1028,10 @@ const ops: Record<string, Op> = {
       await deleteUserComments(env, id);
       await env.DB.batch([
         env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id),
+        env.DB.prepare('DELETE FROM subscriptions WHERE user_id = ?').bind(id),
+        env.DB.prepare('DELETE FROM notice_deliveries WHERE user_id = ?').bind(
+          id,
+        ),
         env.DB.prepare(
           'UPDATE feedback SET user_id = NULL WHERE user_id = ?',
         ).bind(id),
@@ -987,6 +1056,17 @@ async function describe(env: Env, op: string, ids: number[]) {
     return results.map(
       (row) =>
         `<li><strong>${escape(row.display_name ?? row.author ?? '—')}</strong> ở ${escape(row.project)}${row.version ? ` v${escape(row.version)}` : ''}: ${escape(String(row.body).slice(0, 160))}</li>`,
+    );
+  }
+  if (op === 'crash-delete') {
+    const { results } = await env.DB.prepare(
+      `SELECT * FROM crash_reports WHERE id IN (${marks})`,
+    )
+      .bind(...ids)
+      .all<Row>();
+    return results.map(
+      (row) =>
+        `<li><strong>${escape(row.kind)}</strong> · ${escape(row.project)} v${escape(row.app_version)} · ${when(row.created_at)}</li>`,
     );
   }
   if (op === 'fb-delete') {
@@ -1015,6 +1095,7 @@ const consequences: Record<string, string> = {
   remove:
     'Nội dung bị xóa khỏi cơ sở dữ liệu. Bình luận có người trả lời sẽ còn dòng "đã bị quản trị viên gỡ".',
   'fb-delete': 'Góp ý bị xóa vĩnh viễn, không khôi phục được.',
+  'crash-delete': 'Báo lỗi bị xóa vĩnh viễn, không khôi phục được.',
   'user-block':
     'Người này bị đăng xuất khỏi mọi thiết bị, không đăng nhập hay bình luận được nữa. Dữ liệu vẫn giữ; mở khóa được bất cứ lúc nào.',
   'user-delete':
@@ -1043,7 +1124,7 @@ const settingKeys: Record<Tab, (keyof Settings)[]> = {
     'commentMaxLength',
     'commentsPerHour',
   ],
-  feedback: ['feedbackOpen'],
+  feedback: ['feedbackOpen', 'crashReports'],
   accounts: ['emailLogin', 'signups'],
   email: ['notifyHeld', 'notifyFeedback'],
 };
@@ -1073,6 +1154,7 @@ function readSetting(
 async function post(
   request: Request,
   env: Env,
+  ctx: ExecutionContext,
   admin: Admin,
 ): Promise<Response | { confirm: string; back: string }> {
   if (!sameOrigin(request)) return new Response('Forbidden', { status: 403 });
@@ -1092,6 +1174,27 @@ async function post(
     if (changed.length)
       await log(env, admin, 'settings', tab, changed.join(', '));
     return redirect(backTo(back, changed.length ? 'saved' : 'unchanged'), 303);
+  }
+
+  if (action.startsWith('notice-send:')) {
+    const [project = '', version = ''] = action.slice(12).split('@');
+    const names = (await catalog(env))[project];
+    if (!names?.releases.some((release) => release.version === version))
+      return bad();
+    const created = await env.DB.prepare(
+      'INSERT OR IGNORE INTO release_notices (project, version) VALUES (?, ?)',
+    )
+      .bind(project, version)
+      .run();
+    if (!created.meta.changes)
+      return redirect(backTo(back, 'notice-exists'), 303);
+    await log(env, admin, 'notice-send', `${project} v${version}`);
+    ctx.waitUntil(
+      deliverNotices(env)
+        .then((result) => console.log('release notices', result))
+        .catch((error) => console.error('release notices', error)),
+    );
+    return redirect(backTo(back, 'notice-send'), 303);
   }
 
   const [name, rawId] = action.split(':');
@@ -1255,7 +1358,7 @@ export async function manage(
   }
 
   if (request.method === 'POST' && path === '/admin/manage') {
-    const result = await post(request, env, admin);
+    const result = await post(request, env, ctx, admin);
     if (result instanceof Response) return result;
     return render(
       'Xác nhận',
@@ -1283,6 +1386,8 @@ export async function manage(
     '/admin/manage/feedback': ['Góp ý', () => feedbackPage(env, url, back)],
     '/admin/manage/downloads': ['Lượt tải', () => downloadsPage(env, ctx)],
     '/admin/manage/users': ['Người dùng', () => usersPage(env, url)],
+    '/admin/manage/releases': ['Email bản mới', () => releasesPage(env, back)],
+    '/admin/manage/crashes': ['Báo lỗi app', () => crashesPage(env, url, back)],
     '/admin/manage/settings': ['Cài đặt', () => settingsPage(env, url)],
     '/admin/manage/log': ['Nhật ký', () => logPage(env, url)],
     '/admin/manage/status': ['Tình trạng dịch vụ', () => statusPage(env, ctx)],

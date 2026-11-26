@@ -44,11 +44,19 @@ Collection **Về mình / About** có hai form: **Về mình (VI)** và **About 
 
 ## Sửa chữ giao diện (trang chủ, menu, footer, bình luận, góp ý)
 
-Collection **Chữ giao diện** có hai form **Chữ giao diện (VI)** và **Interface text (EN)**, mỗi form chia nhóm: Trang chủ, menu, footer · Bình luận · Form góp ý · Đăng nhập & tài khoản · Số lượt tải. File thật là `src/content/ui/vi.yml` và `en.yml`.
+Collection **Chữ giao diện** có hai form **Chữ giao diện (VI)** và **Interface text (EN)**, mỗi form chia nhóm: Trang chủ, menu, footer · Bình luận · Form góp ý · Đăng nhập & tài khoản · Email báo bản mới, hủy nhận · Số lượt tải. File thật là `src/content/ui/vi.yml` và `en.yml`.
 
 - Mỗi ô có gợi ý "VD (VI): …" là câu tiếng Việt lúc chuyển sang CMS, để biết ô đó hiện ở đâu.
 - Giữ nguyên các chỗ trong ngoặc nhọn như `{n}`, `{email}`, `{page}`: web thay chúng bằng số hoặc email thật. Build báo lỗi nếu bản VI và EN khác nhau ở các chỗ này, hoặc nếu một ô bị để trống.
-- Trang quyền riêng tư (`/privacy`) vẫn sửa bằng file `src/components/PrivacyPage.astro`, vì đây là nội dung pháp lý đi kèm EULA của Pet Desktop.
+
+## Sửa trang Quyền riêng tư (/privacy)
+
+Collection **Quyền riêng tư / Privacy** có bốn form, mỗi ngôn ngữ hai phần. File thật nằm ở `src/content/privacy/<vi|en>/`.
+
+- **Website** (`site.md`): tiêu đề, mô tả cho Google, đoạn mở đầu, ngày cập nhật và phần nói về dữ liệu website lưu.
+- **Ứng dụng Desktop Pet** (`app.md`): hiện thành một mục có neo `#desktop-pet`, nơi EULA.txt của app trỏ tới. Phần này phải nói đúng như EULA của bản app đang phát hành; sửa một bên thì sửa cả bên kia.
+- Có thay đổi thì đổi **Ngày cập nhật** ở cả VI và EN cho giống nhau; build báo lỗi nếu khác.
+- Website sắp thu thập loại dữ liệu mới thì cập nhật trang này **trước** khi bật tính năng (docs/DATA-ROADMAP.md). Bản nháp cho phần báo lỗi app nằm ở docs/CRASH-REPORTS.md, chỉ dán vào khi app thật sự có tính năng đó.
 
 ## Dùng CMS online bằng tài khoản owner (Gmail)
 
