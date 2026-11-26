@@ -43,6 +43,15 @@ export async function sendMail(
   return response.ok;
 }
 
+/** Emails the site owner (users.role = 'owner'); false if not sent. */
+export async function notifyOwner(env: Env, subject: string, lines: string[]) {
+  const owner = await env.DB.prepare(
+    "SELECT email FROM users WHERE role = 'owner' LIMIT 1",
+  ).first<{ email: string }>();
+  if (!owner) return false;
+  return sendMail(env, owner.email, subject, lines);
+}
+
 /** Tells the site owner (users.role = 'owner') about a held comment. */
 export async function notifyHeld(
   env: Env,

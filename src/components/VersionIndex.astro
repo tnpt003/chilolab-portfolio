@@ -18,6 +18,7 @@ const entries = await listVersions(data.locale, data.slug);
   description={`${t.intro} ${data.title}`}
   locale={data.locale}
   slug={`${data.slug}/versions`}
+  share={data.preview}
 >
   <div class="wrap version-page">
     <a class="back" href={pathFor(data.locale, data.slug)}>

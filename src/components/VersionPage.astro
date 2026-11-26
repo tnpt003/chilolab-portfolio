@@ -34,6 +34,7 @@ const latest = (
   description={data.summary}
   locale={data.locale}
   slug={`${data.project}/versions/${data.version}`}
+  share={project.data.preview}
 >
   <div class="wrap version-page">
     <a class="back" href={versionPath(data.locale, data.project)}>

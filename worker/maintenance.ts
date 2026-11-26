@@ -1,4 +1,5 @@
 import type { Env } from './env';
+import { notifyOwner } from './mail';
 import { OWNER_DAYS } from './session';
 
 // Scheduled upkeep (wrangler.jsonc "triggers"), run once a day:
@@ -6,6 +7,9 @@ import { OWNER_DAYS } from './session';
 //   sign-in codes, owner sessions past the 7-day limit, admin log > 1 year).
 // - backup(): once a week, a gzipped JSON copy of the visitor data in the
 //   private R2 bucket bound as BACKUPS. Skipped while that binding is absent.
+// - Alerts: if a step fails, the backup is skipped, or (checked each Tuesday
+//   UTC) the newest backup is over 8 days old, the owner gets an email
+//   through Resend. Without RESEND_API_KEY it only logs.
 // Restore with scripts/restore-backup.mjs (docs/DATABASE.md).
 
 const stamp = (time: number) =>
@@ -90,12 +94,72 @@ export async function backup(env: Env, now = new Date()) {
   return { key, bytes: gzipped.byteLength, removed: old.length };
 }
 
+const STALE_DAYS = 8;
+
+/** Age in days of the newest backup in R2, or null when there is none. */
+export async function newestBackupAge(env: Env, now = new Date()) {
+  if (!env.BACKUPS) return null;
+  const listed = await env.BACKUPS.list({ prefix: 'd1/' });
+  const newest = listed.objects
+    .map((object) => object.uploaded.getTime())
+    .reduce((a, b) => Math.max(a, b), 0);
+  return newest ? (now.getTime() - newest) / 86400_000 : null;
+}
+
+const describe = (error: unknown) =>
+  error instanceof Error ? `${error.name}: ${error.message}` : String(error);
+
+async function alert(env: Env, problem: string) {
+  console.error('maintenance alert', problem);
+  try {
+    await notifyOwner(env, '[ChiloLab] Bảo trì tự động gặp lỗi', [
+      problem,
+      'Xem chi tiết ở Cloudflare dashboard → Workers → chilolab-portfolio → Logs.',
+      'Cách xử lý và khôi phục: docs/DATABASE.md, mục "Bảo trì tự động (cron)".',
+    ]);
+  } catch (error) {
+    console.error('maintenance alert mail', error);
+  }
+}
+
 /**
- * Daily cron at 19:00 UTC (02:00 in Vietnam): cleanup every day, and a
- * backup on the run that falls on Sunday UTC (early Monday in Vietnam).
+ * Daily cron at 19:00 UTC (02:00 in Vietnam): cleanup every day, a backup on
+ * the run that falls on Sunday UTC (early Monday in Vietnam), and on Tuesday
+ * UTC a check that the newest backup is recent.
  */
 export async function scheduled(controller: ScheduledController, env: Env) {
   const when = new Date(controller.scheduledTime);
-  console.log('cleanup', await cleanup(env));
-  if (when.getUTCDay() === 0) console.log('backup', await backup(env, when));
+  try {
+    console.log('cleanup', await cleanup(env));
+  } catch (error) {
+    await alert(env, `Dọn dữ liệu hằng ngày thất bại: ${describe(error)}`);
+  }
+  if (when.getUTCDay() === 0) {
+    try {
+      const result = await backup(env, when);
+      console.log('backup', result);
+      if ('skipped' in result)
+        await alert(env, `Backup tuần này bị bỏ qua: ${result.skipped}.`);
+    } catch (error) {
+      await alert(env, `Backup D1 lên R2 thất bại: ${describe(error)}`);
+    }
+  }
+  // Catches a Sunday run that never happened, not only one that failed.
+  if (when.getUTCDay() === 2 && env.BACKUPS) {
+    try {
+      const age = await newestBackupAge(env, when);
+      if (age === null)
+        await alert(
+          env,
+          'Bucket chilolab-backups chưa có bản backup nào trong d1/.',
+        );
+      else if (age > STALE_DAYS)
+        await alert(
+          env,
+          `Bản backup mới nhất đã ${Math.floor(age)} ngày tuổi (quá ${STALE_DAYS} ngày).`,
+        );
+    } catch (error) {
+      await alert(env, `Không kiểm tra được bucket backup: ${describe(error)}`);
+    }
+  }
 }
