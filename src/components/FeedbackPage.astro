@@ -22,6 +22,9 @@ const runtime = {
   verifying: t.verifying,
   failed: t.failed,
   rateLimited: t.rateLimited,
+  closed: t.closed,
+  fileTooLarge: t.fileTooLarge,
+  fileType: t.fileType,
 };
 ---
 
@@ -125,6 +128,17 @@ const runtime = {
       <p class="field-hint" id="feedback-contact-hint">
         {t.contactHint}
       </p>
+      <label for="feedback-screenshot">{t.screenshot}</label>
+      <input
+        id="feedback-screenshot"
+        name="screenshot"
+        type="file"
+        accept="image/png,image/jpeg,image/webp"
+        aria-describedby="feedback-screenshot-hint"
+      />
+      <p class="field-hint" id="feedback-screenshot-hint">
+        {t.screenshotHint}
+      </p>
       <div class="turnstile" data-turnstile></div>
       <button class="button" type="submit">
         {t.send}
@@ -203,36 +217,64 @@ const runtime = {
       }
       const fields = Object.fromEntries(new FormData(form));
       delete fields['cf-turnstile-response'];
+      delete fields.screenshot;
+      const picked = form.querySelector<HTMLInputElement>(
+        'input[name=screenshot]',
+      )!.files?.[0];
+      if (picked && picked.size > 3 * 1024 * 1024) {
+        status.textContent = copy.fileTooLarge;
+        return;
+      }
+      if (picked && !/^image\/(png|jpeg|webp)$/.test(picked.type)) {
+        status.textContent = copy.fileType;
+        return;
+      }
       let closed = false;
+      let fileError = '';
       const button = form.querySelector<HTMLButtonElement>(
         'button[type=submit]',
       )!;
       button.disabled = true;
       status.textContent = copy.sending;
       try {
+        const data = JSON.stringify({
+          ...fields,
+          project: form.dataset.project,
+          locale: form.dataset.locale,
+          token,
+        });
+        // With a picture, send multipart: the same JSON plus the file.
+        let body: BodyInit = data;
+        if (picked) {
+          body = new FormData();
+          body.append('data', data);
+          body.append('screenshot', picked);
+        }
         const response = await fetch('/api/feedback', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            ...fields,
-            project: form.dataset.project,
-            locale: form.dataset.locale,
-            token,
-          }),
+          ...(picked
+            ? {}
+            : { headers: { 'Content-Type': 'application/json' } }),
+          body,
         });
         if (!response.ok) {
-          const data = await response.json().catch(() => ({}));
-          closed = data.error === 'closed';
+          const result = await response.json().catch(() => ({}));
+          closed = result.error === 'closed';
+          if (result.error === 'file_too_large' || result.error === 'file_type')
+            fileError =
+              result.error === 'file_type' ? copy.fileType : copy.fileTooLarge;
           throw new Error(String(response.status));
         }
         form.reset();
         status.textContent = copy.sent;
       } catch (error) {
-        status.textContent = String(error).includes('429')
-          ? copy.rateLimited
-          : String(error).includes('403') && closed
-            ? copy.closed
-            : copy.failed;
+        status.textContent = fileError
+          ? fileError
+          : String(error).includes('429')
+            ? copy.rateLimited
+            : String(error).includes('403') && closed
+              ? copy.closed
+              : copy.failed;
       } finally {
         token = '';
         api?.reset(widget);

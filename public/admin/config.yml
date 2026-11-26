@@ -1753,6 +1753,30 @@ collections:
                   widget: string,
                   hint: 'VD (VI): Cần bật JavaScript để gửi góp ý.',
                 }
+              - {
+                  label: 'screenshot',
+                  name: 'screenshot',
+                  widget: string,
+                  hint: 'VD (VI): Ảnh chụp màn hình (không bắt buộc)',
+                }
+              - {
+                  label: 'screenshotHint',
+                  name: 'screenshotHint',
+                  widget: text,
+                  hint: 'VD (VI): PNG, JPEG hoặc WebP, tối đa 3 MB. Chỉ chủ website xem được. Hãy che thông tin cá nhân trong ảnh trước khi gửi.',
+                }
+              - {
+                  label: 'fileTooLarge',
+                  name: 'fileTooLarge',
+                  widget: string,
+                  hint: 'VD (VI): Ảnh lớn hơn 3 MB. Hãy chọn ảnh nhỏ hơn hoặc cắt bớt.',
+                }
+              - {
+                  label: 'fileType',
+                  name: 'fileType',
+                  widget: string,
+                  hint: 'VD (VI): Chỉ nhận ảnh PNG, JPEG hoặc WebP.',
+                }
           - label: 'Đăng nhập & tài khoản'
             name: user
             widget: object
@@ -2805,6 +2829,30 @@ collections:
                   name: 'noscript',
                   widget: string,
                   hint: 'VD (VI): Cần bật JavaScript để gửi góp ý.',
+                }
+              - {
+                  label: 'screenshot',
+                  name: 'screenshot',
+                  widget: string,
+                  hint: 'VD (VI): Ảnh chụp màn hình (không bắt buộc)',
+                }
+              - {
+                  label: 'screenshotHint',
+                  name: 'screenshotHint',
+                  widget: text,
+                  hint: 'VD (VI): PNG, JPEG hoặc WebP, tối đa 3 MB. Chỉ chủ website xem được. Hãy che thông tin cá nhân trong ảnh trước khi gửi.',
+                }
+              - {
+                  label: 'fileTooLarge',
+                  name: 'fileTooLarge',
+                  widget: string,
+                  hint: 'VD (VI): Ảnh lớn hơn 3 MB. Hãy chọn ảnh nhỏ hơn hoặc cắt bớt.',
+                }
+              - {
+                  label: 'fileType',
+                  name: 'fileType',
+                  widget: string,
+                  hint: 'VD (VI): Chỉ nhận ảnh PNG, JPEG hoặc WebP.',
                 }
           - label: 'Đăng nhập & tài khoản'
             name: user

@@ -12,7 +12,7 @@ updated: 2026-11-26
 
 - **Account:** when you sign in with Google, the website receives your Google account ID, email and name. You can change your display name on the account page. The website never sees your Google password. When you sign in by email, the website stores your email; the 6-digit code is stored only as a hash and expires after 10 minutes. There are no passwords.
 - **Comments:** the text, time, and the page or version you commented on. Comments are public with your display name; your email is never shown.
-- **Feedback and bug reports:** what you send, the app version, the Windows version and a contact if you add one. Only the site owner can read them.
+- **Feedback and bug reports:** what you send, the app version, the Windows version, a contact if you add one, and a screenshot if you attach one. Only the site owner can read or see them. Screenshots are kept in private Cloudflare R2 storage and deleted together with the feedback.
 - **New version emails:** only if you choose them on your account page. The website stores the projects you picked, the email language and when you signed up. Emails go to your account's address. The website records who received each email so nobody gets it twice, and deletes that record 30 days after sending finishes.
 - **Downloads:** only a daily counter per file, with no information about who downloaded.
 
@@ -37,5 +37,5 @@ IP addresses are used briefly to limit how often you can post and to stop spam; 
 - You can edit or delete your comments at any time.
 - Unticking a project on the [account page](/en/user/account#updates), or using the unsubscribe link in an email, removes that new version email signup at once.
 - Deleting your account on the [account page](/en/user/account) immediately removes your name, email, email signups and the text of all your comments.
-- Feedback is kept until the owner has handled and deleted it. To have it removed sooner, or for any question, use the [feedback page](/en/pet-desktop/feedback).
+- Feedback (with any screenshot) is kept until the owner has handled and deleted it. To have it removed sooner, or for any question, use the [feedback page](/en/pet-desktop/feedback).
 - Once a week the database is backed up to private storage that only the site owner can open, to recover from an incident. Each backup is kept for at most 12 weeks, so deleted data can remain in an older backup for up to 12 weeks before it is gone for good.

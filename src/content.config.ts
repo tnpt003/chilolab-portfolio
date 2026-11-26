@@ -347,6 +347,10 @@ const ui = defineCollection({
       rateLimited: line,
       closed: line,
       noscript: line,
+      screenshot: line,
+      screenshotHint: line,
+      fileTooLarge: line,
+      fileType: line,
     }),
     user: z.object({
       loginTitle: line,

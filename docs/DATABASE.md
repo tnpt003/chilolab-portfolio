@@ -68,6 +68,13 @@ Khóa tài khoản (`users.blocked_at`): xóa mọi phiên, đăng nhập bị t
 - Mỗi email có link `/user/unsubscribe#<token>` (token sau dấu `#` nên không vào log hay thống kê) và header `List-Unsubscribe` + `List-Unsubscribe-Post` để Gmail/Outlook hiện nút hủy một chạm (`POST /api/subscriptions/unsubscribe?token=…`). Token chỉ hủy được đúng một đăng ký, không đăng nhập được.
 - Xóa tài khoản (tự xóa hoặc chủ site xóa) xóa luôn đăng ký. Tài khoản bị khóa không nhận email.
 
+## Ảnh đính kèm góp ý
+
+- Form góp ý nhận một ảnh PNG, JPEG hoặc WebP, tối đa 3 MB (gửi dạng multipart). Server đọc vài byte đầu để biết đúng là ảnh, không tin đuôi file hay loại trình duyệt báo.
+- Ảnh lưu ở bucket R2 riêng tư `chilolab-backups` dưới `feedback/` (binding `BACKUPS`; việc dọn backup chỉ đụng tới `d1/`). D1 chỉ giữ `file_key`, `file_type`, `file_bytes` trong bảng `feedback`.
+- Chỉ owner xem được, qua link "Ảnh đính kèm" ở `/admin/manage/feedback` (`/admin/manage/files/<id>`, kèm CSP sandbox). Xóa góp ý thì xóa luôn ảnh.
+- Backup hằng tuần chỉ chép D1, không chép ảnh.
+
 ## Báo lỗi app
 
 Phía server đã có, **đang tắt** (setting `crashReports`). Giao thức cho app, điều kiện để bật và bản nháp cho /privacy + EULA: [CRASH-REPORTS.md](CRASH-REPORTS.md).

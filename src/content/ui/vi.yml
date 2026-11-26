@@ -111,6 +111,10 @@ feedback:
   rateLimited: Bạn gửi hơi nhanh, đợi một phút rồi thử lại.
   closed: Form góp ý đang tạm đóng. Vui lòng quay lại sau.
   noscript: Cần bật JavaScript để gửi góp ý.
+  screenshot: 'Ảnh chụp màn hình (không bắt buộc)'
+  screenshotHint: 'PNG, JPEG hoặc WebP, tối đa 3 MB. Chỉ chủ website xem được. Hãy che thông tin cá nhân trong ảnh trước khi gửi.'
+  fileTooLarge: 'Ảnh lớn hơn 3 MB. Hãy chọn ảnh nhỏ hơn hoặc cắt bớt.'
+  fileType: 'Chỉ nhận ảnh PNG, JPEG hoặc WebP.'
 user:
   loginTitle: Đăng nhập
   loginHeading: Chào mừng đến ChiloLab

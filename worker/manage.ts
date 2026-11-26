@@ -1,5 +1,6 @@
 import { deleteUserComments, removeComment } from './comments';
 import { redirect, sameOrigin, text, type Env } from './env';
+import { deleteUpload, serveUpload } from './files';
 import { getStats, statsProjects } from './github';
 import { mailEnabled } from './mail';
 import { crashesPage, releasesPage } from './manage-phase2';
@@ -454,10 +455,13 @@ async function feedbackPage(env: Env, url: URL, back: string) {
       )
       .join('');
     const note = `<details class="note"><summary>${row.note ? 'Sửa ghi chú' : 'Thêm ghi chú'}</summary><label class="sr-only" for="note-${row.id}">Ghi chú nội bộ</label><textarea id="note-${row.id}" name="note-${row.id}" rows="3" maxlength="2000">${escape(row.note)}</textarea><br>${button(`note:${row.id}`, 'Lưu ghi chú', 'ghost')}</details>`;
+    const file = row.file_key
+      ? `\n<a href="/admin/manage/files/${escape(row.id)}" target="_blank" rel="noopener">Ảnh đính kèm (${Math.max(1, Math.round(Number(row.file_bytes) / 1024))} KB)</a>`
+      : '';
     const from = row.user_id
       ? `<br><small>Tài khoản: <a href="/admin/manage/users/${escape(row.user_id)}">${escape(row.display_name ?? `#${row.user_id}`)}</a></small>`
       : '';
-    return `<tr class="${row.status === 'done' ? 'done' : ''}"><td class="pick">${checkbox(row.id, `Chọn góp ý #${row.id}`)}</td><td>${when(row.created_at)}<br><span class="tag ${row.status === 'new' ? 'warn' : row.status === 'progress' ? 'info' : 'ok'}">${feedbackStates[String(row.status)] ?? escape(row.status)}</span></td><td>${escape(row.project)} · ${escape(row.locale)}<br><small>${escape(kinds[String(row.kind)] ?? row.kind)}</small></td><td class="body">${row.summary ? `<strong>${escape(row.summary)}</strong>\n` : ''}${escape(row.message)}${row.note ? `\n<small>Ghi chú: ${escape(row.note)}</small>` : ''}${note}</td><td>${escape(row.app_version)}${row.os ? ` · ${escape(row.os)}` : ''}</td><td>${escape(row.contact)}${from}</td><td class="ops">${moves}${button(`fb-delete:${row.id}`, 'Xóa…', 'danger')}</td></tr>`;
+    return `<tr class="${row.status === 'done' ? 'done' : ''}"><td class="pick">${checkbox(row.id, `Chọn góp ý #${row.id}`)}</td><td>${when(row.created_at)}<br><span class="tag ${row.status === 'new' ? 'warn' : row.status === 'progress' ? 'info' : 'ok'}">${feedbackStates[String(row.status)] ?? escape(row.status)}</span></td><td>${escape(row.project)} · ${escape(row.locale)}<br><small>${escape(kinds[String(row.kind)] ?? row.kind)}</small></td><td class="body">${row.summary ? `<strong>${escape(row.summary)}</strong>\n` : ''}${escape(row.message)}${row.note ? `\n<small>Ghi chú: ${escape(row.note)}</small>` : ''}${file}${note}</td><td>${escape(row.app_version)}${row.os ? ` · ${escape(row.os)}` : ''}</td><td>${escape(row.contact)}${from}</td><td class="ops">${moves}${button(`fb-delete:${row.id}`, 'Xóa…', 'danger')}</td></tr>`;
   });
   const n = (key: string) => count(groups.results, key);
   return `<h1>Góp ý và báo lỗi</h1>
@@ -779,7 +783,8 @@ async function statusPage(env: Env, ctx: ExecutionContext) {
             (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'admin_log') AS adminLog,
             (SELECT COUNT(*) FROM pragma_table_info('users') WHERE name = 'blocked_at') AS blocked,
             (SELECT COUNT(*) FROM pragma_table_info('feedback') WHERE name = 'note') AS note,
-            (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('subscriptions', 'release_notices', 'notice_deliveries', 'crash_reports')) AS phase2`,
+            (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('subscriptions', 'release_notices', 'notice_deliveries', 'crash_reports')) AS phase2,
+            (SELECT COUNT(*) FROM pragma_table_info('feedback') WHERE name = 'file_key') AS files`,
   ).first<Row>();
   const migrated = (value: unknown) => Number(value) > 0;
   const github = await getStats('pet-desktop', ctx);
@@ -813,6 +818,7 @@ async function statusPage(env: Env, ctx: ExecutionContext) {
       `<tr><td>0005 · Cài đặt site</td><td>${migrated(schema?.settings) ? '<span class="tag ok">Đã chạy</span>' : '<span class="tag">Chưa chạy</span>'}</td></tr>`,
       `<tr><td>0006 · Khóa tài khoản, ghi chú góp ý, nhật ký</td><td>${migrated(schema?.adminLog) && migrated(schema?.blocked) && migrated(schema?.note) ? '<span class="tag ok">Đã chạy</span>' : '<span class="tag">Chưa chạy</span>'}</td></tr>`,
       `<tr><td>0007 · Email bản mới, báo lỗi app</td><td>${Number(schema?.phase2) === 4 ? '<span class="tag ok">Đã chạy</span>' : '<span class="tag">Chưa chạy</span>'}</td></tr>`,
+      `<tr><td>0008 · Ảnh đính kèm góp ý</td><td>${migrated(schema?.files) ? '<span class="tag ok">Đã chạy</span>' : '<span class="tag">Chưa chạy</span>'}</td></tr>`,
     ],
     '',
   )}<p class="hint">Chưa chạy thì: <code>npm run db:migrate:remote</code>.</p></section>`;
@@ -972,10 +978,14 @@ const ops: Record<string, Op> = {
     destructive: true,
     bulk: true,
     run: async (env, id) => {
-      const done = await env.DB.prepare('DELETE FROM feedback WHERE id = ?')
+      const row = await env.DB.prepare(
+        'DELETE FROM feedback WHERE id = ? RETURNING file_key',
+      )
         .bind(id)
-        .run();
-      return done.meta.changes ? `góp ý #${id}` : null;
+        .first<{ file_key: string | null }>();
+      if (!row) return null;
+      await deleteUpload(env, row.file_key);
+      return `góp ý #${id}`;
     },
   },
   'user-signout': {
@@ -1094,7 +1104,8 @@ async function describe(env: Env, op: string, ids: number[]) {
 const consequences: Record<string, string> = {
   remove:
     'Nội dung bị xóa khỏi cơ sở dữ liệu. Bình luận có người trả lời sẽ còn dòng "đã bị quản trị viên gỡ".',
-  'fb-delete': 'Góp ý bị xóa vĩnh viễn, không khôi phục được.',
+  'fb-delete':
+    'Góp ý (và ảnh đính kèm, nếu có) bị xóa vĩnh viễn, không khôi phục được.',
   'crash-delete': 'Báo lỗi bị xóa vĩnh viễn, không khôi phục được.',
   'user-block':
     'Người này bị đăng xuất khỏi mọi thiết bị, không đăng nhập hay bình luận được nữa. Dữ liệu vẫn giữ; mở khóa được bất cứ lúc nào.',
@@ -1374,6 +1385,19 @@ export async function manage(
   if (exportMatch) {
     const response = await exportCsv(env, exportMatch[1]!, admin);
     if (response) return response;
+  }
+
+  const file = /^\/admin\/manage\/files\/(\d{1,12})$/.exec(path);
+  if (file) {
+    const row = await env.DB.prepare(
+      'SELECT file_key, file_type FROM feedback WHERE id = ?',
+    )
+      .bind(Number(file[1]))
+      .first<{ file_key: string | null; file_type: string | null }>();
+    return (
+      (await serveUpload(env, row?.file_key, row?.file_type)) ??
+      new Response('Not found', { status: 404, headers: htmlHeaders })
+    );
   }
 
   const back =

@@ -111,6 +111,10 @@ feedback:
   rateLimited: You are sending quickly; wait a minute and try again.
   closed: The feedback form is closed for now. Please check back later.
   noscript: JavaScript is needed to send feedback.
+  screenshot: 'Screenshot (optional)'
+  screenshotHint: 'PNG, JPEG or WebP, up to 3 MB. Only the site owner can see it. Please hide any personal details in the picture before sending.'
+  fileTooLarge: 'The picture is over 3 MB. Please pick a smaller one or crop it.'
+  fileType: 'Only PNG, JPEG or WebP pictures are accepted.'
 user:
   loginTitle: Sign in
   loginHeading: Welcome to ChiloLab

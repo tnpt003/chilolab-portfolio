@@ -12,7 +12,7 @@ updated: 2026-11-26
 
 - **Tài khoản:** khi đăng nhập bằng Google, website nhận mã tài khoản Google, email và tên của bạn. Tên hiển thị có thể đổi trong trang tài khoản. Website không nhận mật khẩu Google. Khi đăng nhập bằng email, website lưu email của bạn; mã 6 số chỉ được lưu dạng mã băm và hết hạn sau 10 phút. Website không dùng mật khẩu.
 - **Bình luận:** nội dung, thời gian, trang hoặc phiên bản bạn bình luận. Bình luận hiện công khai kèm tên hiển thị; email không bao giờ hiện công khai.
-- **Góp ý và báo lỗi:** nội dung bạn gửi, phiên bản ứng dụng, phiên bản Windows và cách liên hệ nếu bạn tự điền. Chỉ chủ website đọc được.
+- **Góp ý và báo lỗi:** nội dung bạn gửi, phiên bản ứng dụng, phiên bản Windows, cách liên hệ nếu bạn tự điền, và ảnh chụp màn hình nếu bạn đính kèm. Chỉ chủ website đọc và xem được. Ảnh lưu trong kho riêng tư của Cloudflare R2 và bị xóa cùng góp ý.
 - **Email báo bản mới:** chỉ khi bạn tự chọn trong trang tài khoản. Website lưu dự án bạn chọn, ngôn ngữ của email và thời điểm đăng ký. Email gửi tới địa chỉ của tài khoản. Website ghi lại ai đã nhận mỗi email để không gửi trùng, và xóa ghi chép đó 30 ngày sau khi gửi xong.
 - **Lượt tải:** chỉ một bộ đếm theo ngày cho từng tệp, không kèm thông tin về người tải.
 
@@ -37,5 +37,5 @@ Nội dung bình luận được kiểm tra tự động (danh sách từ và m�
 - Bạn có thể sửa hoặc xóa bình luận của mình bất cứ lúc nào.
 - Bỏ chọn trong [trang tài khoản](/user/account#updates) hoặc bấm link hủy trong email sẽ xóa đăng ký nhận email bản mới ngay.
 - Xóa tài khoản trong [trang tài khoản](/user/account) sẽ xóa tên, email, đăng ký nhận email và nội dung mọi bình luận của bạn ngay lập tức.
-- Góp ý được giữ đến khi chủ website xử lý xong rồi xóa. Muốn xóa sớm hoặc có câu hỏi, hãy gửi qua [trang góp ý](/pet-desktop/feedback).
+- Góp ý (cùng ảnh đính kèm) được giữ đến khi chủ website xử lý xong rồi xóa. Muốn xóa sớm hoặc có câu hỏi, hãy gửi qua [trang góp ý](/pet-desktop/feedback).
 - Mỗi tuần, cơ sở dữ liệu được sao lưu vào một kho riêng tư chỉ chủ website mở được, để khôi phục khi có sự cố. Mỗi bản sao lưu giữ tối đa 12 tuần, nên dữ liệu đã xóa có thể còn trong bản sao lưu cũ tới 12 tuần rồi mới mất hẳn.

@@ -4,6 +4,13 @@ import { cmsAuth, cmsPage } from './cms';
 import { comments } from './comments';
 import { addCrashReport } from './crashes';
 import {
+  deleteUpload,
+  MAX_FILE,
+  readUpload,
+  storeUpload,
+  type Upload,
+} from './files';
+import {
   asLocale,
   baseHeaders,
   json,
@@ -44,14 +51,51 @@ async function allowed(request: Request, env: Env) {
   return data;
 }
 
+/**
+ * Feedback arrives as JSON, or as multipart form data (a "data" part with
+ * the same JSON plus an optional "screenshot" image) when a file is attached.
+ */
+async function readFeedback(
+  request: Request,
+): Promise<
+  | { body: Record<string, unknown>; upload: Upload | null }
+  | { error: string; status: number }
+> {
+  const type = request.headers.get('Content-Type') ?? '';
+  if (!type.startsWith('multipart/form-data')) {
+    const body = await readJson(request);
+    return body ? { body, upload: null } : { error: 'invalid', status: 400 };
+  }
+  if (Number(request.headers.get('Content-Length') ?? 0) > MAX_FILE + 64_000)
+    return { error: 'file_too_large', status: 413 };
+  const form = await request.formData().catch(() => null);
+  const data = form?.get('data');
+  if (typeof data !== 'string' || data.length > 16_000)
+    return { error: 'invalid', status: 400 };
+  let body: unknown;
+  try {
+    body = JSON.parse(data);
+  } catch {
+    return { error: 'invalid', status: 400 };
+  }
+  if (!body || typeof body !== 'object' || Array.isArray(body))
+    return { error: 'invalid', status: 400 };
+  const upload = await readUpload(form!.get('screenshot'));
+  if (upload === 'too_large') return { error: 'file_too_large', status: 413 };
+  if (upload === 'bad_file') return { error: 'file_type', status: 400 };
+  return { body: body as Record<string, unknown>, upload };
+}
+
 async function addFeedback(request: Request, env: Env, ctx: ExecutionContext) {
   const settings = await getSettings(env);
   if (!settings.feedbackOpen) return json({ error: 'closed' }, 403);
   const ip = request.headers.get('CF-Connecting-IP') ?? 'unknown';
   if (!(await underLimit(env, `ip:${ip}`)))
     return json({ error: 'rate_limited' }, 429);
-  const body = await readJson(request);
-  if (!body) return json({ error: 'invalid' }, 400);
+  const read = await readFeedback(request);
+  if ('error' in read) return json({ error: read.error }, read.status);
+  const { body, upload } = read;
+  if (upload && !env.BACKUPS) return json({ error: 'file_unavailable' }, 503);
   const project = String(body.project ?? '');
   const kind = ['idea', 'bug', 'other'].find((value) => value === body.kind);
   const summary = text(body.summary, 3, 120);
@@ -76,22 +120,32 @@ async function addFeedback(request: Request, env: Env, ctx: ExecutionContext) {
   if (!(await human(request, env, body.token)))
     return json({ error: 'verification_failed' }, 403);
   const user = await currentUser(request, env);
-  await env.DB.prepare(
-    `INSERT INTO feedback (project, kind, summary, message, contact, app_version, os, locale, user_id)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-  )
-    .bind(
-      project,
-      kind,
-      summary,
-      message,
-      contact,
-      appVersion,
-      os,
-      locale,
-      user?.id ?? null,
+  const key = upload ? await storeUpload(env, upload) : null;
+  try {
+    await env.DB.prepare(
+      `INSERT INTO feedback (project, kind, summary, message, contact, app_version, os, locale, user_id, file_key, file_type, file_bytes)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
-    .run();
+      .bind(
+        project,
+        kind,
+        summary,
+        message,
+        contact,
+        appVersion,
+        os,
+        locale,
+        user?.id ?? null,
+        key,
+        upload?.type ?? null,
+        upload?.bytes.byteLength ?? null,
+      )
+      .run();
+  } catch (error) {
+    // No row points at the image, so do not keep it.
+    await deleteUpload(env, key).catch(() => {});
+    throw error;
+  }
   if (settings.notifyFeedback)
     ctx.waitUntil(
       notifyFeedback(env, new URL(request.url).origin, {

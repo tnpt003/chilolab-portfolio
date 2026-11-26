@@ -192,7 +192,7 @@ const t = (await getUi(locale)).comments;
       }
       const who = el('p', 'comment-as');
       who.append(`${copy.signedInAs} `, el('strong', '', me.displayName));
-      const { form, area, status } = editor(
+      const { form, area } = editor(
         '',
         copy.placeholder,
         copy.post,
