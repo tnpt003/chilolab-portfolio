@@ -20,3 +20,6 @@ image/
 backup*.sql
 backup*.json.gz
 restore*.sql
+
+# Claude Code personal settings
+.claude/settings.local.json
