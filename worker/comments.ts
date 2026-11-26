@@ -62,7 +62,7 @@ async function limitError(
   if (isNew && settings.commentsPerHour > 0) {
     const since = new Date(Date.now() - 3600_000)
       .toISOString()
-      .replace(/.d+Z$/, 'Z');
+      .replace(/\.\d+Z$/, 'Z');
     const row = await env.DB.prepare(
       'SELECT COUNT(*) AS n FROM comments WHERE user_id = ? AND created_at > ?',
     )

@@ -105,6 +105,29 @@ npm run dev:worker               # build rồi chạy Worker ở http://localhos
 
 Đăng nhập Google trên máy cần `GOOGLE_CLIENT_SECRET` trong `.dev.vars` và redirect URI `http://localhost:8787/api/auth/google/callback` trong Google Cloud. Bản build production dùng Turnstile site key thật, không chạy trên localhost; muốn thử form góp ý thì build với `PUBLIC_TURNSTILE_SITE_KEY=1x00000000000000000000AA`. Workers AI luôn gọi lên Cloudflare (tính vào quota miễn phí).
 
+## Test tự động cho Worker
+
+`npm run test:worker` chạy `tests/worker/*.test.ts` bằng `node:test`, không cần thư viện thêm. D1 được giả lập bằng SQLite có sẵn trong Node, dựng từ chính các file trong `migrations/`. R2 là một bucket giả trong bộ nhớ. Mọi `fetch` ra ngoài (Resend, Turnstile, Google, GitHub) đều bị chặn và ghi lại, nên test không gửi email thật. CI chạy lệnh này sau `verify`.
+
+Mỗi file test một phần:
+
+- `admin-gate`: `/admin/manage` chỉ mở cho owner (kể cả phiên owner quá 7 ngày, phiên hết hạn, tài khoản bị khóa).
+- `admin-actions`: thao tác trong panel phải từ chính site, thao tác xóa phải xác nhận, owner không bị khóa hoặc xóa, không thao tác nào đổi được role.
+- `cms`: token CMS chỉ đến tay owner.
+- `email-login`: mã 6 số lưu dạng hash, khóa sau 5 lần sai, hết hạn, một mã mỗi phút.
+- `google`: PKCE, `state` sai hoặc thiếu bị chặn, ID token sai issuer, audience hoặc thời hạn bị từ chối.
+- `privacy`: token phiên chỉ lưu dạng hash, không lưu IP, người dùng tự xóa được tài khoản.
+- `comments`: kiểm duyệt bình luận và quyền xóa, duyệt.
+- `feedback`: ảnh đính kèm kiểm loại theo nội dung file, giới hạn 3 MB, bị xóa nếu lưu góp ý lỗi, chỉ owner mở được.
+- `crashes`: báo lỗi app tắt mặc định, cần consent, xóa tên người dùng và email.
+- `subscriptions`: hủy đăng ký một chạm.
+- `releases`: giới hạn 80 email mỗi ngày.
+- `maintenance`: dọn dẹp hằng ngày, backup R2 (bỏ `sessions` và `email_codes`, giữ 12 bản), email báo owner khi lỗi.
+
+Khi thêm migration hoặc trang quản trị mới, test "every panel page renders" sẽ báo nếu code và schema lệch nhau.
+
+Các file test không được type-check (Node chỉ bỏ type đi). Đừng dùng enum hoặc parameter property trong `tests/worker` và `worker/`.
+
 ## Triển khai thay đổi schema
 
 Thêm file mới trong `migrations/`, không sửa file cũ. Áp dụng **ngay trước** khi push code dùng schema mới:

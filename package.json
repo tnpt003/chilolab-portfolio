@@ -11,6 +11,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "test:browser": "playwright test",
+    "test:worker": "node --import ./tests/worker/hooks.mjs --test \"tests/worker/*.test.ts\"",
     "test:container": "node scripts/smoke-container.mjs",
     "check": "astro check",
     "verify": "npm run check && npm run check:worker && npm run build && node scripts/verify-build.mjs",
