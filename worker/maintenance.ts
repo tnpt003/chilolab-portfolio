@@ -8,6 +8,7 @@ import { OWNER_DAYS } from './session';
 //   sign-in codes, owner sessions past the 7-day limit, admin log > 1 year).
 // - cleanupPhase2(): crash reports after 90 days, and the list of who got a
 //   release email 30 days after that notice finished.
+// - cleanupAuthStats(): hourly sign-in counters after 90 days.
 // - deliverNotices() (worker/releases.ts): the rest of any release email
 //   that did not fit in an earlier day's sending budget.
 // - backup(): once a week, a gzipped JSON copy of the visitor data in the
@@ -60,6 +61,14 @@ export async function cleanupPhase2(env: Env) {
     crashes: crashes!.meta.changes ?? 0,
     deliveries: deliveries!.meta.changes ?? 0,
   };
+}
+
+/** Sign-in counters (migrations/0009) older than 90 days. */
+export async function cleanupAuthStats(env: Env) {
+  const done = await env.DB.prepare('DELETE FROM auth_stats WHERE hour < ?')
+    .bind(new Date(Date.now() - 90 * 86400_000).toISOString().slice(0, 13))
+    .run();
+  return { authStats: done.meta.changes ?? 0 };
 }
 
 // Short-lived rows are left out: a restored site signs everyone in again.
@@ -170,6 +179,14 @@ export async function scheduled(controller: ScheduledController, env: Env) {
     await alert(
       env,
       `Dọn báo lỗi app hoặc gửi email bản mới thất bại (đã chạy migration 0007 chưa?): ${describe(error)}`,
+    );
+  }
+  try {
+    console.log('cleanup auth stats', await cleanupAuthStats(env));
+  } catch (error) {
+    await alert(
+      env,
+      `Dọn số liệu đăng nhập thất bại (đã chạy migration 0009 chưa?): ${describe(error)}`,
     );
   }
   if (when.getUTCDay() === 0) {

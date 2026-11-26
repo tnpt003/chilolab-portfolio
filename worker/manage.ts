@@ -32,6 +32,7 @@ import {
   type Badges,
   type Row,
 } from './manage-ui';
+import { authLabels, sessionHash, type AuthEvent } from './security';
 import { ADMIN_HINT, cookie, endSession } from './session';
 import {
   clampInt,
@@ -53,6 +54,7 @@ export type { Admin };
 const stamp = () => new Date().toISOString().replace(/\.\d+Z$/, 'Z');
 
 const notices: Record<string, string> = {
+  'signout-others': 'Đã đăng xuất mọi thiết bị khác của tài khoản này.',
   saved: 'Đã lưu cài đặt.',
   unchanged: 'Không có gì thay đổi.',
   approve: 'Đã cho hiện bình luận.',
@@ -775,6 +777,49 @@ ${table(
 ${pager(url, page, Number(total.results[0]?.n ?? 0))}`;
 }
 
+/** Sign-in counters (worker/security.ts) and this owner's sessions. */
+async function signInSection(env: Env, admin: Admin, back: string) {
+  const [hours, sessions] = await env.DB.batch<Row>([
+    env.DB.prepare(
+      `SELECT kind,
+              SUM(CASE WHEN hour >= ? THEN count ELSE 0 END) AS day,
+              SUM(count) AS week,
+              MAX(CASE WHEN hour >= ? THEN count ELSE 0 END) AS peak
+         FROM auth_stats WHERE hour >= ? GROUP BY kind`,
+    ).bind(
+      new Date(Date.now() - 86400_000).toISOString().slice(0, 13),
+      new Date(Date.now() - 86400_000).toISOString().slice(0, 13),
+      new Date(Date.now() - 7 * 86400_000).toISOString().slice(0, 13),
+    ),
+    env.DB.prepare(
+      'SELECT created_at, expires_at FROM sessions WHERE user_id = ? ORDER BY created_at DESC',
+    ).bind(admin.userId ?? -1),
+  ]);
+  const byKind = new Map(hours!.results.map((row) => [row.kind, row]));
+  const rows = (Object.keys(authLabels) as AuthEvent[]).map((kind) => {
+    const row = byKind.get(kind);
+    return `<tr><td>${authLabels[kind]}</td><td>${escape(row?.day ?? 0)}</td><td>${escape(row?.peak ?? 0)}</td><td>${escape(row?.week ?? 0)}</td></tr>`;
+  });
+  const own = sessions!.results;
+  return `<section class="box" id="auth"><h2>Đăng nhập</h2><p class="hint">Chỉ đếm theo giờ, không lưu email hay IP. Email báo chủ site khi một loại vượt ngưỡng trong một giờ (ví dụ 20 lần nhập sai mã).</p>${table(
+    ['Sự kiện', '24 giờ qua', 'Cao nhất 1 giờ', '7 ngày qua'],
+    rows,
+    '',
+  )}</section>
+<section class="box" id="sessions"><h2>Phiên đăng nhập của bạn</h2>${
+    admin.userId === null
+      ? '<p class="hint">Đang mở bằng chế độ dev trên máy, không có phiên.</p>'
+      : `<p>Tài khoản này đang đăng nhập ở <strong>${own.length}</strong> nơi (tính cả trình duyệt này). Mỗi phiên chủ site hết hạn sau 7 ngày.</p>${table(
+          ['Bắt đầu', 'Hết hạn'],
+          own.map(
+            (row) =>
+              `<tr><td>${when(row.created_at)}</td><td>${when(row.expires_at)}</td></tr>`,
+          ),
+          '',
+        )}${own.length > 1 ? `${formStart(back, 'sessions-form')}${button('signout-others', 'Đăng xuất mọi thiết bị khác', 'danger')}</form>` : ''}`
+  }</section>`;
+}
+
 async function statusPage(env: Env, ctx: ExecutionContext) {
   const service = (ok: boolean, label: string, hint: string) =>
     `<tr><td>${label}</td><td>${ok ? '<span class="tag ok">Đã cấu hình</span>' : '<span class="tag">Chưa có</span>'}</td><td><small>${hint}</small></td></tr>`;
@@ -784,7 +829,8 @@ async function statusPage(env: Env, ctx: ExecutionContext) {
             (SELECT COUNT(*) FROM pragma_table_info('users') WHERE name = 'blocked_at') AS blocked,
             (SELECT COUNT(*) FROM pragma_table_info('feedback') WHERE name = 'note') AS note,
             (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name IN ('subscriptions', 'release_notices', 'notice_deliveries', 'crash_reports')) AS phase2,
-            (SELECT COUNT(*) FROM pragma_table_info('feedback') WHERE name = 'file_key') AS files`,
+            (SELECT COUNT(*) FROM pragma_table_info('feedback') WHERE name = 'file_key') AS files,
+            (SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'auth_stats') AS authStats`,
   ).first<Row>();
   const migrated = (value: unknown) => Number(value) > 0;
   const github = await getStats('pet-desktop', ctx);
@@ -819,6 +865,7 @@ async function statusPage(env: Env, ctx: ExecutionContext) {
       `<tr><td>0006 · Khóa tài khoản, ghi chú góp ý, nhật ký</td><td>${migrated(schema?.adminLog) && migrated(schema?.blocked) && migrated(schema?.note) ? '<span class="tag ok">Đã chạy</span>' : '<span class="tag">Chưa chạy</span>'}</td></tr>`,
       `<tr><td>0007 · Email bản mới, báo lỗi app</td><td>${Number(schema?.phase2) === 4 ? '<span class="tag ok">Đã chạy</span>' : '<span class="tag">Chưa chạy</span>'}</td></tr>`,
       `<tr><td>0008 · Ảnh đính kèm góp ý</td><td>${migrated(schema?.files) ? '<span class="tag ok">Đã chạy</span>' : '<span class="tag">Chưa chạy</span>'}</td></tr>`,
+      `<tr><td>0009 · Số liệu đăng nhập</td><td>${migrated(schema?.authStats) ? '<span class="tag ok">Đã chạy</span>' : '<span class="tag">Chưa chạy</span>'}</td></tr>`,
     ],
     '',
   )}<p class="hint">Chưa chạy thì: <code>npm run db:migrate:remote</code>.</p></section>`;
@@ -1187,6 +1234,26 @@ async function post(
     return redirect(backTo(back, changed.length ? 'saved' : 'unchanged'), 303);
   }
 
+  // Ends every session of this owner account except the one in use, e.g.
+  // after a sign-in alert email the owner did not expect.
+  if (action === 'signout-others') {
+    const current = await sessionHash(request);
+    if (admin.userId === null || !current) return bad();
+    const done = await env.DB.prepare(
+      'DELETE FROM sessions WHERE user_id = ? AND token_hash <> ?',
+    )
+      .bind(admin.userId, current)
+      .run();
+    await log(
+      env,
+      admin,
+      'signout-others',
+      `tài khoản #${admin.userId}`,
+      `${done.meta.changes ?? 0} phiên`,
+    );
+    return redirect(backTo(back, 'signout-others'), 303);
+  }
+
   if (action.startsWith('notice-send:')) {
     const [project = '', version = ''] = action.slice(12).split('@');
     const names = (await catalog(env))[project];
@@ -1414,7 +1481,15 @@ export async function manage(
     '/admin/manage/crashes': ['Báo lỗi app', () => crashesPage(env, url, back)],
     '/admin/manage/settings': ['Cài đặt', () => settingsPage(env, url)],
     '/admin/manage/log': ['Nhật ký', () => logPage(env, url)],
-    '/admin/manage/status': ['Tình trạng dịch vụ', () => statusPage(env, ctx)],
+    '/admin/manage/status': [
+      'Tình trạng dịch vụ',
+      async () =>
+        (await statusPage(env, ctx)) +
+        (await signInSection(env, admin, back).catch(
+          () =>
+            '<section class="box"><h2>Đăng nhập</h2><p class="hint">Chưa có số liệu: chạy migration 0009 (<code>npm run db:migrate:remote</code>).</p></section>',
+        )),
+    ],
   };
   const entry: [string, () => Promise<string | null>] | undefined = detail
     ? detail[1] === 'comments'

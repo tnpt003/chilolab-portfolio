@@ -1,6 +1,7 @@
 import { deleteUserComments } from './comments';
 import { emailLogin } from './email-login';
 import { mailEnabled } from './mail';
+import { alertOwnerSignIn, countAuth } from './security';
 import { getSettings } from './settings';
 import {
   json,
@@ -82,8 +83,10 @@ async function finishGoogle(request: Request, env: Env) {
     return redirect(`${loginPath('vi')}?error=expired`);
   }
   const clear = { 'Set-Cookie': cookie(OAUTH_COOKIE, '', 0) };
-  const fail = (reason: string) =>
-    redirect(`${loginPath(saved.locale)}?error=${reason}`, 302, clear);
+  const fail = async (reason: string) => {
+    if (reason === 'google') await countAuth(env, 'google_failed');
+    return redirect(`${loginPath(saved.locale)}?error=${reason}`, 302, clear);
+  };
 
   const code = url.searchParams.get('code');
   if (!code || url.searchParams.get('state') !== saved.state)
@@ -133,10 +136,10 @@ async function finishGoogle(request: Request, env: Env) {
   const now = new Date().toISOString();
 
   let user = await env.DB.prepare(
-    'SELECT id, blocked_at FROM users WHERE google_sub = ? OR email = ? ORDER BY google_sub = ? DESC LIMIT 1',
+    'SELECT id, blocked_at, role FROM users WHERE google_sub = ? OR email = ? ORDER BY google_sub = ? DESC LIMIT 1',
   )
     .bind(claims.sub, email, claims.sub)
-    .first<{ id: number; blocked_at?: string | null }>();
+    .first<{ id: number; blocked_at?: string | null; role?: string }>();
   if (user?.blocked_at) return fail('blocked');
   if (user)
     await env.DB.prepare(
@@ -146,14 +149,18 @@ async function finishGoogle(request: Request, env: Env) {
       .run();
   else if (!(await getSettings(env)).signups)
     return fail('registration_closed');
-  else
+  else {
     user = await env.DB.prepare(
       `INSERT INTO users (google_sub, email, display_name, last_login_at)
        VALUES (?, ?, ?, ?) RETURNING id`,
     )
       .bind(claims.sub, email, name, now)
       .first<{ id: number }>();
+    await countAuth(env, 'signup');
+  }
   if (!user) return fail('google');
+  await countAuth(env, 'signin_google');
+  if (user.role === 'owner') await alertOwnerSignIn(env, request, email);
 
   const headers = new Headers({ Location: safeReturn(saved.back) });
   headers.append('Set-Cookie', clear['Set-Cookie']);

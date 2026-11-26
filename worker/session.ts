@@ -2,7 +2,8 @@ import { randomToken, sha256, type Env } from './env';
 
 // Session cookie: random 256-bit token, HttpOnly, Secure, SameSite=Lax.
 // The __Host- prefix pins it to this exact host and path "/".
-const COOKIE = '__Host-chilolab_session';
+export const SESSION_COOKIE = '__Host-chilolab_session';
+const COOKIE = SESSION_COOKIE;
 const DAYS = 30;
 /** The owner opens /admin/manage, so a stolen owner cookie works for less time. */
 export const OWNER_DAYS = 7;
