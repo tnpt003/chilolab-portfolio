@@ -2,13 +2,13 @@
 import type { CollectionEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import VersionList from './VersionList.astro';
-import { pathFor } from '../lib/content';
-import { listVersions, versionCopy } from '../lib/versions';
+import { getUi, pathFor } from '../lib/content';
+import { listVersions } from '../lib/versions';
 interface Props {
   project: CollectionEntry<'projects'>;
 }
 const { data } = Astro.props.project;
-const t = versionCopy[data.locale];
+const t = (await getUi(data.locale)).versions;
 const entries = await listVersions(data.locale, data.slug);
 ---
 

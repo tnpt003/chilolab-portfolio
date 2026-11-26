@@ -51,7 +51,7 @@ export async function getUi(locale: Locale) {
       throw new Error(`Interface text needs exactly one ${language} file.`);
     return found[0].data;
   };
-  const marks = (text: string) => [...text.matchAll(/{w+}/g)].sort().join();
+  const marks = (text: string) => [...text.matchAll(/\{\w+\}/g)].sort().join();
   const compare = (vi: unknown, en: unknown, path: string) => {
     if (typeof vi === 'string' && typeof en === 'string') {
       if (marks(vi) !== marks(en))

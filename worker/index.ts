@@ -1,6 +1,6 @@
 import { devIdentity } from './access';
 import { auth } from './auth';
-import { cmsAuth, cmsPage } from './cms';
+import { cmsAuth, cmsPage, cmsToken } from './cms';
 import { comments } from './comments';
 import { addCrashReport } from './crashes';
 import {
@@ -225,6 +225,8 @@ export default {
       return cmsPage(request, env);
     if (path === '/api/cms/auth' && request.method === 'GET')
       return cmsAuth(request, env);
+    if (path === '/api/cms/token' && request.method === 'GET')
+      return cmsToken(request, env);
 
     // Answered before the same-origin check: the desktop app has no Origin,
     // and mail apps post one-click unsubscribes from their own servers.

@@ -71,14 +71,16 @@ Thiết lập một lần:
 Dùng hằng ngày:
 
 1. Đăng nhập tại `/user/login` bằng Gmail owner (hoặc mã email).
-2. Mở `https://chilolab.com/admin` → bấm **Sign In with GitHub**. Cửa sổ nhỏ mở `/api/cms/auth`, kiểm tra phiên owner và trả token cho CMS; không có trang đăng nhập GitHub nào.
+2. Mở `https://chilolab.com/admin`: CMS tự đăng nhập. `public/admin/boot.js` lấy token từ `/api/cms/token` (chỉ trả cho phiên owner), lưu vào `localStorage["sveltia-cms.user"]` rồi mới nạp Sveltia. Nếu bước này lỗi, trang vẫn hiện nút **Sign In with GitHub** như cũ: cửa sổ nhỏ mở `/api/cms/auth`, kiểm tra phiên owner và trả token; không có trang đăng nhập GitHub nào.
 3. Soạn và Save: mỗi lần Save là một commit lên `main`, Workers Builds build lại website.
 
-Người không phải owner mở `/admin` bị chuyển sang trang đăng nhập (hoặc nhận 403 nếu đã đăng nhập bằng tài khoản thường); `/api/cms/auth` trả lỗi và không lộ token. Token hết hạn hoặc bị thu hồi thì tạo token mới và chạy lại bước 2. Phiên owner hết hạn sau 7 ngày.
+Sửa ngay từ trang web: khi đăng nhập owner, dải vàng trên cùng có **Sửa trang này**, **Mở CMS** và **Mở trang quản trị**; mỗi phần của trang (hero, từng dự án, khung tải xuống, các mục trang Về mình, quyền riêng tư, footer…) có nút **✎ Sửa** ở góc phải, mở thẳng mục đó trong CMS. Phần nào sửa ở mục nào được khai báo bằng thuộc tính `data-edit` (link dựng bằng `src/lib/edit.ts`); thêm phần mới thì gắn `data-edit` cho nó. Khách không thấy và không tải gì thêm: script chỉ chạy khi có cookie gợi ý owner và `/api/me` xác nhận.
+
+Người không phải owner mở `/admin` bị chuyển sang trang đăng nhập (hoặc nhận 403 nếu đã đăng nhập bằng tài khoản thường); `/api/cms/auth` và `/api/cms/token` trả lỗi và không lộ token (`/api/cms/token` còn từ chối yêu cầu từ trang khác qua `Sec-Fetch-Site`). Token nằm trong `localStorage` của trình duyệt owner; trên máy dùng chung, bấm Sign Out trong CMS và đăng xuất khỏi trang khi xong. Token hết hạn hoặc bị thu hồi thì tạo token mới và chạy lại bước 2. Phiên owner hết hạn sau 7 ngày.
 
 ## Nâng cấp phiên bản CMS
 
-Đổi số phiên bản trong `src` của `public/admin/index.html`, tính lại SRI rồi thay giá trị `integrity`:
+Đổi số phiên bản trong `CMS_SRC` của `public/admin/boot.js`, tính lại SRI rồi thay giá trị `CMS_INTEGRITY`:
 
 ```sh
 curl -sL https://unpkg.com/@sveltia/cms@<phiên-bản>/dist/sveltia-cms.js | openssl dgst -sha384 -binary | openssl base64 -A

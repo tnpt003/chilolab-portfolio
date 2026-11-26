@@ -1,4 +1,4 @@
-import { baseHeaders, randomToken, redirect, type Env } from './env';
+import { baseHeaders, json, randomToken, redirect, type Env } from './env';
 import { currentUser } from './session';
 
 // Sveltia CMS (public/admin) signs in through the owner's site account
@@ -17,6 +17,21 @@ export async function cmsPage(request: Request, env: Env) {
       headers: { ...baseHeaders, 'Content-Type': 'text/plain; charset=utf-8' },
     });
   return redirect(`/user/login?${new URLSearchParams({ return: '/admin' })}`);
+}
+
+/**
+ * Token for the owner's /admin page (public/admin/boot.js), so the CMS signs
+ * in on its own without the "Sign In with GitHub" popup. Same-origin fetches
+ * from an owner session only; everything else gets an error and no token.
+ */
+export async function cmsToken(request: Request, env: Env) {
+  const site = request.headers.get('Sec-Fetch-Site');
+  if (site && site !== 'same-origin') return json({ error: 'Forbidden' }, 403);
+  const user = await currentUser(request, env);
+  if (user?.role !== 'owner') return json({ error: 'Forbidden' }, 403);
+  if (!env.CMS_GITHUB_TOKEN)
+    return json({ error: 'CMS_GITHUB_TOKEN is not set on the Worker.' }, 503);
+  return json({ token: env.CMS_GITHUB_TOKEN });
 }
 
 /**

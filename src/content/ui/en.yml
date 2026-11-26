@@ -182,3 +182,49 @@ updates:
 downloads:
   count: '{n} downloads'
   source: Installer and portable downloads from GitHub Releases, updated every minute.
+owner:
+  mode: Owner mode
+  note: Visitors do not see this bar.
+  pending: '{held} held comments · {feedback} new feedback'
+  manage: Open the admin panel
+  cms: Open the CMS
+  editPage: Edit this page
+  edit: Edit
+chrome:
+  skip: Skip to content
+  mainNav: Main navigation
+  feedTitle: 'ChiloLab: version notes'
+  shareAlt: Pet Desktop on a Windows desktop
+  notFoundTitle: Page not found
+  notFound: "This page doesn't exist."
+  notFoundDescription: This page does not exist.
+  notFoundHome: Home in English
+  gallery: In the app
+  galleryViewer: Picture viewer
+  galleryPrevious: Previous picture
+  galleryNext: Next picture
+  galleryClose: Close
+  install: 'Install in {n} steps'
+  installSteps: See each step
+  video: '{project} introduction video'
+  openVideo: Open video
+versions:
+  heading: Versions
+  intro: What’s new and what’s fixed in each update, written down here.
+  all: All versions
+  read: Read version details
+  empty: No version posts yet. I’ll post here when an update comes out.
+  back: Back to product
+  source: Source documentation
+  downloadLatest: Download the latest version
+  portable: Portable build
+  latestHeading: Download
+  latestInstaller: 'Download the latest {project} for Windows'
+  feedback: Report a bug / suggest
+  discuss: Comment on this version
+  latestNotes: See what’s new
+  date: Release date
+  pending: These notes describe a development or preview version, not a public release announcement.
+  released: Released
+  preview: Preview
+  development: In development

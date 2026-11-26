@@ -1,12 +1,13 @@
 ---
 import Icon, { type IconName } from './Icon.astro';
+import { getUi } from '../lib/content';
 
 interface Props {
   steps: { icon: IconName; title: string; text: string }[];
   locale: 'vi' | 'en';
 }
 const { steps, locale } = Astro.props;
-const vi = locale === 'vi';
+const c = (await getUi(locale)).chrome;
 
 // Step text is plain, with **bold** for button names and `code` for files.
 const escape = (value: string) =>
@@ -22,11 +23,7 @@ const format = (value: string) =>
 ---
 
 <section class="install" aria-labelledby="install-heading">
-  <h2 id="install-heading">
-    {vi
-      ? `Cài đặt trong ${steps.length} bước`
-      : `Install in ${steps.length} steps`}
-  </h2>
+  <h2 id="install-heading">{c.install.replace('{n}', String(steps.length))}</h2>
   <ol class="steps install-steps">
     {steps.map((step, index) => (
       <li>

@@ -8,13 +8,9 @@
   </head>
   <body>
     <!--
-      Sveltia CMS, pinned with Subresource Integrity. To upgrade, change the
-      version and recompute the hash (see docs/CMS.md).
+      boot.js signs the CMS in with the owner session, then loads Sveltia CMS
+      (version and Subresource Integrity hash are pinned there; see docs/CMS.md).
     -->
-    <script
-      src="https://unpkg.com/@sveltia/cms@0.264.0/dist/sveltia-cms.js"
-      integrity="sha384-nXK/TrW1zvoqO7/l1W1waX3rDZgUlvE9E6bbW8BEUd/56zTeT7PQSk7Pxb+i6tJN"
-      crossorigin="anonymous"
-    ></script>
+    <script type="module" src="/admin/boot.js"></script>
   </body>
 </html>

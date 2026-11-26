@@ -12,7 +12,6 @@ import {
   alwaysLatest,
   featuredDownload,
   listVersions,
-  versionCopy,
   versionPath,
 } from '../lib/versions';
 import VersionList from './VersionList.astro';
@@ -20,6 +19,7 @@ import Comments from './Comments.astro';
 import { feedbackPath, userPath } from '../lib/community';
 import DownloadCounter from './DownloadCounter.astro';
 import DownloadStat from './DownloadStat.astro';
+import { editProject, editVersion } from '../lib/edit';
 interface Props {
   project: CollectionEntry<'projects'>;
 }
@@ -28,10 +28,14 @@ const { data } = project;
 const ui = await getUi(data.locale);
 const t = ui.site;
 const versions = await listVersions(data.locale, data.slug);
-const v = versionCopy[data.locale];
-const latest = (
-  await featuredDownload(data.locale, data.slug, data.featuredVersion)
-)?.data;
+const v = ui.versions;
+const featured = await featuredDownload(
+  data.locale,
+  data.slug,
+  data.featuredVersion,
+);
+const latest = featured?.data;
+const editPage = editProject(data.locale, data.slug);
 const { Content } = await render(project);
 const hasLinks = Boolean(data.demoUrl || data.downloadUrl);
 const poster =
@@ -47,17 +51,22 @@ const poster =
   locale={data.locale}
   slug={data.slug}
   share={data.preview}
+  edit={editPage}
 >
   <div class="project-detail wrap">
     <a class="back" href={`${pathFor(data.locale)}#projects`}>
       {t.back}
     </a>
-    <header class="detail-heading">
+    <header class="detail-heading" data-edit={editPage}>
       <h1>{data.title}</h1>
       <p class="lead">{data.description}</p>
     </header>
     {latest ? (
-      <section class="download-panel" aria-labelledby="download-heading">
+      <section
+        class="download-panel"
+        aria-labelledby="download-heading"
+        data-edit={editVersion(data.locale, data.slug, featured!.id)}
+      >
         <div>
           <h2 id="download-heading">{v.latestHeading}</h2>
           <p class="download-release">
@@ -106,9 +115,7 @@ const poster =
             <span>
               {data.downloadNote}{' '}
               {data.install.length > 0 && (
-                <a href="#install-heading">
-                  {data.locale === 'vi' ? 'Xem từng bước' : 'See each step'}
-                </a>
+                <a href="#install-heading">{ui.chrome.installSteps}</a>
               )}
             </span>
           </p>
@@ -135,16 +142,10 @@ const poster =
             preload="none"
             width="1280"
             height="720"
-            aria-label={
-              data.locale === 'vi'
-                ? 'Video giới thiệu Pet Desktop'
-                : 'Pet Desktop introduction video'
-            }
+            aria-label={ui.chrome.video.replace('{project}', data.title)}
           >
             <source src={data.video} type="video/mp4" />
-            <a href={data.video}>
-              {data.locale === 'vi' ? 'Mở video' : 'Open video'}
-            </a>
+            <a href={data.video}>{ui.chrome.openVideo}</a>
           </video>
         </div>
         {data.videoCaption && <figcaption>{data.videoCaption}</figcaption>}
@@ -171,7 +172,7 @@ const poster =
           </div>
         </aside>
       )}
-      <article class="prose">
+      <article class="prose" data-edit={editPage}>
         <Content />
       </article>
       {!hasLinks && (

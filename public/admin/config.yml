@@ -2172,6 +2172,279 @@ collections:
                   widget: text,
                   hint: 'VD (VI): Số lần tải bộ cài và bản portable từ GitHub Releases, cập nhật mỗi phút.',
                 }
+          - label: 'Dải chủ site và nút sửa'
+            name: owner
+            widget: object
+            collapsed: true
+            fields:
+              - {
+                  label: 'mode',
+                  name: 'mode',
+                  widget: string,
+                  hint: 'VD (VI): Chế độ chủ site',
+                }
+              - {
+                  label: 'note',
+                  name: 'note',
+                  widget: string,
+                  hint: 'VD (VI): Khách không thấy dải này.',
+                }
+              - {
+                  label: 'pending',
+                  name: 'pending',
+                  widget: string,
+                  hint: 'VD (VI): {held} bình luận chờ duyệt · {feedback} góp ý mới',
+                }
+              - {
+                  label: 'manage',
+                  name: 'manage',
+                  widget: string,
+                  hint: 'VD (VI): Mở trang quản trị',
+                }
+              - {
+                  label: 'cms',
+                  name: 'cms',
+                  widget: string,
+                  hint: 'VD (VI): Mở CMS',
+                }
+              - {
+                  label: 'editPage',
+                  name: 'editPage',
+                  widget: string,
+                  hint: 'VD (VI): Sửa trang này',
+                }
+              - {
+                  label: 'edit',
+                  name: 'edit',
+                  widget: string,
+                  hint: 'VD (VI): Sửa',
+                }
+          - label: 'Chữ phụ (skip link, 404, ảnh, video)'
+            name: chrome
+            widget: object
+            collapsed: true
+            fields:
+              - {
+                  label: 'skip',
+                  name: 'skip',
+                  widget: string,
+                  hint: 'VD (VI): Đến nội dung',
+                }
+              - {
+                  label: 'mainNav',
+                  name: 'mainNav',
+                  widget: string,
+                  hint: 'VD (VI): Điều hướng chính',
+                }
+              - {
+                  label: 'feedTitle',
+                  name: 'feedTitle',
+                  widget: string,
+                  hint: 'VD (VI): ChiloLab: ghi chú phiên bản',
+                }
+              - {
+                  label: 'shareAlt',
+                  name: 'shareAlt',
+                  widget: string,
+                  hint: 'VD (VI): Giao diện Pet Desktop trên desktop Windows',
+                }
+              - {
+                  label: 'notFoundTitle',
+                  name: 'notFoundTitle',
+                  widget: string,
+                  hint: 'VD (VI): Không tìm thấy trang',
+                }
+              - {
+                  label: 'notFound',
+                  name: 'notFound',
+                  widget: string,
+                  hint: 'VD (VI): Trang này chưa có ở đây.',
+                }
+              - {
+                  label: 'notFoundDescription',
+                  name: 'notFoundDescription',
+                  widget: string,
+                  hint: 'VD (VI): Trang bạn tìm không tồn tại.',
+                }
+              - {
+                  label: 'notFoundHome',
+                  name: 'notFoundHome',
+                  widget: string,
+                  hint: 'VD (VI): Về trang chủ',
+                }
+              - {
+                  label: 'gallery',
+                  name: 'gallery',
+                  widget: string,
+                  hint: 'VD (VI): Hình trong app',
+                }
+              - {
+                  label: 'galleryViewer',
+                  name: 'galleryViewer',
+                  widget: string,
+                  hint: 'VD (VI): Xem ảnh lớn',
+                }
+              - {
+                  label: 'galleryPrevious',
+                  name: 'galleryPrevious',
+                  widget: string,
+                  hint: 'VD (VI): Ảnh trước',
+                }
+              - {
+                  label: 'galleryNext',
+                  name: 'galleryNext',
+                  widget: string,
+                  hint: 'VD (VI): Ảnh sau',
+                }
+              - {
+                  label: 'galleryClose',
+                  name: 'galleryClose',
+                  widget: string,
+                  hint: 'VD (VI): Đóng',
+                }
+              - {
+                  label: 'install',
+                  name: 'install',
+                  widget: string,
+                  hint: 'VD (VI): Cài đặt trong {n} bước',
+                }
+              - {
+                  label: 'installSteps',
+                  name: 'installSteps',
+                  widget: string,
+                  hint: 'VD (VI): Xem từng bước',
+                }
+              - {
+                  label: 'video',
+                  name: 'video',
+                  widget: string,
+                  hint: 'VD (VI): Video giới thiệu {project}',
+                }
+              - {
+                  label: 'openVideo',
+                  name: 'openVideo',
+                  widget: string,
+                  hint: 'VD (VI): Mở video',
+                }
+          - label: 'Trang phiên bản'
+            name: versions
+            widget: object
+            collapsed: true
+            fields:
+              - {
+                  label: 'heading',
+                  name: 'heading',
+                  widget: string,
+                  hint: 'VD (VI): Phiên bản',
+                }
+              - {
+                  label: 'intro',
+                  name: 'intro',
+                  widget: string,
+                  hint: 'VD (VI): Mỗi bản cập nhật có gì mới, sửa gì, mình ghi lại ở đây.',
+                }
+              - {
+                  label: 'all',
+                  name: 'all',
+                  widget: string,
+                  hint: 'VD (VI): Tất cả phiên bản',
+                }
+              - {
+                  label: 'read',
+                  name: 'read',
+                  widget: string,
+                  hint: 'VD (VI): Xem chi tiết phiên bản',
+                }
+              - {
+                  label: 'empty',
+                  name: 'empty',
+                  widget: text,
+                  hint: 'VD (VI): Chưa có bài nào về phiên bản. Có bản cập nhật là mình đăng ở đây.',
+                }
+              - {
+                  label: 'back',
+                  name: 'back',
+                  widget: string,
+                  hint: 'VD (VI): Về trang sản phẩm',
+                }
+              - {
+                  label: 'source',
+                  name: 'source',
+                  widget: string,
+                  hint: 'VD (VI): Tài liệu nguồn',
+                }
+              - {
+                  label: 'downloadLatest',
+                  name: 'downloadLatest',
+                  widget: string,
+                  hint: 'VD (VI): Tải bản mới nhất',
+                }
+              - {
+                  label: 'portable',
+                  name: 'portable',
+                  widget: string,
+                  hint: 'VD (VI): Bản Portable',
+                }
+              - {
+                  label: 'latestHeading',
+                  name: 'latestHeading',
+                  widget: string,
+                  hint: 'VD (VI): Tải xuống',
+                }
+              - {
+                  label: 'latestInstaller',
+                  name: 'latestInstaller',
+                  widget: string,
+                  hint: 'VD (VI): Tải {project} bản mới nhất cho Windows',
+                }
+              - {
+                  label: 'feedback',
+                  name: 'feedback',
+                  widget: string,
+                  hint: 'VD (VI): Báo lỗi / góp ý',
+                }
+              - {
+                  label: 'discuss',
+                  name: 'discuss',
+                  widget: string,
+                  hint: 'VD (VI): Bình luận về phiên bản này',
+                }
+              - {
+                  label: 'latestNotes',
+                  name: 'latestNotes',
+                  widget: string,
+                  hint: 'VD (VI): Xem có gì mới',
+                }
+              - {
+                  label: 'date',
+                  name: 'date',
+                  widget: string,
+                  hint: 'VD (VI): Ngày phát hành',
+                }
+              - {
+                  label: 'pending',
+                  name: 'pending',
+                  widget: text,
+                  hint: 'VD (VI): Đây là ghi chú về phiên bản đang phát triển hoặc xem trước, chưa phải thông báo phát hành công khai.',
+                }
+              - {
+                  label: 'released',
+                  name: 'released',
+                  widget: string,
+                  hint: 'VD (VI): Đã phát hành',
+                }
+              - {
+                  label: 'preview',
+                  name: 'preview',
+                  widget: string,
+                  hint: 'VD (VI): Bản xem trước',
+                }
+              - {
+                  label: 'development',
+                  name: 'development',
+                  widget: string,
+                  hint: 'VD (VI): Đang phát triển',
+                }
       - name: ui_en
         label: Interface text (EN)
         file: /src/content/ui/en.yml
@@ -3248,4 +3521,277 @@ collections:
                   name: 'source',
                   widget: text,
                   hint: 'VD (VI): Số lần tải bộ cài và bản portable từ GitHub Releases, cập nhật mỗi phút.',
+                }
+          - label: 'Dải chủ site và nút sửa'
+            name: owner
+            widget: object
+            collapsed: true
+            fields:
+              - {
+                  label: 'mode',
+                  name: 'mode',
+                  widget: string,
+                  hint: 'VD (VI): Chế độ chủ site',
+                }
+              - {
+                  label: 'note',
+                  name: 'note',
+                  widget: string,
+                  hint: 'VD (VI): Khách không thấy dải này.',
+                }
+              - {
+                  label: 'pending',
+                  name: 'pending',
+                  widget: string,
+                  hint: 'VD (VI): {held} bình luận chờ duyệt · {feedback} góp ý mới',
+                }
+              - {
+                  label: 'manage',
+                  name: 'manage',
+                  widget: string,
+                  hint: 'VD (VI): Mở trang quản trị',
+                }
+              - {
+                  label: 'cms',
+                  name: 'cms',
+                  widget: string,
+                  hint: 'VD (VI): Mở CMS',
+                }
+              - {
+                  label: 'editPage',
+                  name: 'editPage',
+                  widget: string,
+                  hint: 'VD (VI): Sửa trang này',
+                }
+              - {
+                  label: 'edit',
+                  name: 'edit',
+                  widget: string,
+                  hint: 'VD (VI): Sửa',
+                }
+          - label: 'Chữ phụ (skip link, 404, ảnh, video)'
+            name: chrome
+            widget: object
+            collapsed: true
+            fields:
+              - {
+                  label: 'skip',
+                  name: 'skip',
+                  widget: string,
+                  hint: 'VD (VI): Đến nội dung',
+                }
+              - {
+                  label: 'mainNav',
+                  name: 'mainNav',
+                  widget: string,
+                  hint: 'VD (VI): Điều hướng chính',
+                }
+              - {
+                  label: 'feedTitle',
+                  name: 'feedTitle',
+                  widget: string,
+                  hint: 'VD (VI): ChiloLab: ghi chú phiên bản',
+                }
+              - {
+                  label: 'shareAlt',
+                  name: 'shareAlt',
+                  widget: string,
+                  hint: 'VD (VI): Giao diện Pet Desktop trên desktop Windows',
+                }
+              - {
+                  label: 'notFoundTitle',
+                  name: 'notFoundTitle',
+                  widget: string,
+                  hint: 'VD (VI): Không tìm thấy trang',
+                }
+              - {
+                  label: 'notFound',
+                  name: 'notFound',
+                  widget: string,
+                  hint: 'VD (VI): Trang này chưa có ở đây.',
+                }
+              - {
+                  label: 'notFoundDescription',
+                  name: 'notFoundDescription',
+                  widget: string,
+                  hint: 'VD (VI): Trang bạn tìm không tồn tại.',
+                }
+              - {
+                  label: 'notFoundHome',
+                  name: 'notFoundHome',
+                  widget: string,
+                  hint: 'VD (VI): Về trang chủ',
+                }
+              - {
+                  label: 'gallery',
+                  name: 'gallery',
+                  widget: string,
+                  hint: 'VD (VI): Hình trong app',
+                }
+              - {
+                  label: 'galleryViewer',
+                  name: 'galleryViewer',
+                  widget: string,
+                  hint: 'VD (VI): Xem ảnh lớn',
+                }
+              - {
+                  label: 'galleryPrevious',
+                  name: 'galleryPrevious',
+                  widget: string,
+                  hint: 'VD (VI): Ảnh trước',
+                }
+              - {
+                  label: 'galleryNext',
+                  name: 'galleryNext',
+                  widget: string,
+                  hint: 'VD (VI): Ảnh sau',
+                }
+              - {
+                  label: 'galleryClose',
+                  name: 'galleryClose',
+                  widget: string,
+                  hint: 'VD (VI): Đóng',
+                }
+              - {
+                  label: 'install',
+                  name: 'install',
+                  widget: string,
+                  hint: 'VD (VI): Cài đặt trong {n} bước',
+                }
+              - {
+                  label: 'installSteps',
+                  name: 'installSteps',
+                  widget: string,
+                  hint: 'VD (VI): Xem từng bước',
+                }
+              - {
+                  label: 'video',
+                  name: 'video',
+                  widget: string,
+                  hint: 'VD (VI): Video giới thiệu {project}',
+                }
+              - {
+                  label: 'openVideo',
+                  name: 'openVideo',
+                  widget: string,
+                  hint: 'VD (VI): Mở video',
+                }
+          - label: 'Trang phiên bản'
+            name: versions
+            widget: object
+            collapsed: true
+            fields:
+              - {
+                  label: 'heading',
+                  name: 'heading',
+                  widget: string,
+                  hint: 'VD (VI): Phiên bản',
+                }
+              - {
+                  label: 'intro',
+                  name: 'intro',
+                  widget: string,
+                  hint: 'VD (VI): Mỗi bản cập nhật có gì mới, sửa gì, mình ghi lại ở đây.',
+                }
+              - {
+                  label: 'all',
+                  name: 'all',
+                  widget: string,
+                  hint: 'VD (VI): Tất cả phiên bản',
+                }
+              - {
+                  label: 'read',
+                  name: 'read',
+                  widget: string,
+                  hint: 'VD (VI): Xem chi tiết phiên bản',
+                }
+              - {
+                  label: 'empty',
+                  name: 'empty',
+                  widget: text,
+                  hint: 'VD (VI): Chưa có bài nào về phiên bản. Có bản cập nhật là mình đăng ở đây.',
+                }
+              - {
+                  label: 'back',
+                  name: 'back',
+                  widget: string,
+                  hint: 'VD (VI): Về trang sản phẩm',
+                }
+              - {
+                  label: 'source',
+                  name: 'source',
+                  widget: string,
+                  hint: 'VD (VI): Tài liệu nguồn',
+                }
+              - {
+                  label: 'downloadLatest',
+                  name: 'downloadLatest',
+                  widget: string,
+                  hint: 'VD (VI): Tải bản mới nhất',
+                }
+              - {
+                  label: 'portable',
+                  name: 'portable',
+                  widget: string,
+                  hint: 'VD (VI): Bản Portable',
+                }
+              - {
+                  label: 'latestHeading',
+                  name: 'latestHeading',
+                  widget: string,
+                  hint: 'VD (VI): Tải xuống',
+                }
+              - {
+                  label: 'latestInstaller',
+                  name: 'latestInstaller',
+                  widget: string,
+                  hint: 'VD (VI): Tải {project} bản mới nhất cho Windows',
+                }
+              - {
+                  label: 'feedback',
+                  name: 'feedback',
+                  widget: string,
+                  hint: 'VD (VI): Báo lỗi / góp ý',
+                }
+              - {
+                  label: 'discuss',
+                  name: 'discuss',
+                  widget: string,
+                  hint: 'VD (VI): Bình luận về phiên bản này',
+                }
+              - {
+                  label: 'latestNotes',
+                  name: 'latestNotes',
+                  widget: string,
+                  hint: 'VD (VI): Xem có gì mới',
+                }
+              - {
+                  label: 'date',
+                  name: 'date',
+                  widget: string,
+                  hint: 'VD (VI): Ngày phát hành',
+                }
+              - {
+                  label: 'pending',
+                  name: 'pending',
+                  widget: text,
+                  hint: 'VD (VI): Đây là ghi chú về phiên bản đang phát triển hoặc xem trước, chưa phải thông báo phát hành công khai.',
+                }
+              - {
+                  label: 'released',
+                  name: 'released',
+                  widget: string,
+                  hint: 'VD (VI): Đã phát hành',
+                }
+              - {
+                  label: 'preview',
+                  name: 'preview',
+                  widget: string,
+                  hint: 'VD (VI): Bản xem trước',
+                }
+              - {
+                  label: 'development',
+                  name: 'development',
+                  widget: string,
+                  hint: 'VD (VI): Đang phát triển',
                 }

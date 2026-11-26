@@ -1,13 +1,14 @@
 ---
 import type { ImageMetadata } from 'astro';
 import { getImage, Image } from 'astro:assets';
+import { getUi } from '../lib/content';
 
 interface Props {
   shots: { image: ImageMetadata; alt: string }[];
   locale: 'vi' | 'en';
 }
 const { shots, locale } = Astro.props;
-const vi = locale === 'vi';
+const c = (await getUi(locale)).chrome;
 const items = await Promise.all(
   shots.map(async (shot) => ({
     ...shot,
@@ -23,7 +24,7 @@ const items = await Promise.all(
 ---
 
 <section class="project-gallery" aria-labelledby="gallery-heading">
-  <h2 id="gallery-heading">{vi ? 'Hình trong app' : 'In the app'}</h2>
+  <h2 id="gallery-heading">{c.gallery}</h2>
   <ul>
     {items.map((shot, index) => (
       <li>
@@ -40,7 +41,7 @@ const items = await Promise.all(
       </li>
     ))}
   </ul>
-  <dialog class="lightbox" aria-label={vi ? 'Xem ảnh lớn' : 'Picture viewer'}>
+  <dialog class="lightbox" aria-label={c.galleryViewer}>
     <figure>
       <img alt="" />
       <figcaption>
@@ -48,25 +49,13 @@ const items = await Promise.all(
         <span class="lightbox-count"></span>
       </figcaption>
     </figure>
-    <button
-      type="button"
-      class="lightbox-prev"
-      aria-label={vi ? 'Ảnh trước' : 'Previous picture'}
-    >
+    <button type="button" class="lightbox-prev" aria-label={c.galleryPrevious}>
       ‹
     </button>
-    <button
-      type="button"
-      class="lightbox-next"
-      aria-label={vi ? 'Ảnh sau' : 'Next picture'}
-    >
+    <button type="button" class="lightbox-next" aria-label={c.galleryNext}>
       ›
     </button>
-    <button
-      type="button"
-      class="lightbox-close"
-      aria-label={vi ? 'Đóng' : 'Close'}
-    >
+    <button type="button" class="lightbox-close" aria-label={c.galleryClose}>
       ×
     </button>
   </dialog>

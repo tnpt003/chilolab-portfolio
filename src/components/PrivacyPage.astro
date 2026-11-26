@@ -2,6 +2,7 @@
 import { render } from 'astro:content';
 import Base from '../layouts/Base.astro';
 import { getPrivacy, type Locale } from '../lib/content';
+import { editPrivacy } from '../lib/edit';
 interface Props {
   locale: Locale;
 }
@@ -18,8 +19,12 @@ const { data } = site;
   description={data.description!}
   locale={locale}
   slug="privacy"
+  edit={editPrivacy(locale, 'site')}
 >
-  <article class="wrap prose privacy-page">
+  <article
+    class="wrap prose privacy-page"
+    data-edit={editPrivacy(locale, 'site')}
+  >
     <h1>{data.title}</h1>
     <p class="lead">{data.lead}</p>
     <p>
@@ -28,7 +33,9 @@ const { data } = site;
     </p>
     <SiteContent />
     {/* The app's EULA links to this anchor; keep the id. */}
-    <h2 id="desktop-pet">{app.data.title}</h2>
-    <AppContent />
+    <section data-edit={editPrivacy(locale, 'app')}>
+      <h2 id="desktop-pet">{app.data.title}</h2>
+      <AppContent />
+    </section>
   </article>
 </Base>

@@ -1,24 +1,21 @@
 ---
 import { render, type CollectionEntry } from 'astro:content';
 import Base from '../layouts/Base.astro';
-import { pathFor } from '../lib/content';
-import {
-  alwaysLatest,
-  featuredDownload,
-  versionCopy,
-  versionPath,
-} from '../lib/versions';
+import { getUi, pathFor } from '../lib/content';
+import { alwaysLatest, featuredDownload, versionPath } from '../lib/versions';
 import DownloadCounter from './DownloadCounter.astro';
 import Comments from './Comments.astro';
 import { feedbackPath } from '../lib/community';
+import { editVersion } from '../lib/edit';
 interface Props {
   entry: CollectionEntry<'versions'>;
   project: CollectionEntry<'projects'>;
 }
 const { entry, project } = Astro.props;
 const { data } = entry;
-const t = versionCopy[data.locale];
+const t = (await getUi(data.locale)).versions;
 const { Content } = await render(entry);
+const editPage = editVersion(data.locale, data.project, entry.id);
 const latest = (
   await featuredDownload(
     data.locale,
@@ -35,12 +32,13 @@ const latest = (
   locale={data.locale}
   slug={`${data.project}/versions/${data.version}`}
   share={project.data.preview}
+  edit={editPage}
 >
   <div class="wrap version-page">
     <a class="back" href={versionPath(data.locale, data.project)}>
       ← {t.all}
     </a>
-    <header class="detail-heading">
+    <header class="detail-heading" data-edit={editPage}>
       <a href={pathFor(data.locale, data.project)}>{project.data.title}</a>
       <div class="version-meta">
         <span class="version-status">{t[data.status]}</span>
@@ -69,7 +67,7 @@ const latest = (
         <a href={feedbackPath(data.locale, data.project)}>{t.feedback}</a>
       </div>
     </header>
-    <article class="prose version-article">
+    <article class="prose version-article" data-edit={editPage}>
       <Content />
     </article>
     <nav class="version-bottom" aria-label={t.heading}>

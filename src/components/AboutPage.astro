@@ -13,6 +13,7 @@ import {
   type Locale,
 } from '../lib/content';
 import { listVersions, versionPath } from '../lib/versions';
+import { editProfile } from '../lib/edit';
 import {
   athenaUrl,
   email,
@@ -85,10 +86,11 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
   description={p.metaDescription}
   locale={locale}
   slug="about"
+  edit={editProfile(locale)}
   share={{ image: portrait, alt: t.portraitAlt }}
 >
   <div class="desk">
-    <section class="about-hero wrap">
+    <section class="about-hero wrap" data-edit={editProfile(locale)}>
       <div class="about-hero-copy">
         <h1>{p.heading}</h1>
         <p class="lead">{p.lead}</p>
@@ -134,7 +136,11 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
     </section>
   </div>
 
-  <section class="about-block wrap" aria-labelledby="experience-title">
+  <section
+    data-edit={editProfile(locale)}
+    class="about-block wrap"
+    aria-labelledby="experience-title"
+  >
     <h2 id="experience-title">{p.experienceTitle}</h2>
     <div class="job">
       <div>
@@ -160,7 +166,11 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
     </div>
   </section>
 
-  <section class="about-block wrap" aria-labelledby="how-title">
+  <section
+    data-edit={editProfile(locale)}
+    class="about-block wrap"
+    aria-labelledby="how-title"
+  >
     <div class="section-heading">
       <h2 id="how-title">{p.howTitle}</h2>
       <p>{p.howIntro}</p>
@@ -176,7 +186,11 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
     </ol>
   </section>
 
-  <section class="about-block wrap" aria-labelledby="skills-title">
+  <section
+    data-edit={editProfile(locale)}
+    class="about-block wrap"
+    aria-labelledby="skills-title"
+  >
     <div class="section-heading">
       <h2 id="skills-title">{p.skillsTitle}</h2>
       <p>{p.skillsIntro}</p>
@@ -191,7 +205,11 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
     </dl>
   </section>
 
-  <section class="about-block wrap" aria-labelledby="journey-title">
+  <section
+    data-edit={editProfile(locale)}
+    class="about-block wrap"
+    aria-labelledby="journey-title"
+  >
     <h2 id="journey-title">{p.journeyTitle}</h2>
     <div class="journey">
       {/* The ChiloLab cat rides down the rail as the reader scrolls. */}
@@ -232,7 +250,11 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
     </div>
   </section>
 
-  <section class="about-block wrap" aria-labelledby="courses-title">
+  <section
+    data-edit={editProfile(locale)}
+    class="about-block wrap"
+    aria-labelledby="courses-title"
+  >
     <h2 id="courses-title">{p.coursesTitle}</h2>
     <ul class="course-list">
       {p.courses.map((course) => (
@@ -249,7 +271,11 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
     </p>
   </section>
 
-  <section class="about-block wrap" aria-labelledby="built-title">
+  <section
+    data-edit={editProfile(locale)}
+    class="about-block wrap"
+    aria-labelledby="built-title"
+  >
     <div class="section-heading">
       <h2 id="built-title">{p.builtTitle}</h2>
       <p>{p.builtIntro}</p>
@@ -279,7 +305,11 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
     </ul>
   </section>
 
-  <section class="about-block wrap" aria-labelledby="languages-title">
+  <section
+    data-edit={editProfile(locale)}
+    class="about-block wrap"
+    aria-labelledby="languages-title"
+  >
     <h2 id="languages-title">{p.languagesTitle}</h2>
     <div class="job">
       <div>
@@ -307,7 +337,11 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
     </div>
   </section>
 
-  <section class="contact wrap" aria-labelledby="contact-title">
+  <section
+    data-edit={editProfile(locale)}
+    class="contact wrap"
+    aria-labelledby="contact-title"
+  >
     <div class="contact-panel">
       <h2 id="contact-title">{p.contactTitle}</h2>
       <p>{p.contactText}</p>

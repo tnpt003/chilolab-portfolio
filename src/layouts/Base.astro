@@ -18,6 +18,7 @@ import { email, githubUrl } from '../lib/profile';
 import { getImage } from 'astro:assets';
 import shareImage from '../assets/pet-battle-hub.png';
 import Logo from '../components/Logo.astro';
+import { editUi } from '../lib/edit';
 interface Props {
   title: string;
   description: string;
@@ -28,6 +29,8 @@ interface Props {
   tab?: string;
   /** Link-preview picture; defaults to the Pet Desktop battle hub. */
   share?: { image: ImageMetadata; alt: string };
+  /** CMS entry behind this page, for the owner bar; defaults to interface text. */
+  edit?: string;
 }
 const {
   title,
@@ -37,9 +40,12 @@ const {
   noindex = false,
   tab = `${title} · chilolab.com`,
   share,
+  edit = editUi(locale),
 } = Astro.props;
 const ui = await getUi(locale);
 const t = ui.site;
+const c = ui.chrome;
+const o = ui.owner;
 const other = locale === 'vi' ? 'en' : 'vi';
 const canonical = new URL(pathFor(locale, slug), Astro.site);
 const projects = await listProjects(locale);
@@ -94,11 +100,7 @@ const jsonLd = structured.length
       '@graph': structured,
     }).replaceAll('<', '\\u003c')
   : '';
-const ogAlt =
-  share?.alt ??
-  (locale === 'vi'
-    ? 'Giao diện Pet Desktop trên desktop Windows'
-    : 'Pet Desktop on a Windows desktop');
+const ogAlt = share?.alt ?? c.shareAlt;
 ---
 
 <!doctype html>
@@ -148,40 +150,29 @@ const ogAlt =
     <link
       rel="alternate"
       type="application/rss+xml"
-      title={
-        locale === 'vi'
-          ? 'ChiloLab: ghi chú phiên bản'
-          : 'ChiloLab: version notes'
-      }
+      title={c.feedTitle}
       href={feedPath(locale)}
     />
     {jsonLd && <script type="application/ld+json" set:html={jsonLd} />}
   </head>
   <body>
     <a class="skip" href="#main">
-      {locale === 'vi' ? 'Đến nội dung' : 'Skip to content'}
+      {c.skip}
     </a>
     <div
       class="owner-bar"
       data-owner-bar
-      data-pending={
-        locale === 'vi'
-          ? '{held} bình luận chờ duyệt · {feedback} góp ý mới'
-          : '{held} held comments · {feedback} new feedback'
-      }
+      data-pending={o.pending}
+      data-edit-label={o.edit}
       hidden
     >
       <div class="wrap">
-        <strong>{locale === 'vi' ? 'Chế độ chủ site' : 'Owner mode'}</strong>
-        <span class="owner-bar-note">
-          {locale === 'vi'
-            ? 'Khách không thấy dải này.'
-            : 'Visitors do not see this bar.'}
-        </span>
+        <strong>{o.mode}</strong>
+        <span class="owner-bar-note">{o.note}</span>
         <a href="/admin/manage" data-owner-pending></a>
-        <a href="/admin/manage">
-          {locale === 'vi' ? 'Mở trang quản trị' : 'Open the admin panel'}
-        </a>
+        <a href={edit}>{o.editPage}</a>
+        <a href="/admin">{o.cms}</a>
+        <a href="/admin/manage">{o.manage}</a>
       </div>
     </div>
     <header class="header wrap">
@@ -189,9 +180,7 @@ const ogAlt =
         <Logo />
         ChiloLab
       </a>
-      <nav
-        aria-label={locale === 'vi' ? 'Điều hướng chính' : 'Main navigation'}
-      >
+      <nav aria-label={c.mainNav}>
         <a href={`${pathFor(locale)}#projects`}>{t.projects}</a>
         <a
           href={pathFor(locale, 'about')}
@@ -212,7 +201,7 @@ const ogAlt =
     <main id="main">
       <slot />
     </main>
-    <footer class="footer">
+    <footer class="footer" data-edit={editUi(locale)}>
       <div class="wrap footer-grid">
         <div class="footer-brand">
           <a class="brand" href={pathFor(locale)}>
@@ -289,6 +278,21 @@ const ogAlt =
                 .replace('{feedback}', String(feedback));
             else pending.remove();
             bar.hidden = false;
+            // Edit buttons: each [data-edit] block gets a link to its CMS
+            // entry in its top-right corner. Visitors never get these.
+            const label = bar.dataset.editLabel!;
+            for (const block of document.querySelectorAll<HTMLElement>(
+              '[data-edit]',
+            )) {
+              const link = document.createElement('a');
+              link.className = 'edit-pin';
+              link.href = block.dataset.edit!;
+              link.textContent = `✎ ${label}`;
+              const name = block.querySelector('h1, h2, h3')?.textContent;
+              if (name) link.setAttribute('aria-label', `${label}: ${name}`);
+              block.classList.add('has-edit');
+              block.prepend(link);
+            }
           })
           .catch(() => {});
     </script>

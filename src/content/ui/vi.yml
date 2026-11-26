@@ -182,3 +182,49 @@ updates:
 downloads:
   count: '{n} lượt tải'
   source: Số lần tải bộ cài và bản portable từ GitHub Releases, cập nhật mỗi phút.
+owner:
+  mode: Chế độ chủ site
+  note: Khách không thấy dải này.
+  pending: '{held} bình luận chờ duyệt · {feedback} góp ý mới'
+  manage: Mở trang quản trị
+  cms: Mở CMS
+  editPage: Sửa trang này
+  edit: Sửa
+chrome:
+  skip: Đến nội dung
+  mainNav: Điều hướng chính
+  feedTitle: 'ChiloLab: ghi chú phiên bản'
+  shareAlt: Giao diện Pet Desktop trên desktop Windows
+  notFoundTitle: Không tìm thấy trang
+  notFound: Trang này chưa có ở đây.
+  notFoundDescription: Trang bạn tìm không tồn tại.
+  notFoundHome: Về trang chủ
+  gallery: Hình trong app
+  galleryViewer: Xem ảnh lớn
+  galleryPrevious: Ảnh trước
+  galleryNext: Ảnh sau
+  galleryClose: Đóng
+  install: 'Cài đặt trong {n} bước'
+  installSteps: Xem từng bước
+  video: 'Video giới thiệu {project}'
+  openVideo: Mở video
+versions:
+  heading: Phiên bản
+  intro: Mỗi bản cập nhật có gì mới, sửa gì, mình ghi lại ở đây.
+  all: Tất cả phiên bản
+  read: Xem chi tiết phiên bản
+  empty: Chưa có bài nào về phiên bản. Có bản cập nhật là mình đăng ở đây.
+  back: Về trang sản phẩm
+  source: Tài liệu nguồn
+  downloadLatest: Tải bản mới nhất
+  portable: Bản Portable
+  latestHeading: Tải xuống
+  latestInstaller: 'Tải {project} bản mới nhất cho Windows'
+  feedback: Báo lỗi / góp ý
+  discuss: Bình luận về phiên bản này
+  latestNotes: Xem có gì mới
+  date: Ngày phát hành
+  pending: Đây là ghi chú về phiên bản đang phát triển hoặc xem trước, chưa phải thông báo phát hành công khai.
+  released: Đã phát hành
+  preview: Bản xem trước
+  development: Đang phát triển

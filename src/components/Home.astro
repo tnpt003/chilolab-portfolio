@@ -15,13 +15,14 @@ import {
   pathFor,
   type Locale,
 } from '../lib/content';
-import { listVersions, versionCopy } from '../lib/versions';
+import { listVersions } from '../lib/versions';
+import { editProfile, editProject, editUi } from '../lib/edit';
 interface Props {
   locale: Locale;
 }
 const { locale } = Astro.props;
 const t = (await getUi(locale)).site;
-const v = versionCopy[locale];
+const v = (await getUi(locale)).versions;
 const projects = await listProjects(locale);
 const me = await getProfile(locale);
 
@@ -49,7 +50,7 @@ const rows = await Promise.all(
 >
   {/* The hero is a desktop: the portrait window sits on it, and the
       ChiloLab cat walks along the taskbar, as Pet Desktop does. */}
-  <section class="desk">
+  <section class="desk" data-edit={editUi(locale)}>
     <div class="hero home-hero wrap">
       <div class="hero-copy">
         <h1>{t.title}</h1>
@@ -105,7 +106,11 @@ const rows = await Promise.all(
     </div>
     <div class="project-list">
       {rows.map(({ project: { data }, version, status, released }) => (
-        <article class="project" id={data.slug}>
+        <article
+          class="project"
+          id={data.slug}
+          data-edit={editProject(locale, data.slug)}
+        >
           <a class="project-link" href={pathFor(locale, data.slug)}>
             <ProjectVisual
               kind={data.kind}
@@ -138,7 +143,11 @@ const rows = await Promise.all(
     </div>
   </section>
 
-  <section class="me-teaser wrap" aria-labelledby="me-title">
+  <section
+    class="me-teaser wrap"
+    aria-labelledby="me-title"
+    data-edit={editProfile(locale)}
+  >
     <div>
       <h2 id="me-title">{t.me}</h2>
       <p>{me.teaser}</p>
@@ -161,7 +170,7 @@ const rows = await Promise.all(
     </div>
   </section>
 
-  <section class="about wrap" id="about">
+  <section class="about wrap" id="about" data-edit={editUi(locale)}>
     <h2>{t.about}</h2>
     <p>{t.aboutText}</p>
   </section>

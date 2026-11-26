@@ -1,13 +1,13 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { versionCopy, versionPath } from '../lib/versions';
-import type { Locale } from '../lib/content';
+import { versionPath } from '../lib/versions';
+import { getUi, type Locale } from '../lib/content';
 interface Props {
   entries: CollectionEntry<'versions'>[];
   locale: Locale;
 }
 const { entries, locale } = Astro.props;
-const t = versionCopy[locale];
+const t = (await getUi(locale)).versions;
 ---
 
 {entries.length === 0 ? (

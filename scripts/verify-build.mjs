@@ -63,6 +63,14 @@ for (const [route, html] of routes) {
     if (href.startsWith('/api/')) continue;
     // /admin/manage is the Worker-rendered owner admin panel (worker/manage.ts).
     if (href === '/admin/manage' || href.startsWith('/admin/manage/')) continue;
+    // /admin is Sveltia CMS (public/admin, owner-only via worker/cms.ts); its
+    // #/collections/... fragments are CMS routes, not element ids.
+    if (href === '/admin' || href.startsWith('/admin#')) {
+      await readFile(new URL('admin/index.html', root)).catch(() =>
+        assert.fail(`${route}: missing CMS page for ${href}`),
+      );
+      continue;
+    }
     if (
       href.startsWith('//') ||
       /\.(?:svg|png|webp|jpg|jpeg|ico|css|js|mp4|pdf)(?:[?#]|$)/i.test(href)

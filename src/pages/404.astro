@@ -1,24 +1,27 @@
 ---
 import Base from '../layouts/Base.astro';
+import { getUi } from '../lib/content';
+const vi = (await getUi('vi')).chrome;
+const en = (await getUi('en')).chrome;
 ---
 
 <Base
-  title="Không tìm thấy trang / Page not found"
-  tab="Không tìm thấy trang · chilolab.com"
-  description="Trang bạn tìm không tồn tại. / This page does not exist."
+  title={`${vi.notFoundTitle} / ${en.notFoundTitle}`}
+  tab={`${vi.notFoundTitle} · chilolab.com`}
+  description={`${vi.notFoundDescription} / ${en.notFoundDescription}`}
   locale="vi"
   noindex
 >
   <section class="wrap error">
     <p>404</p>
-    <h1>Trang này chưa có ở đây.</h1>
-    <p lang="en">This page doesn't exist.</p>
+    <h1>{vi.notFound}</h1>
+    <p lang="en">{en.notFound}</p>
     <div class="actions">
       <a class="button" href="/">
-        Về trang chủ
+        {vi.notFoundHome}
       </a>
       <a href="/en" lang="en">
-        Home in English
+        {en.notFoundHome}
       </a>
     </div>
   </section>
