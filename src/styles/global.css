@@ -1,4 +1,9 @@
 @import './tokens.css';
+/* Scripts hide things with the hidden attribute; class rules that set
+   display (.button is inline-flex) must not bring them back. */
+[hidden] {
+  display: none !important;
+}
 .version-page {
   padding-block: 3rem 5rem;
   max-width: 920px;
@@ -853,7 +858,8 @@ a:has(> .icon),
 .journey-year {
   margin-bottom: 0.4rem;
   font-size: clamp(2.2rem, 4.5vw, 3.4rem);
-  color: color-mix(in srgb, var(--ink) 28%, var(--paper));
+  /* Faded, but still 3.2:1 on paper (WCAG AA for large text). */
+  color: color-mix(in srgb, var(--ink) 60%, var(--paper));
 }
 .journey-entry {
   display: grid;
