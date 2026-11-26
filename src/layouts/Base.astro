@@ -11,12 +11,9 @@ import {
   pathFor,
   type Locale,
 } from '../lib/content';
-import { feedbackPath, privacyPath, userPath } from '../lib/community';
-import { versionPath } from '../lib/versions';
 import { feedPath } from '../lib/feed';
 import { email, githubUrl } from '../lib/profile';
 import { getImage } from 'astro:assets';
-import shareImage from '../assets/pet-battle-hub.png';
 import Logo from '../components/Logo.astro';
 import { editUi } from '../lib/edit';
 interface Props {
@@ -49,11 +46,13 @@ const o = ui.owner;
 const other = locale === 'vi' ? 'en' : 'vi';
 const canonical = new URL(pathFor(locale, slug), Astro.site);
 const projects = await listProjects(locale);
-const f = t.footerLinks;
+const menu = ui.menu;
+// Marks the header link of the page being shown.
+const here = pathFor(locale, slug);
 // Link previews (Facebook, Zalo, Discord…). JPEG because some crawlers
 // still skip WebP; only crawlers fetch it, visitors never download it.
 // Never upscaled: a picture under 600 px wide gets the small "summary" card.
-const shareSrc = share?.image ?? shareImage;
+const shareSrc = share?.image ?? c.shareImage;
 const og = await getImage({
   src: shareSrc,
   width: Math.min(1200, shareSrc.width),
@@ -83,7 +82,7 @@ const structured =
     ? [
         {
           '@type': 'WebSite',
-          name: 'ChiloLab',
+          name: t.brand,
           url: new URL(pathFor(locale), Astro.site).href,
           inLanguage: locale,
           author: { '@id': person['@id'] },
@@ -133,11 +132,11 @@ const ogAlt = share?.alt ?? c.shareAlt;
       </>
     )}
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={`${title} | ChiloLab`} />
+    <meta property="og:title" content={`${title} | ${t.brand}`} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content={locale === 'vi' ? 'vi_VN' : 'en_US'} />
-    <meta property="og:site_name" content="ChiloLab" />
+    <meta property="og:site_name" content={t.brand} />
     <meta property="og:image" content={ogImage} />
     <meta property="og:image:width" content={String(og.attributes.width)} />
     <meta property="og:image:height" content={String(og.attributes.height)} />
@@ -175,19 +174,20 @@ const ogAlt = share?.alt ?? c.shareAlt;
         <a href="/admin/manage">{o.manage}</a>
       </div>
     </div>
-    <header class="header wrap">
+    <header class="header wrap" data-edit={editUi(locale)}>
       <a class="brand" href={pathFor(locale)}>
         <Logo />
-        ChiloLab
+        {t.brand}
       </a>
       <nav aria-label={c.mainNav}>
-        <a href={`${pathFor(locale)}#projects`}>{t.projects}</a>
-        <a
-          href={pathFor(locale, 'about')}
-          aria-current={slug === 'about' ? 'page' : undefined}
-        >
-          {t.me}
-        </a>
+        {menu.header.map((link) => (
+          <a
+            href={link.href}
+            aria-current={link.href === here ? 'page' : undefined}
+          >
+            {link.label}
+          </a>
+        ))}
         <a
           class="language"
           href={pathFor(other, slug)}
@@ -206,12 +206,12 @@ const ogAlt = share?.alt ?? c.shareAlt;
         <div class="footer-brand">
           <a class="brand" href={pathFor(locale)}>
             <Logo />
-            ChiloLab
+            {t.brand}
           </a>
           <p>{t.footer}</p>
         </div>
-        <nav aria-label={f.projects}>
-          <p class="footer-title">{f.projects}</p>
+        <nav aria-label={menu.projectsTitle}>
+          <p class="footer-title">{menu.projectsTitle}</p>
           <ul>
             {projects.map(({ data }) => (
               <li>
@@ -220,42 +220,23 @@ const ogAlt = share?.alt ?? c.shareAlt;
             ))}
           </ul>
         </nav>
-        <nav aria-label="Pet Desktop">
-          <p class="footer-title">Pet Desktop</p>
-          <ul>
-            <li>
-              <a href={`${pathFor(locale, 'pet-desktop')}#download-heading`}>
-                {f.download}
-              </a>
-            </li>
-            <li>
-              <a href={versionPath(locale, 'pet-desktop')}>{f.versions}</a>
-            </li>
-            <li>
-              <a href={feedbackPath(locale, 'pet-desktop')}>{f.feedback}</a>
-            </li>
-          </ul>
-        </nav>
-        <nav aria-label="ChiloLab">
-          <p class="footer-title">ChiloLab</p>
-          <ul>
-            <li>
-              <a href={pathFor(locale, 'about')}>{t.me}</a>
-            </li>
-            <li>
-              <a href={`${pathFor(locale)}#about`}>{t.about}</a>
-            </li>
-            <li>
-              <a href={privacyPath(locale)}>{f.privacy}</a>
-            </li>
-            <li>
-              <a href={userPath(locale, 'login')}>{f.account}</a>
-            </li>
-          </ul>
-        </nav>
+        {menu.footer.map((column) => (
+          <nav aria-label={column.title}>
+            <p class="footer-title">{column.title}</p>
+            <ul>
+              {column.links.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ))}
       </div>
       <div class="wrap footer-bottom">
-        <span>© {new Date().getFullYear()} Nguyễn Tấn Phát, ChiloLab</span>
+        <span>
+          {t.copyright.replace('{year}', String(new Date().getFullYear()))}
+        </span>
       </div>
     </footer>
     <script>

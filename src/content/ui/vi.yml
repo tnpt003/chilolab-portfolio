@@ -22,13 +22,8 @@ site:
   aboutText: ChiloLab là góc nhỏ để mình thử ý tưởng. Ý tưởng nào làm được thì mình biến thành app chạy thật, phát hành từng bản và sửa dần theo góp ý của mọi người. Bạn có thể tải Pet Desktop về chơi, xem mỗi bản mới có gì, hoặc đăng nhập để bình luận và báo lỗi.
   preview: Minh họa ý tưởng, không phải ảnh sản phẩm
   footer: Ý tưởng nhỏ, phát hành thật, sửa theo góp ý.
-  footerLinks:
-    projects: Dự án
-    download: Tải xuống
-    versions: Các phiên bản
-    feedback: Góp ý & báo lỗi
-    privacy: Quyền riêng tư
-    account: Đăng nhập / tài khoản
+  copyright: '© {year} Nguyễn Tấn Phát, ChiloLab'
+  brand: ChiloLab
   demo: Dùng thử
   repo: Xem mã nguồn
   download: Tải xuống
@@ -191,6 +186,7 @@ owner:
   editPage: Sửa trang này
   edit: Sửa
 chrome:
+  shareImage: ../../assets/pet-battle-hub.png
   skip: Đến nội dung
   mainNav: Điều hướng chính
   feedTitle: 'ChiloLab: ghi chú phiên bản'
@@ -228,3 +224,45 @@ versions:
   released: Đã phát hành
   preview: Bản xem trước
   development: Đang phát triển
+menu:
+  header:
+    - label: Dự án
+      href: /#projects
+    - label: Về mình
+      href: /about
+  projectsTitle: Dự án
+  footer:
+    - title: Pet Desktop
+      links:
+        - label: Tải xuống
+          href: /pet-desktop#download-heading
+        - label: Các phiên bản
+          href: /pet-desktop/versions
+        - label: Góp ý & báo lỗi
+          href: /pet-desktop/feedback
+    - title: ChiloLab
+      links:
+        - label: Về mình
+          href: /about
+        - label: Về ChiloLab
+          href: /#about
+        - label: Quyền riêng tư
+          href: /privacy
+        - label: Đăng nhập / tài khoản
+          href: /user/login
+layout:
+  home:
+    - hero
+    - projects
+    - me
+    - about
+  about:
+    - hero
+    - experience
+    - how
+    - skills
+    - journey
+    - courses
+    - built
+    - languages
+    - contact

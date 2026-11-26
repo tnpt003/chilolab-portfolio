@@ -560,6 +560,12 @@ collections:
           - { label: Nút xem dự án, name: seeProjects, widget: string }
           - { label: Nút GitHub, name: github, widget: string }
           - { label: Mô tả ảnh Pet (alt), name: petAlt, widget: text }
+          - label: Ảnh chân dung
+            name: portrait
+            widget: image
+            media_folder: /src/assets
+            public_folder: ../../assets
+            hint: 'Ảnh ở trang chủ và trang Về mình. Mô tả ảnh nằm ở Chữ giao diện → Mô tả ảnh chân dung.'
           - {
               label: Tiêu đề mục Kinh nghiệm,
               name: experienceTitle,
@@ -818,6 +824,12 @@ collections:
           - { label: Nút xem dự án, name: seeProjects, widget: string }
           - { label: Nút GitHub, name: github, widget: string }
           - { label: Mô tả ảnh Pet (alt), name: petAlt, widget: text }
+          - label: Ảnh chân dung
+            name: portrait
+            widget: image
+            media_folder: /src/assets
+            public_folder: ../../assets
+            hint: 'Ảnh ở trang chủ và trang Về mình. Mô tả ảnh nằm ở Chữ giao diện → Mô tả ảnh chân dung.'
           - {
               label: Tiêu đề mục Kinh nghiệm,
               name: experienceTitle,
@@ -1106,182 +1118,154 @@ collections:
             collapsed: true
             fields:
               - {
-                  label: 'projects',
+                  label: 'Tiêu đề mục Dự án (trang chủ)',
                   name: 'projects',
                   widget: string,
-                  hint: 'VD (VI): Dự án',
+                  hint: 'Mặc định: Dự án',
                 }
               - {
-                  label: 'me',
+                  label: 'Tiêu đề mục Về mình (trang chủ)',
                   name: 'me',
                   widget: string,
-                  hint: 'VD (VI): Về mình',
+                  hint: 'Mặc định: Về mình',
                 }
               - {
-                  label: 'about',
+                  label: 'Tiêu đề mục Về ChiloLab',
                   name: 'about',
                   widget: string,
-                  hint: 'VD (VI): Về ChiloLab',
+                  hint: 'Mặc định: Về ChiloLab',
                 }
               - {
-                  label: 'switch',
+                  label: 'Nút đổi ngôn ngữ',
                   name: 'switch',
                   widget: string,
-                  hint: 'VD (VI): English',
+                  hint: 'Mặc định: English',
                 }
               - {
-                  label: 'homeTitle',
+                  label: 'Tiêu đề trang chủ (tab trình duyệt, Google)',
                   name: 'homeTitle',
                   widget: string,
-                  hint: 'VD (VI): Nguyễn Tấn Phát, BA/QC và người làm phần mềm',
+                  hint: 'Mặc định: Nguyễn Tấn Phát, BA/QC và người làm phần mềm',
                 }
               - {
-                  label: 'title',
+                  label: 'Tiêu đề lớn ở hero',
                   name: 'title',
                   widget: text,
-                  hint: 'VD (VI): Chào bạn, mình là Phát. Mình kiểm thử phần mềm, và tự làm app của riêng mình.',
+                  hint: 'Mặc định: Chào bạn, mình là Phát. Mình kiểm thử phần mềm, và tự làm app của riêng mình.',
                 }
               - {
-                  label: 'intro',
+                  label: 'Đoạn giới thiệu ở hero',
                   name: 'intro',
                   widget: text,
-                  hint: 'VD (VI): Mình đang làm BA/QC ở WeebPal và tốt nghiệp ngành Công nghệ thông tin ở HUFLIT. Ở đây có hai app Windows mình tự viết và tự phát hành: một chú mèo sống ngay trên desktop của bạn, và một công cụ giúp kiểm tra website.',
+                  hint: 'Mặc định: Mình đang làm BA/QC ở WeebPal và tốt nghiệp ngành Công nghệ thông tin ở HUFLIT. Ở đây có hai app Windows mình tự viết và tự phát hành: một chú mèo sống ngay trên desktop của bạn, và một công cụ giúp kiểm tra website.',
                 }
               - {
-                  label: 'metaDescription',
+                  label: 'Mô tả trang chủ cho Google',
                   name: 'metaDescription',
                   widget: text,
-                  hint: 'VD (VI): Portfolio của Nguyễn Tấn Phát, BA/QC tại WeebPal, tốt nghiệp Công nghệ thông tin tại HUFLIT. Kinh nghiệm, kỹ năng và hai ứng dụng Windows tự làm: Pet Desktop và PageSpeed-Auth-Auditor.',
+                  hint: 'Mặc định: Portfolio của Nguyễn Tấn Phát, BA/QC tại WeebPal, tốt nghiệp Công nghệ thông tin tại HUFLIT. Kinh nghiệm, kỹ năng và hai ứng dụng Windows tự làm: Pet Desktop và PageSpeed-Auth-Auditor.',
                 }
               - {
-                  label: 'explore',
+                  label: 'Nút "Xem dự án" ở hero',
                   name: 'explore',
                   widget: string,
-                  hint: 'VD (VI): Xem dự án',
+                  hint: 'Mặc định: Xem dự án',
                 }
               - {
-                  label: 'aboutCta',
+                  label: 'Nút "Về mình" ở hero',
                   name: 'aboutCta',
                   widget: string,
-                  hint: 'VD (VI): Về mình',
+                  hint: 'Mặc định: Về mình',
                 }
               - {
-                  label: 'hello',
+                  label: 'Lời chào của mèo',
                   name: 'hello',
                   widget: string,
-                  hint: 'VD (VI): Meo, chào bạn!',
+                  hint: 'Mặc định: Meo, chào bạn!',
                 }
               - {
-                  label: 'stack',
+                  label: 'Nhãn "Công nghệ" ở thẻ dự án',
                   name: 'stack',
                   widget: string,
-                  hint: 'VD (VI): Công nghệ',
+                  hint: 'Mặc định: Công nghệ',
                 }
               - {
-                  label: 'skillsHeading',
+                  label: 'Tiêu đề kỹ năng (trang chủ)',
                   name: 'skillsHeading',
                   widget: string,
-                  hint: 'VD (VI): Mình làm việc với',
+                  hint: 'Mặc định: Mình làm việc với',
                 }
               - {
-                  label: 'portraitAlt',
+                  label: 'Mô tả ảnh chân dung (alt)',
                   name: 'portraitAlt',
                   widget: string,
-                  hint: 'VD (VI): Nguyễn Tấn Phát mặc áo khoác xám, đứng trước một bức tường treo ảnh.',
+                  hint: 'Mặc định: Nguyễn Tấn Phát mặc áo khoác xám, đứng trước một bức tường treo ảnh.',
                 }
               - {
-                  label: 'selected',
+                  label: 'Câu dưới tiêu đề Dự án',
                   name: 'selected',
                   widget: string,
-                  hint: 'VD (VI): Dự án nào cũng có trang riêng, lịch sử phiên bản và chỗ để bạn góp ý.',
+                  hint: 'Mặc định: Dự án nào cũng có trang riêng, lịch sử phiên bản và chỗ để bạn góp ý.',
                 }
               - {
-                  label: 'detail',
+                  label: 'Link "Xem dự án" ở thẻ dự án',
                   name: 'detail',
                   widget: string,
-                  hint: 'VD (VI): Xem dự án',
+                  hint: 'Mặc định: Xem dự án',
                 }
               - {
-                  label: 'back',
+                  label: 'Link quay lại danh sách dự án',
                   name: 'back',
                   widget: string,
-                  hint: 'VD (VI): Tất cả dự án',
+                  hint: 'Mặc định: Tất cả dự án',
                 }
               - {
-                  label: 'aboutText',
+                  label: 'Đoạn Về ChiloLab',
                   name: 'aboutText',
                   widget: text,
-                  hint: 'VD (VI): ChiloLab là góc nhỏ để mình thử ý tưởng. Ý tưởng nào làm được thì mình biến thành app chạy thật, phát hành từng bản và sửa dần theo góp ý của mọi người. Bạn có thể tải Pet Desktop về chơi, xem mỗi bản mới có gì, hoặc đăng nhập để bình luận và báo lỗi.',
+                  hint: 'Mặc định: ChiloLab là góc nhỏ để mình thử ý tưởng. Ý tưởng nào làm được thì mình biến thành app chạy thật, phát hành từng bản và sửa dần theo góp ý của mọi người. Bạn có thể tải Pet Desktop về chơi, xem mỗi bản mới có gì, hoặc đăng nhập để bình luận và báo lỗi.',
                 }
               - {
-                  label: 'preview',
+                  label: 'Nhãn ảnh minh họa ý tưởng',
                   name: 'preview',
                   widget: string,
-                  hint: 'VD (VI): Minh họa ý tưởng, không phải ảnh sản phẩm',
+                  hint: 'Mặc định: Minh họa ý tưởng, không phải ảnh sản phẩm',
                 }
               - {
-                  label: 'footer',
+                  label: 'Câu khẩu hiệu ở footer',
                   name: 'footer',
                   widget: string,
-                  hint: 'VD (VI): Ý tưởng nhỏ, phát hành thật, sửa theo góp ý.',
+                  hint: 'Mặc định: Ý tưởng nhỏ, phát hành thật, sửa theo góp ý.',
                 }
-              - label: 'footerLinks'
-                name: 'footerLinks'
-                widget: object
-                fields:
-                  - {
-                      label: 'projects',
-                      name: 'projects',
-                      widget: string,
-                      hint: 'VD (VI): Dự án',
-                    }
-                  - {
-                      label: 'download',
-                      name: 'download',
-                      widget: string,
-                      hint: 'VD (VI): Tải xuống',
-                    }
-                  - {
-                      label: 'versions',
-                      name: 'versions',
-                      widget: string,
-                      hint: 'VD (VI): Các phiên bản',
-                    }
-                  - {
-                      label: 'feedback',
-                      name: 'feedback',
-                      widget: string,
-                      hint: 'VD (VI): Góp ý & báo lỗi',
-                    }
-                  - {
-                      label: 'privacy',
-                      name: 'privacy',
-                      widget: string,
-                      hint: 'VD (VI): Quyền riêng tư',
-                    }
-                  - {
-                      label: 'account',
-                      name: 'account',
-                      widget: string,
-                      hint: 'VD (VI): Đăng nhập / tài khoản',
-                    }
               - {
-                  label: 'demo',
+                  label: 'Dòng bản quyền ở footer',
+                  name: 'copyright',
+                  widget: string,
+                  hint: 'Mặc định: © {year} Nguyễn Tấn Phát, ChiloLab',
+                }
+              - {
+                  label: 'Chữ thương hiệu cạnh logo',
+                  name: 'brand',
+                  widget: string,
+                  hint: 'Mặc định: ChiloLab',
+                }
+              - {
+                  label: 'Nút Dùng thử',
                   name: 'demo',
                   widget: string,
-                  hint: 'VD (VI): Dùng thử',
+                  hint: 'Mặc định: Dùng thử',
                 }
               - {
-                  label: 'repo',
+                  label: 'Nút Xem mã nguồn',
                   name: 'repo',
                   widget: string,
-                  hint: 'VD (VI): Xem mã nguồn',
+                  hint: 'Mặc định: Xem mã nguồn',
                 }
               - {
-                  label: 'download',
+                  label: 'Nút Tải xuống',
                   name: 'download',
                   widget: string,
-                  hint: 'VD (VI): Tải xuống',
+                  hint: 'Mặc định: Tải xuống',
                 }
           - label: 'Bình luận'
             name: comments
@@ -1289,304 +1273,304 @@ collections:
             collapsed: true
             fields:
               - {
-                  label: 'heading',
+                  label: 'Tiêu đề phần bình luận',
                   name: 'heading',
                   widget: string,
-                  hint: 'VD (VI): Bình luận',
+                  hint: 'Mặc định: Bình luận',
                 }
               - {
-                  label: 'introProject',
+                  label: 'Giới thiệu (trang dự án)',
                   name: 'introProject',
                   widget: text,
-                  hint: 'VD (VI): Bình luận của mọi phiên bản được gộp ở đây. Bình luận có ngôn từ xúc phạm sẽ được giữ lại để xem xét.',
+                  hint: 'Mặc định: Bình luận của mọi phiên bản được gộp ở đây. Bình luận có ngôn từ xúc phạm sẽ được giữ lại để xem xét.',
                 }
               - {
-                  label: 'introVersion',
+                  label: 'Giới thiệu (trang phiên bản)',
                   name: 'introVersion',
                   widget: text,
-                  hint: 'VD (VI): Bình luận về phiên bản này. Bình luận có ngôn từ xúc phạm sẽ được giữ lại để xem xét.',
+                  hint: 'Mặc định: Bình luận về phiên bản này. Bình luận có ngôn từ xúc phạm sẽ được giữ lại để xem xét.',
                 }
               - {
-                  label: 'loading',
+                  label: 'Đang tải',
                   name: 'loading',
                   widget: string,
-                  hint: 'VD (VI): Đang tải bình luận…',
+                  hint: 'Mặc định: Đang tải bình luận…',
                 }
               - {
-                  label: 'empty',
+                  label: 'Chưa có bình luận',
                   name: 'empty',
                   widget: string,
-                  hint: 'VD (VI): Chưa có bình luận nào. Hãy là người đầu tiên!',
+                  hint: 'Mặc định: Chưa có bình luận nào. Hãy là người đầu tiên!',
                 }
               - {
-                  label: 'loadFailed',
+                  label: 'Lỗi tải bình luận',
                   name: 'loadFailed',
                   widget: string,
-                  hint: 'VD (VI): Chưa tải được bình luận. Vui lòng thử lại sau.',
+                  hint: 'Mặc định: Chưa tải được bình luận. Vui lòng thử lại sau.',
                 }
               - {
-                  label: 'signIn',
+                  label: 'Nút đăng nhập để bình luận',
                   name: 'signIn',
                   widget: string,
-                  hint: 'VD (VI): Đăng nhập để bình luận',
+                  hint: 'Mặc định: Đăng nhập để bình luận',
                 }
               - {
-                  label: 'signedInAs',
+                  label: 'Đang bình luận với tên',
                   name: 'signedInAs',
                   widget: string,
-                  hint: 'VD (VI): Đang bình luận với tên',
+                  hint: 'Mặc định: Đang bình luận với tên',
                 }
               - {
-                  label: 'placeholder',
+                  label: 'Gợi ý trong ô bình luận',
                   name: 'placeholder',
                   widget: string,
-                  hint: 'VD (VI): Viết bình luận…',
+                  hint: 'Mặc định: Viết bình luận…',
                 }
               - {
-                  label: 'replyPlaceholder',
+                  label: 'Gợi ý trong ô trả lời',
                   name: 'replyPlaceholder',
                   widget: string,
-                  hint: 'VD (VI): Viết phản hồi…',
+                  hint: 'Mặc định: Viết phản hồi…',
                 }
               - {
-                  label: 'post',
+                  label: 'Nút Gửi',
                   name: 'post',
                   widget: string,
-                  hint: 'VD (VI): Gửi',
+                  hint: 'Mặc định: Gửi',
                 }
               - {
-                  label: 'cancel',
+                  label: 'Nút Hủy',
                   name: 'cancel',
                   widget: string,
-                  hint: 'VD (VI): Hủy',
+                  hint: 'Mặc định: Hủy',
                 }
               - {
-                  label: 'save',
+                  label: 'Nút Lưu',
                   name: 'save',
                   widget: string,
-                  hint: 'VD (VI): Lưu',
+                  hint: 'Mặc định: Lưu',
                 }
               - {
-                  label: 'reply',
+                  label: 'Nút Trả lời',
                   name: 'reply',
                   widget: string,
-                  hint: 'VD (VI): Trả lời',
+                  hint: 'Mặc định: Trả lời',
                 }
               - {
-                  label: 'edit',
+                  label: 'Nút Sửa',
                   name: 'edit',
                   widget: string,
-                  hint: 'VD (VI): Sửa',
+                  hint: 'Mặc định: Sửa',
                 }
               - {
-                  label: 'remove',
+                  label: 'Nút Xóa',
                   name: 'remove',
                   widget: string,
-                  hint: 'VD (VI): Xóa',
+                  hint: 'Mặc định: Xóa',
                 }
               - {
-                  label: 'confirmRemove',
+                  label: 'Hỏi lại trước khi xóa',
                   name: 'confirmRemove',
                   widget: string,
-                  hint: 'VD (VI): Xóa bình luận này?',
+                  hint: 'Mặc định: Xóa bình luận này?',
                 }
               - {
-                  label: 'edited',
+                  label: 'Nhãn "đã sửa"',
                   name: 'edited',
                   widget: string,
-                  hint: 'VD (VI): đã sửa',
+                  hint: 'Mặc định: đã sửa',
                 }
               - {
-                  label: 'held',
+                  label: 'Bình luận của bạn đang chờ duyệt',
                   name: 'held',
                   widget: string,
-                  hint: 'VD (VI): Đang chờ duyệt — chỉ bạn thấy bình luận này.',
+                  hint: 'Mặc định: Đang chờ duyệt — chỉ bạn thấy bình luận này.',
                 }
               - {
-                  label: 'deleted',
+                  label: 'Bình luận đã bị xóa',
                   name: 'deleted',
                   widget: string,
-                  hint: 'VD (VI): Bình luận này đã bị xóa.',
+                  hint: 'Mặc định: Bình luận này đã bị xóa.',
                 }
               - {
-                  label: 'removed',
+                  label: 'Bình luận bị quản trị viên gỡ',
                   name: 'removed',
                   widget: string,
-                  hint: 'VD (VI): Bình luận này đã bị quản trị viên gỡ.',
+                  hint: 'Mặc định: Bình luận này đã bị quản trị viên gỡ.',
                 }
               - {
-                  label: 'formerUser',
+                  label: 'Tên người dùng đã xóa tài khoản',
                   name: 'formerUser',
                   widget: string,
-                  hint: 'VD (VI): Người dùng đã xóa tài khoản',
+                  hint: 'Mặc định: Người dùng đã xóa tài khoản',
                 }
               - {
-                  label: 'showReplies',
+                  label: 'Xem thêm phản hồi ({n})',
                   name: 'showReplies',
                   widget: string,
-                  hint: 'VD (VI): Xem thêm {n} phản hồi',
+                  hint: 'Mặc định: Xem thêm {n} phản hồi',
                 }
               - {
-                  label: 'hideReplies',
+                  label: 'Thu gọn phản hồi',
                   name: 'hideReplies',
                   widget: string,
-                  hint: 'VD (VI): Thu gọn phản hồi',
+                  hint: 'Mặc định: Thu gọn phản hồi',
                 }
               - {
-                  label: 'previous',
+                  label: 'Trang trước',
                   name: 'previous',
                   widget: string,
-                  hint: 'VD (VI): Trước',
+                  hint: 'Mặc định: Trước',
                 }
               - {
-                  label: 'next',
+                  label: 'Trang sau',
                   name: 'next',
                   widget: string,
-                  hint: 'VD (VI): Sau',
+                  hint: 'Mặc định: Sau',
                 }
               - {
-                  label: 'pageOf',
+                  label: 'Số trang ({page}/{pages})',
                   name: 'pageOf',
                   widget: string,
-                  hint: 'VD (VI): Trang {page}/{pages}',
+                  hint: 'Mặc định: Trang {page}/{pages}',
                 }
               - {
-                  label: 'pagination',
+                  label: 'Tên vùng phân trang (trình đọc màn hình)',
                   name: 'pagination',
                   widget: string,
-                  hint: 'VD (VI): Phân trang bình luận',
+                  hint: 'Mặc định: Phân trang bình luận',
                 }
               - {
-                  label: 'count',
+                  label: 'Số bình luận ({n})',
                   name: 'count',
                   widget: string,
-                  hint: 'VD (VI): {n} bình luận',
+                  hint: 'Mặc định: {n} bình luận',
                 }
               - {
-                  label: 'sending',
+                  label: 'Đang gửi',
                   name: 'sending',
                   widget: string,
-                  hint: 'VD (VI): Đang gửi…',
+                  hint: 'Mặc định: Đang gửi…',
                 }
               - {
-                  label: 'failed',
+                  label: 'Lỗi gửi',
                   name: 'failed',
                   widget: string,
-                  hint: 'VD (VI): Chưa gửi được. Vui lòng thử lại.',
+                  hint: 'Mặc định: Chưa gửi được. Vui lòng thử lại.',
                 }
               - {
-                  label: 'rateLimited',
+                  label: 'Gửi quá nhanh',
                   name: 'rateLimited',
                   widget: string,
-                  hint: 'VD (VI): Bạn gửi hơi nhanh, đợi một phút rồi thử lại.',
+                  hint: 'Mặc định: Bạn gửi hơi nhanh, đợi một phút rồi thử lại.',
                 }
               - {
-                  label: 'closed',
+                  label: 'Bình luận đang đóng',
                   name: 'closed',
                   widget: string,
-                  hint: 'VD (VI): Bình luận mới đang tạm đóng.',
+                  hint: 'Mặc định: Bình luận mới đang tạm đóng.',
                 }
               - {
-                  label: 'tooLong',
+                  label: 'Bình luận quá dài ({n})',
                   name: 'tooLong',
                   widget: string,
-                  hint: 'VD (VI): Bình luận dài quá, tối đa {n} ký tự.',
+                  hint: 'Mặc định: Bình luận dài quá, tối đa {n} ký tự.',
                 }
               - {
-                  label: 'hourlyLimit',
+                  label: 'Quá số bình luận trong giờ',
                   name: 'hourlyLimit',
                   widget: string,
-                  hint: 'VD (VI): Bạn đã bình luận nhiều trong giờ qua, vui lòng quay lại sau.',
+                  hint: 'Mặc định: Bạn đã bình luận nhiều trong giờ qua, vui lòng quay lại sau.',
                 }
               - {
-                  label: 'heldNotice',
+                  label: 'Thông báo bình luận bị giữ',
                   name: 'heldNotice',
                   widget: string,
-                  hint: 'VD (VI): Bình luận đang được giữ lại để xem xét và sẽ hiện sau khi được duyệt.',
+                  hint: 'Mặc định: Bình luận đang được giữ lại để xem xét và sẽ hiện sau khi được duyệt.',
                 }
               - {
-                  label: 'versionLabel',
+                  label: 'Nhãn phiên bản',
                   name: 'versionLabel',
                   widget: string,
-                  hint: 'VD (VI): Phiên bản',
+                  hint: 'Mặc định: Phiên bản',
                 }
               - {
-                  label: 'projectLabel',
+                  label: 'Nhãn trang dự án',
                   name: 'projectLabel',
                   widget: string,
-                  hint: 'VD (VI): Trang dự án',
+                  hint: 'Mặc định: Trang dự án',
                 }
               - {
-                  label: 'authorBadge',
+                  label: 'Huy hiệu Tác giả',
                   name: 'authorBadge',
                   widget: string,
-                  hint: 'VD (VI): Tác giả',
+                  hint: 'Mặc định: Tác giả',
                 }
               - {
-                  label: 'heldOther',
+                  label: 'Bình luận người khác chờ duyệt',
                   name: 'heldOther',
                   widget: string,
-                  hint: 'VD (VI): Đang bị giữ chờ duyệt',
+                  hint: 'Mặc định: Đang bị giữ chờ duyệt',
                 }
               - {
-                  label: 'approve',
+                  label: 'Nút Duyệt',
                   name: 'approve',
                   widget: string,
-                  hint: 'VD (VI): Duyệt',
+                  hint: 'Mặc định: Duyệt',
                 }
               - {
-                  label: 'removeOther',
+                  label: 'Nút Gỡ',
                   name: 'removeOther',
                   widget: string,
-                  hint: 'VD (VI): Gỡ',
+                  hint: 'Mặc định: Gỡ',
                 }
               - {
-                  label: 'confirmRemoveOther',
+                  label: 'Hỏi lại trước khi gỡ',
                   name: 'confirmRemoveOther',
                   widget: string,
-                  hint: 'VD (VI): Gỡ bình luận này của người khác?',
+                  hint: 'Mặc định: Gỡ bình luận này của người khác?',
                 }
               - {
-                  label: 'reason_profanity',
+                  label: 'Lý do giữ: ngôn từ thô tục',
                   name: 'reason_profanity',
                   widget: string,
-                  hint: 'VD (VI): chửi thề',
+                  hint: 'Mặc định: chửi thề',
                 }
               - {
-                  label: 'reason_insult',
+                  label: 'Lý do giữ: xúc phạm',
                   name: 'reason_insult',
                   widget: string,
-                  hint: 'VD (VI): xúc phạm',
+                  hint: 'Mặc định: xúc phạm',
                 }
               - {
-                  label: 'reason_hate',
+                  label: 'Lý do giữ: thù ghét',
                   name: 'reason_hate',
                   widget: string,
-                  hint: 'VD (VI): thù ghét',
+                  hint: 'Mặc định: thù ghét',
                 }
               - {
-                  label: 'reason_sexual',
+                  label: 'Lý do giữ: nội dung tình dục',
                   name: 'reason_sexual',
                   widget: string,
-                  hint: 'VD (VI): tình dục',
+                  hint: 'Mặc định: tình dục',
                 }
               - {
-                  label: 'reason_threat',
+                  label: 'Lý do giữ: đe dọa',
                   name: 'reason_threat',
                   widget: string,
-                  hint: 'VD (VI): đe dọa',
+                  hint: 'Mặc định: đe dọa',
                 }
               - {
-                  label: 'reason_spam',
+                  label: 'Lý do giữ: spam',
                   name: 'reason_spam',
                   widget: string,
-                  hint: 'VD (VI): spam',
+                  hint: 'Mặc định: spam',
                 }
               - {
-                  label: 'reason_link',
+                  label: 'Lý do giữ: chứa link',
                   name: 'reason_link',
                   widget: string,
-                  hint: 'VD (VI): có đường link',
+                  hint: 'Mặc định: có đường link',
                 }
           - label: 'Form góp ý'
             name: feedback
@@ -1594,566 +1578,566 @@ collections:
             collapsed: true
             fields:
               - {
-                  label: 'title',
+                  label: 'Tiêu đề trang góp ý',
                   name: 'title',
                   widget: string,
-                  hint: 'VD (VI): Góp ý và báo lỗi',
+                  hint: 'Mặc định: Góp ý và báo lỗi',
                 }
               - {
-                  label: 'intro',
+                  label: 'Giới thiệu',
                   name: 'intro',
                   widget: text,
-                  hint: 'VD (VI): Những gì bạn gửi ở đây chỉ mình đọc, không hiện công khai. Không cần đăng nhập.',
+                  hint: 'Mặc định: Những gì bạn gửi ở đây chỉ mình đọc, không hiện công khai. Không cần đăng nhập.',
                 }
               - {
-                  label: 'publicNote',
+                  label: 'Ghi chú thảo luận công khai',
                   name: 'publicNote',
                   widget: string,
-                  hint: 'VD (VI): Muốn thảo luận công khai? Hãy dùng phần bình luận ở',
+                  hint: 'Mặc định: Muốn thảo luận công khai? Hãy dùng phần bình luận ở',
                 }
               - {
-                  label: 'kind',
+                  label: 'Câu hỏi loại góp ý',
                   name: 'kind',
                   widget: string,
-                  hint: 'VD (VI): Bạn muốn gửi gì?',
+                  hint: 'Mặc định: Bạn muốn gửi gì?',
                 }
-              - label: 'kinds'
+              - label: 'Các loại góp ý'
                 name: 'kinds'
                 widget: object
                 fields:
                   - {
-                      label: 'bug',
+                      label: 'Báo lỗi',
                       name: 'bug',
                       widget: string,
-                      hint: 'VD (VI): Báo lỗi',
+                      hint: 'Mặc định: Báo lỗi',
                     }
                   - {
-                      label: 'idea',
+                      label: 'Ý tưởng',
                       name: 'idea',
                       widget: string,
-                      hint: 'VD (VI): Góp ý / ý tưởng',
+                      hint: 'Mặc định: Góp ý / ý tưởng',
                     }
                   - {
-                      label: 'other',
+                      label: 'Khác',
                       name: 'other',
                       widget: string,
-                      hint: 'VD (VI): Khác',
+                      hint: 'Mặc định: Khác',
                     }
               - {
-                  label: 'summary',
+                  label: 'Nhãn ô tiêu đề',
                   name: 'summary',
                   widget: string,
-                  hint: 'VD (VI): Tiêu đề ngắn',
+                  hint: 'Mặc định: Tiêu đề ngắn',
                 }
               - {
-                  label: 'summaryHint',
+                  label: 'Gợi ý ô tiêu đề',
                   name: 'summaryHint',
                   widget: string,
-                  hint: 'VD (VI): Ví dụ: Mèo đứng yên sau khi mở máy lại',
+                  hint: 'Mặc định: Ví dụ: Mèo đứng yên sau khi mở máy lại',
                 }
               - {
-                  label: 'message',
+                  label: 'Nhãn ô chi tiết',
                   name: 'message',
                   widget: string,
-                  hint: 'VD (VI): Chi tiết',
+                  hint: 'Mặc định: Chi tiết',
                 }
               - {
-                  label: 'messageHintBug',
+                  label: 'Gợi ý chi tiết (báo lỗi)',
                   name: 'messageHintBug',
                   widget: text,
-                  hint: 'VD (VI): Bạn đã làm gì? Bạn mong đợi điều gì? Thực tế xảy ra gì? Lỗi có lặp lại không?',
+                  hint: 'Mặc định: Bạn đã làm gì? Bạn mong đợi điều gì? Thực tế xảy ra gì? Lỗi có lặp lại không?',
                 }
               - {
-                  label: 'messageHintIdea',
+                  label: 'Gợi ý chi tiết (ý tưởng)',
                   name: 'messageHintIdea',
                   widget: string,
-                  hint: 'VD (VI): Mô tả ý tưởng và vì sao nó hữu ích với bạn.',
+                  hint: 'Mặc định: Mô tả ý tưởng và vì sao nó hữu ích với bạn.',
                 }
               - {
-                  label: 'version',
+                  label: 'Nhãn ô phiên bản',
                   name: 'version',
                   widget: string,
-                  hint: 'VD (VI): Phiên bản đang dùng',
+                  hint: 'Mặc định: Phiên bản đang dùng',
                 }
               - {
-                  label: 'versionUnknown',
+                  label: 'Lựa chọn "Không rõ"',
                   name: 'versionUnknown',
                   widget: string,
-                  hint: 'VD (VI): Không rõ / khác',
+                  hint: 'Mặc định: Không rõ / khác',
                 }
               - {
-                  label: 'os',
+                  label: 'Nhãn ô Windows',
                   name: 'os',
                   widget: string,
-                  hint: 'VD (VI): Phiên bản Windows (không bắt buộc)',
+                  hint: 'Mặc định: Phiên bản Windows (không bắt buộc)',
                 }
               - {
-                  label: 'osHint',
+                  label: 'Gợi ý ô Windows',
                   name: 'osHint',
                   widget: string,
-                  hint: 'VD (VI): Ví dụ: Windows 11 23H2',
+                  hint: 'Mặc định: Ví dụ: Windows 11 23H2',
                 }
               - {
-                  label: 'contact',
+                  label: 'Nhãn ô liên hệ',
                   name: 'contact',
                   widget: string,
-                  hint: 'VD (VI): Email hoặc cách liên hệ (không bắt buộc)',
+                  hint: 'Mặc định: Email hoặc cách liên hệ (không bắt buộc)',
                 }
               - {
-                  label: 'contactHint',
+                  label: 'Gợi ý ô liên hệ',
                   name: 'contactHint',
                   widget: string,
-                  hint: 'VD (VI): Chỉ dùng để hỏi thêm về nội dung này.',
+                  hint: 'Mặc định: Chỉ dùng để hỏi thêm về nội dung này.',
                 }
               - {
-                  label: 'send',
+                  label: 'Nút Gửi',
                   name: 'send',
                   widget: string,
-                  hint: 'VD (VI): Gửi',
+                  hint: 'Mặc định: Gửi',
                 }
               - {
-                  label: 'sending',
+                  label: 'Đang gửi',
                   name: 'sending',
                   widget: string,
-                  hint: 'VD (VI): Đang gửi…',
+                  hint: 'Mặc định: Đang gửi…',
                 }
               - {
-                  label: 'sent',
+                  label: 'Gửi thành công',
                   name: 'sent',
                   widget: string,
-                  hint: 'VD (VI): Cảm ơn bạn! Mình đã nhận được rồi nhé.',
+                  hint: 'Mặc định: Cảm ơn bạn! Mình đã nhận được rồi nhé.',
                 }
               - {
-                  label: 'verifying',
+                  label: 'Đang xác minh chống spam',
                   name: 'verifying',
                   widget: string,
-                  hint: 'VD (VI): Đang xác minh chống spam, vui lòng đợi vài giây rồi bấm gửi lại.',
+                  hint: 'Mặc định: Đang xác minh chống spam, vui lòng đợi vài giây rồi bấm gửi lại.',
                 }
               - {
-                  label: 'failed',
+                  label: 'Lỗi gửi',
                   name: 'failed',
                   widget: string,
-                  hint: 'VD (VI): Gửi chưa được. Kiểm tra nội dung rồi thử lại.',
+                  hint: 'Mặc định: Gửi chưa được. Kiểm tra nội dung rồi thử lại.',
                 }
               - {
-                  label: 'rateLimited',
+                  label: 'Gửi quá nhanh',
                   name: 'rateLimited',
                   widget: string,
-                  hint: 'VD (VI): Bạn gửi hơi nhanh, đợi một phút rồi thử lại.',
+                  hint: 'Mặc định: Bạn gửi hơi nhanh, đợi một phút rồi thử lại.',
                 }
               - {
-                  label: 'closed',
+                  label: 'Form đang đóng',
                   name: 'closed',
                   widget: string,
-                  hint: 'VD (VI): Form góp ý đang tạm đóng. Vui lòng quay lại sau.',
+                  hint: 'Mặc định: Form góp ý đang tạm đóng. Vui lòng quay lại sau.',
                 }
               - {
-                  label: 'noscript',
+                  label: 'Cần bật JavaScript',
                   name: 'noscript',
                   widget: string,
-                  hint: 'VD (VI): Cần bật JavaScript để gửi góp ý.',
+                  hint: 'Mặc định: Cần bật JavaScript để gửi góp ý.',
                 }
               - {
-                  label: 'screenshot',
+                  label: 'Nhãn ô ảnh chụp',
                   name: 'screenshot',
                   widget: string,
-                  hint: 'VD (VI): Ảnh chụp màn hình (không bắt buộc)',
+                  hint: 'Mặc định: Ảnh chụp màn hình (không bắt buộc)',
                 }
               - {
-                  label: 'screenshotHint',
+                  label: 'Gợi ý ô ảnh chụp',
                   name: 'screenshotHint',
                   widget: text,
-                  hint: 'VD (VI): PNG, JPEG hoặc WebP, tối đa 3 MB. Chỉ chủ website xem được. Hãy che thông tin cá nhân trong ảnh trước khi gửi.',
+                  hint: 'Mặc định: PNG, JPEG hoặc WebP, tối đa 3 MB. Chỉ chủ website xem được. Hãy che thông tin cá nhân trong ảnh trước khi gửi.',
                 }
               - {
-                  label: 'fileTooLarge',
+                  label: 'Ảnh quá lớn',
                   name: 'fileTooLarge',
                   widget: string,
-                  hint: 'VD (VI): Ảnh lớn hơn 3 MB. Hãy chọn ảnh nhỏ hơn hoặc cắt bớt.',
+                  hint: 'Mặc định: Ảnh lớn hơn 3 MB. Hãy chọn ảnh nhỏ hơn hoặc cắt bớt.',
                 }
               - {
-                  label: 'fileType',
+                  label: 'Sai loại ảnh',
                   name: 'fileType',
                   widget: string,
-                  hint: 'VD (VI): Chỉ nhận ảnh PNG, JPEG hoặc WebP.',
+                  hint: 'Mặc định: Chỉ nhận ảnh PNG, JPEG hoặc WebP.',
                 }
-          - label: 'Đăng nhập & tài khoản'
+          - label: 'Đăng nhập và tài khoản'
             name: user
             widget: object
             collapsed: true
             fields:
               - {
-                  label: 'loginTitle',
+                  label: 'Tiêu đề trang đăng nhập',
                   name: 'loginTitle',
                   widget: string,
-                  hint: 'VD (VI): Đăng nhập',
+                  hint: 'Mặc định: Đăng nhập',
                 }
               - {
-                  label: 'loginHeading',
+                  label: 'Lời chào trang đăng nhập',
                   name: 'loginHeading',
                   widget: string,
-                  hint: 'VD (VI): Chào mừng đến ChiloLab',
+                  hint: 'Mặc định: Chào mừng đến ChiloLab',
                 }
               - {
-                  label: 'loginIntro',
+                  label: 'Giới thiệu trang đăng nhập',
                   name: 'loginIntro',
                   widget: string,
-                  hint: 'VD (VI): Đăng nhập để bình luận và trả lời về các dự án, phiên bản.',
+                  hint: 'Mặc định: Đăng nhập để bình luận và trả lời về các dự án, phiên bản.',
                 }
               - {
-                  label: 'google',
+                  label: 'Nút đăng nhập Google',
                   name: 'google',
                   widget: string,
-                  hint: 'VD (VI): Tiếp tục với Google',
+                  hint: 'Mặc định: Tiếp tục với Google',
                 }
               - {
-                  label: 'or',
+                  label: 'Chữ "hoặc"',
                   name: 'or',
                   widget: string,
-                  hint: 'VD (VI): hoặc',
+                  hint: 'Mặc định: hoặc',
                 }
               - {
-                  label: 'emailLabel',
+                  label: 'Nhãn ô email',
                   name: 'emailLabel',
                   widget: string,
-                  hint: 'VD (VI): Email',
+                  hint: 'Mặc định: Email',
                 }
               - {
-                  label: 'emailPlaceholder',
+                  label: 'Gợi ý ô email',
                   name: 'emailPlaceholder',
                   widget: string,
-                  hint: 'VD (VI): user@example.com',
+                  hint: 'Mặc định: user@example.com',
                 }
               - {
-                  label: 'sendCode',
+                  label: 'Nút gửi mã',
                   name: 'sendCode',
                   widget: string,
-                  hint: 'VD (VI): Gửi mã đăng nhập',
+                  hint: 'Mặc định: Gửi mã đăng nhập',
                 }
               - {
-                  label: 'codeSent',
+                  label: 'Đã gửi mã ({email})',
                   name: 'codeSent',
                   widget: string,
-                  hint: 'VD (VI): Đã gửi mã 6 số tới {email}. Kiểm tra cả hộp thư Spam.',
+                  hint: 'Mặc định: Đã gửi mã 6 số tới {email}. Kiểm tra cả hộp thư Spam.',
                 }
               - {
-                  label: 'codeLabel',
+                  label: 'Nhãn ô mã',
                   name: 'codeLabel',
                   widget: string,
-                  hint: 'VD (VI): Mã 6 số',
+                  hint: 'Mặc định: Mã 6 số',
                 }
               - {
-                  label: 'verify',
+                  label: 'Nút xác nhận mã',
                   name: 'verify',
                   widget: string,
-                  hint: 'VD (VI): Đăng nhập',
+                  hint: 'Mặc định: Đăng nhập',
                 }
               - {
-                  label: 'changeEmail',
+                  label: 'Dùng email khác',
                   name: 'changeEmail',
                   widget: string,
-                  hint: 'VD (VI): Dùng email khác',
+                  hint: 'Mặc định: Dùng email khác',
                 }
               - {
-                  label: 'resend',
+                  label: 'Gửi lại mã',
                   name: 'resend',
                   widget: string,
-                  hint: 'VD (VI): Gửi lại mã',
+                  hint: 'Mặc định: Gửi lại mã',
                 }
               - {
-                  label: 'sending',
+                  label: 'Đang gửi',
                   name: 'sending',
                   widget: string,
-                  hint: 'VD (VI): Đang gửi…',
+                  hint: 'Mặc định: Đang gửi…',
                 }
               - {
-                  label: 'verifying',
+                  label: 'Đang xác minh chống spam',
                   name: 'verifying',
                   widget: string,
-                  hint: 'VD (VI): Đang xác minh chống spam, vui lòng đợi vài giây rồi bấm lại.',
+                  hint: 'Mặc định: Đang xác minh chống spam, vui lòng đợi vài giây rồi bấm lại.',
                 }
-              - label: 'emailErrors'
+              - label: 'Lỗi đăng nhập bằng email'
                 name: 'emailErrors'
                 widget: object
                 fields:
                   - {
-                      label: 'invalid_email',
+                      label: 'Email không hợp lệ',
                       name: 'invalid_email',
                       widget: string,
-                      hint: 'VD (VI): Email không hợp lệ.',
+                      hint: 'Mặc định: Email không hợp lệ.',
                     }
                   - {
-                      label: 'invalid_code',
+                      label: 'Mã sai hoặc hết hạn',
                       name: 'invalid_code',
                       widget: string,
-                      hint: 'VD (VI): Mã không đúng hoặc đã hết hạn.',
+                      hint: 'Mặc định: Mã không đúng hoặc đã hết hạn.',
                     }
                   - {
-                      label: 'too_many_attempts',
+                      label: 'Nhập sai quá nhiều lần',
                       name: 'too_many_attempts',
                       widget: string,
-                      hint: 'VD (VI): Nhập sai quá nhiều lần. Hãy gửi mã mới.',
+                      hint: 'Mặc định: Nhập sai quá nhiều lần. Hãy gửi mã mới.',
                     }
                   - {
-                      label: 'rate_limited',
+                      label: 'Yêu cầu mã quá nhanh',
                       name: 'rate_limited',
                       widget: string,
-                      hint: 'VD (VI): Bạn yêu cầu mã hơi nhanh, đợi một phút rồi thử lại.',
+                      hint: 'Mặc định: Bạn yêu cầu mã hơi nhanh, đợi một phút rồi thử lại.',
                     }
                   - {
-                      label: 'verification_failed',
+                      label: 'Không xác minh được chống spam',
                       name: 'verification_failed',
                       widget: string,
-                      hint: 'VD (VI): Không xác minh được chống spam, vui lòng thử lại.',
+                      hint: 'Mặc định: Không xác minh được chống spam, vui lòng thử lại.',
                     }
                   - {
-                      label: 'unavailable',
+                      label: 'Chức năng chưa bật',
                       name: 'unavailable',
                       widget: string,
-                      hint: 'VD (VI): Đăng nhập bằng email chưa được bật.',
+                      hint: 'Mặc định: Đăng nhập bằng email chưa được bật.',
                     }
                   - {
-                      label: 'mail_failed',
+                      label: 'Không gửi được email',
                       name: 'mail_failed',
                       widget: string,
-                      hint: 'VD (VI): Chưa gửi được email, vui lòng thử lại sau.',
+                      hint: 'Mặc định: Chưa gửi được email, vui lòng thử lại sau.',
                     }
                   - {
-                      label: 'registration_closed',
+                      label: 'Không nhận tài khoản mới',
                       name: 'registration_closed',
                       widget: string,
-                      hint: 'VD (VI): Hiện không nhận tài khoản mới; chỉ tài khoản đã có đăng nhập được.',
+                      hint: 'Mặc định: Hiện không nhận tài khoản mới; chỉ tài khoản đã có đăng nhập được.',
                     }
                   - {
-                      label: 'blocked',
+                      label: 'Tài khoản bị khóa',
                       name: 'blocked',
                       widget: string,
-                      hint: 'VD (VI): Tài khoản này đã bị khóa.',
+                      hint: 'Mặc định: Tài khoản này đã bị khóa.',
                     }
               - {
-                  label: 'newAccount',
+                  label: 'Ghi chú tài khoản mới',
                   name: 'newAccount',
                   widget: string,
-                  hint: 'VD (VI): Chưa có tài khoản? Lần đầu đăng nhập sẽ tự tạo tài khoản.',
+                  hint: 'Mặc định: Chưa có tài khoản? Lần đầu đăng nhập sẽ tự tạo tài khoản.',
                 }
               - {
-                  label: 'agree',
+                  label: 'Câu đồng ý điều khoản',
                   name: 'agree',
                   widget: string,
-                  hint: 'VD (VI): Khi tiếp tục, bạn đồng ý với',
+                  hint: 'Mặc định: Khi tiếp tục, bạn đồng ý với',
                 }
               - {
-                  label: 'privacy',
+                  label: 'Link chính sách quyền riêng tư',
                   name: 'privacy',
                   widget: string,
-                  hint: 'VD (VI): Chính sách quyền riêng tư',
+                  hint: 'Mặc định: Chính sách quyền riêng tư',
                 }
               - {
-                  label: 'unavailable',
+                  label: 'Chức năng chưa bật',
                   name: 'unavailable',
                   widget: string,
-                  hint: 'VD (VI): Đăng nhập bằng Google chưa được bật. Vui lòng quay lại sau.',
+                  hint: 'Mặc định: Đăng nhập bằng Google chưa được bật. Vui lòng quay lại sau.',
                 }
-              - label: 'errors'
+              - label: 'Lỗi đăng nhập Google'
                 name: 'errors'
                 widget: object
                 fields:
                   - {
-                      label: 'cancelled',
+                      label: 'Đã hủy đăng nhập',
                       name: 'cancelled',
                       widget: string,
-                      hint: 'VD (VI): Bạn đã hủy đăng nhập.',
+                      hint: 'Mặc định: Bạn đã hủy đăng nhập.',
                     }
                   - {
-                      label: 'expired',
+                      label: 'Phiên hết hạn',
                       name: 'expired',
                       widget: string,
-                      hint: 'VD (VI): Phiên đăng nhập đã hết hạn, vui lòng thử lại.',
+                      hint: 'Mặc định: Phiên đăng nhập đã hết hạn, vui lòng thử lại.',
                     }
                   - {
-                      label: 'google',
+                      label: 'Nút đăng nhập Google',
                       name: 'google',
                       widget: string,
-                      hint: 'VD (VI): Google không xác nhận được tài khoản, vui lòng thử lại.',
+                      hint: 'Mặc định: Google không xác nhận được tài khoản, vui lòng thử lại.',
                     }
                   - {
-                      label: 'unavailable',
+                      label: 'Chức năng chưa bật',
                       name: 'unavailable',
                       widget: string,
-                      hint: 'VD (VI): Đăng nhập bằng Google chưa được bật.',
+                      hint: 'Mặc định: Đăng nhập bằng Google chưa được bật.',
                     }
                   - {
-                      label: 'registration_closed',
+                      label: 'Không nhận tài khoản mới',
                       name: 'registration_closed',
                       widget: string,
-                      hint: 'VD (VI): Hiện không nhận tài khoản mới; chỉ tài khoản đã có đăng nhập được.',
+                      hint: 'Mặc định: Hiện không nhận tài khoản mới; chỉ tài khoản đã có đăng nhập được.',
                     }
                   - {
-                      label: 'blocked',
+                      label: 'Tài khoản bị khóa',
                       name: 'blocked',
                       widget: string,
-                      hint: 'VD (VI): Tài khoản này đã bị khóa.',
+                      hint: 'Mặc định: Tài khoản này đã bị khóa.',
                     }
               - {
-                  label: 'accountTitle',
+                  label: 'Tiêu đề trang tài khoản',
                   name: 'accountTitle',
                   widget: string,
-                  hint: 'VD (VI): Tài khoản',
+                  hint: 'Mặc định: Tài khoản',
                 }
               - {
-                  label: 'signedInAs',
+                  label: 'Đang đăng nhập với',
                   name: 'signedInAs',
                   widget: string,
-                  hint: 'VD (VI): Đăng nhập với',
+                  hint: 'Mặc định: Đăng nhập với',
                 }
               - {
-                  label: 'displayName',
+                  label: 'Nhãn tên hiển thị',
                   name: 'displayName',
                   widget: string,
-                  hint: 'VD (VI): Tên hiển thị',
+                  hint: 'Mặc định: Tên hiển thị',
                 }
               - {
-                  label: 'displayNameHint',
+                  label: 'Gợi ý tên hiển thị',
                   name: 'displayNameHint',
                   widget: string,
-                  hint: 'VD (VI): Tên này hiện cạnh bình luận của bạn (2–40 ký tự).',
+                  hint: 'Mặc định: Tên này hiện cạnh bình luận của bạn (2–40 ký tự).',
                 }
               - {
-                  label: 'save',
+                  label: 'Nút Lưu',
                   name: 'save',
                   widget: string,
-                  hint: 'VD (VI): Lưu',
+                  hint: 'Mặc định: Lưu',
                 }
               - {
-                  label: 'saved',
+                  label: 'Đã lưu',
                   name: 'saved',
                   widget: string,
-                  hint: 'VD (VI): Đã lưu.',
+                  hint: 'Mặc định: Đã lưu.',
                 }
               - {
-                  label: 'signOut',
+                  label: 'Nút Đăng xuất',
                   name: 'signOut',
                   widget: string,
-                  hint: 'VD (VI): Đăng xuất',
+                  hint: 'Mặc định: Đăng xuất',
                 }
               - {
-                  label: 'adminLink',
+                  label: 'Link trang quản trị',
                   name: 'adminLink',
                   widget: string,
-                  hint: 'VD (VI): Vào trang quản trị',
+                  hint: 'Mặc định: Vào trang quản trị',
                 }
               - {
-                  label: 'deleteTitle',
+                  label: 'Tiêu đề xóa tài khoản',
                   name: 'deleteTitle',
                   widget: string,
-                  hint: 'VD (VI): Xóa tài khoản',
+                  hint: 'Mặc định: Xóa tài khoản',
                 }
               - {
-                  label: 'deleteIntro',
+                  label: 'Giải thích xóa tài khoản',
                   name: 'deleteIntro',
                   widget: text,
-                  hint: 'VD (VI): Xóa tài khoản sẽ xóa vĩnh viễn tên, email và nội dung mọi bình luận của bạn. Bình luận có người trả lời sẽ chỉ còn dòng "đã bị xóa".',
+                  hint: 'Mặc định: Xóa tài khoản sẽ xóa vĩnh viễn tên, email và nội dung mọi bình luận của bạn. Bình luận có người trả lời sẽ chỉ còn dòng "đã bị xóa".',
                 }
               - {
-                  label: 'deleteButton',
+                  label: 'Nút xóa tài khoản',
                   name: 'deleteButton',
                   widget: string,
-                  hint: 'VD (VI): Xóa tài khoản của tôi',
+                  hint: 'Mặc định: Xóa tài khoản của tôi',
                 }
               - {
-                  label: 'deleteConfirm',
+                  label: 'Hỏi lại trước khi xóa tài khoản',
                   name: 'deleteConfirm',
                   widget: string,
-                  hint: 'VD (VI): Xóa vĩnh viễn tài khoản và mọi bình luận của bạn?',
+                  hint: 'Mặc định: Xóa vĩnh viễn tài khoản và mọi bình luận của bạn?',
                 }
               - {
-                  label: 'deleted',
+                  label: 'Đã xóa tài khoản',
                   name: 'deleted',
                   widget: string,
-                  hint: 'VD (VI): Tài khoản đã được xóa.',
+                  hint: 'Mặc định: Tài khoản đã được xóa.',
                 }
               - {
-                  label: 'failed',
+                  label: 'Lỗi chung',
                   name: 'failed',
                   widget: string,
-                  hint: 'VD (VI): Chưa thực hiện được, vui lòng thử lại.',
+                  hint: 'Mặc định: Chưa thực hiện được, vui lòng thử lại.',
                 }
-          - label: 'Email báo bản mới, hủy nhận'
+          - label: 'Email báo bản mới'
             name: updates
             widget: object
             collapsed: true
             fields:
               - {
-                  label: 'projectLink',
+                  label: 'Link nhận email (trang dự án)',
                   name: 'projectLink',
                   widget: string,
-                  hint: 'VD (VI): Nhận email khi có bản mới',
+                  hint: 'Mặc định: Nhận email khi có bản mới',
                 }
               - {
-                  label: 'title',
+                  label: 'Tiêu đề phần email bản mới',
                   name: 'title',
                   widget: string,
-                  hint: 'VD (VI): Email báo bản mới',
+                  hint: 'Mặc định: Email báo bản mới',
                 }
               - {
-                  label: 'intro',
+                  label: 'Giới thiệu',
                   name: 'intro',
                   widget: text,
-                  hint: 'VD (VI): Chọn dự án bạn muốn nhận email khi có bản phát hành mới. Email gửi tới địa chỉ của tài khoản này, bằng ngôn ngữ của trang bạn đang xem lúc chọn.',
+                  hint: 'Mặc định: Chọn dự án bạn muốn nhận email khi có bản phát hành mới. Email gửi tới địa chỉ của tài khoản này, bằng ngôn ngữ của trang bạn đang xem lúc chọn.',
                 }
               - {
-                  label: 'note',
+                  label: 'Ghi chú hủy nhận',
                   name: 'note',
                   widget: text,
-                  hint: 'VD (VI): Mỗi email có link hủy nhận. Bỏ chọn ở đây cũng hủy ngay.',
+                  hint: 'Mặc định: Mỗi email có link hủy nhận. Bỏ chọn ở đây cũng hủy ngay.',
                 }
               - {
-                  label: 'saved',
+                  label: 'Đã lưu',
                   name: 'saved',
                   widget: string,
-                  hint: 'VD (VI): Đã lưu lựa chọn.',
+                  hint: 'Mặc định: Đã lưu lựa chọn.',
                 }
               - {
-                  label: 'failed',
+                  label: 'Lỗi lưu',
                   name: 'failed',
                   widget: string,
-                  hint: 'VD (VI): Chưa lưu được, vui lòng thử lại.',
+                  hint: 'Mặc định: Chưa lưu được, vui lòng thử lại.',
                 }
               - {
-                  label: 'unsubscribeTitle',
+                  label: 'Tiêu đề trang hủy nhận',
                   name: 'unsubscribeTitle',
                   widget: string,
-                  hint: 'VD (VI): Hủy nhận email bản mới',
+                  hint: 'Mặc định: Hủy nhận email bản mới',
                 }
               - {
-                  label: 'unsubscribeIntro',
+                  label: 'Giới thiệu trang hủy nhận',
                   name: 'unsubscribeIntro',
                   widget: text,
-                  hint: 'VD (VI): Bấm nút dưới đây để không nhận email báo bản mới của dự án trong email bạn vừa nhận nữa.',
+                  hint: 'Mặc định: Bấm nút dưới đây để không nhận email báo bản mới của dự án trong email bạn vừa nhận nữa.',
                 }
               - {
-                  label: 'unsubscribeButton',
+                  label: 'Nút hủy nhận',
                   name: 'unsubscribeButton',
                   widget: string,
-                  hint: 'VD (VI): Hủy nhận email',
+                  hint: 'Mặc định: Hủy nhận email',
                 }
               - {
-                  label: 'unsubscribed',
+                  label: 'Đã hủy nhận',
                   name: 'unsubscribed',
                   widget: text,
-                  hint: 'VD (VI): Đã hủy. Bạn sẽ không nhận email báo bản mới của {project} nữa.',
+                  hint: 'Mặc định: Đã hủy. Bạn sẽ không nhận email báo bản mới của {project} nữa.',
                 }
               - {
-                  label: 'unsubscribeInvalid',
+                  label: 'Link hủy sai',
                   name: 'unsubscribeInvalid',
                   widget: string,
-                  hint: 'VD (VI): Link hủy không đúng hoặc đã được dùng rồi.',
+                  hint: 'Mặc định: Link hủy không đúng hoặc đã được dùng rồi.',
                 }
               - {
-                  label: 'manage',
+                  label: 'Link quản lý email',
                   name: 'manage',
                   widget: string,
-                  hint: 'VD (VI): Quản lý email bản mới trong trang tài khoản',
+                  hint: 'Mặc định: Quản lý email bản mới trong trang tài khoản',
                 }
           - label: 'Số lượt tải'
             name: downloads
@@ -2161,16 +2145,16 @@ collections:
             collapsed: true
             fields:
               - {
-                  label: 'count',
+                  label: 'Số lượt tải ({n})',
                   name: 'count',
                   widget: string,
-                  hint: 'VD (VI): {n} lượt tải',
+                  hint: 'Mặc định: {n} lượt tải',
                 }
               - {
-                  label: 'source',
+                  label: 'Giải thích nguồn số lượt tải',
                   name: 'source',
                   widget: text,
-                  hint: 'VD (VI): Số lần tải bộ cài và bản portable từ GitHub Releases, cập nhật mỗi phút.',
+                  hint: 'Mặc định: Số lần tải bộ cài và bản portable từ GitHub Releases, cập nhật mỗi phút.',
                 }
           - label: 'Dải chủ site và nút sửa'
             name: owner
@@ -2178,153 +2162,159 @@ collections:
             collapsed: true
             fields:
               - {
-                  label: 'mode',
+                  label: 'Tên dải chủ site',
                   name: 'mode',
                   widget: string,
-                  hint: 'VD (VI): Chế độ chủ site',
+                  hint: 'Mặc định: Chế độ chủ site',
                 }
               - {
-                  label: 'note',
+                  label: 'Ghi chú dải chủ site',
                   name: 'note',
                   widget: string,
-                  hint: 'VD (VI): Khách không thấy dải này.',
+                  hint: 'Mặc định: Khách không thấy dải này.',
                 }
               - {
-                  label: 'pending',
+                  label: 'Việc chờ xử lý ({held}, {feedback})',
                   name: 'pending',
                   widget: string,
-                  hint: 'VD (VI): {held} bình luận chờ duyệt · {feedback} góp ý mới',
+                  hint: 'Mặc định: {held} bình luận chờ duyệt · {feedback} góp ý mới',
                 }
               - {
-                  label: 'manage',
+                  label: 'Link trang quản trị',
                   name: 'manage',
                   widget: string,
-                  hint: 'VD (VI): Mở trang quản trị',
+                  hint: 'Mặc định: Mở trang quản trị',
                 }
               - {
-                  label: 'cms',
+                  label: 'Link mở CMS',
                   name: 'cms',
                   widget: string,
-                  hint: 'VD (VI): Mở CMS',
+                  hint: 'Mặc định: Mở CMS',
                 }
               - {
-                  label: 'editPage',
+                  label: 'Link sửa trang này',
                   name: 'editPage',
                   widget: string,
-                  hint: 'VD (VI): Sửa trang này',
+                  hint: 'Mặc định: Sửa trang này',
                 }
               - {
-                  label: 'edit',
+                  label: 'Chữ trên nút ✎',
                   name: 'edit',
                   widget: string,
-                  hint: 'VD (VI): Sửa',
+                  hint: 'Mặc định: Sửa',
                 }
           - label: 'Chữ phụ (skip link, 404, ảnh, video)'
             name: chrome
             widget: object
             collapsed: true
             fields:
+              - label: 'Ảnh chia sẻ link mặc định (Facebook, Zalo…)'
+                name: shareImage
+                widget: image
+                media_folder: /src/assets
+                public_folder: ../../assets
+                hint: 'Ảnh hiện khi chia sẻ link một trang không có ảnh riêng. Nên rộng ít nhất 1200 px.'
               - {
-                  label: 'skip',
+                  label: 'Link "Đến nội dung" (bàn phím)',
                   name: 'skip',
                   widget: string,
-                  hint: 'VD (VI): Đến nội dung',
+                  hint: 'Mặc định: Đến nội dung',
                 }
               - {
-                  label: 'mainNav',
+                  label: 'Tên menu chính (trình đọc màn hình)',
                   name: 'mainNav',
                   widget: string,
-                  hint: 'VD (VI): Điều hướng chính',
+                  hint: 'Mặc định: Điều hướng chính',
                 }
               - {
-                  label: 'feedTitle',
+                  label: 'Tên RSS ghi chú phiên bản',
                   name: 'feedTitle',
                   widget: string,
-                  hint: 'VD (VI): ChiloLab: ghi chú phiên bản',
+                  hint: 'Mặc định: ChiloLab: ghi chú phiên bản',
                 }
               - {
-                  label: 'shareAlt',
+                  label: 'Mô tả ảnh chia sẻ mặc định (alt)',
                   name: 'shareAlt',
                   widget: string,
-                  hint: 'VD (VI): Giao diện Pet Desktop trên desktop Windows',
+                  hint: 'Mặc định: Giao diện Pet Desktop trên desktop Windows',
                 }
               - {
-                  label: 'notFoundTitle',
+                  label: 'Tiêu đề trang 404',
                   name: 'notFoundTitle',
                   widget: string,
-                  hint: 'VD (VI): Không tìm thấy trang',
+                  hint: 'Mặc định: Không tìm thấy trang',
                 }
               - {
-                  label: 'notFound',
+                  label: 'Câu chính trang 404',
                   name: 'notFound',
                   widget: string,
-                  hint: 'VD (VI): Trang này chưa có ở đây.',
+                  hint: 'Mặc định: Trang này chưa có ở đây.',
                 }
               - {
-                  label: 'notFoundDescription',
+                  label: 'Mô tả trang 404',
                   name: 'notFoundDescription',
                   widget: string,
-                  hint: 'VD (VI): Trang bạn tìm không tồn tại.',
+                  hint: 'Mặc định: Trang bạn tìm không tồn tại.',
                 }
               - {
-                  label: 'notFoundHome',
+                  label: 'Nút về trang chủ (404)',
                   name: 'notFoundHome',
                   widget: string,
-                  hint: 'VD (VI): Về trang chủ',
+                  hint: 'Mặc định: Về trang chủ',
                 }
               - {
-                  label: 'gallery',
+                  label: 'Tiêu đề thư viện ảnh',
                   name: 'gallery',
                   widget: string,
-                  hint: 'VD (VI): Hình trong app',
+                  hint: 'Mặc định: Hình trong app',
                 }
               - {
-                  label: 'galleryViewer',
+                  label: 'Tên khung xem ảnh',
                   name: 'galleryViewer',
                   widget: string,
-                  hint: 'VD (VI): Xem ảnh lớn',
+                  hint: 'Mặc định: Xem ảnh lớn',
                 }
               - {
-                  label: 'galleryPrevious',
+                  label: 'Nút ảnh trước',
                   name: 'galleryPrevious',
                   widget: string,
-                  hint: 'VD (VI): Ảnh trước',
+                  hint: 'Mặc định: Ảnh trước',
                 }
               - {
-                  label: 'galleryNext',
+                  label: 'Nút ảnh sau',
                   name: 'galleryNext',
                   widget: string,
-                  hint: 'VD (VI): Ảnh sau',
+                  hint: 'Mặc định: Ảnh sau',
                 }
               - {
-                  label: 'galleryClose',
+                  label: 'Nút đóng ảnh',
                   name: 'galleryClose',
                   widget: string,
-                  hint: 'VD (VI): Đóng',
+                  hint: 'Mặc định: Đóng',
                 }
               - {
-                  label: 'install',
+                  label: 'Tiêu đề cài đặt ({n} bước)',
                   name: 'install',
                   widget: string,
-                  hint: 'VD (VI): Cài đặt trong {n} bước',
+                  hint: 'Mặc định: Cài đặt trong {n} bước',
                 }
               - {
-                  label: 'installSteps',
+                  label: 'Link "Xem từng bước"',
                   name: 'installSteps',
                   widget: string,
-                  hint: 'VD (VI): Xem từng bước',
+                  hint: 'Mặc định: Xem từng bước',
                 }
               - {
-                  label: 'video',
+                  label: 'Tên video ({project})',
                   name: 'video',
                   widget: string,
-                  hint: 'VD (VI): Video giới thiệu {project}',
+                  hint: 'Mặc định: Video giới thiệu {project}',
                 }
               - {
-                  label: 'openVideo',
+                  label: 'Link mở video',
                   name: 'openVideo',
                   widget: string,
-                  hint: 'VD (VI): Mở video',
+                  hint: 'Mặc định: Mở video',
                 }
           - label: 'Trang phiên bản'
             name: versions
@@ -2332,119 +2322,191 @@ collections:
             collapsed: true
             fields:
               - {
-                  label: 'heading',
+                  label: 'Tiêu đề Phiên bản',
                   name: 'heading',
                   widget: string,
-                  hint: 'VD (VI): Phiên bản',
+                  hint: 'Mặc định: Phiên bản',
                 }
               - {
-                  label: 'intro',
+                  label: 'Giới thiệu trang phiên bản',
                   name: 'intro',
                   widget: string,
-                  hint: 'VD (VI): Mỗi bản cập nhật có gì mới, sửa gì, mình ghi lại ở đây.',
+                  hint: 'Mặc định: Mỗi bản cập nhật có gì mới, sửa gì, mình ghi lại ở đây.',
                 }
               - {
-                  label: 'all',
+                  label: 'Link Tất cả phiên bản',
                   name: 'all',
                   widget: string,
-                  hint: 'VD (VI): Tất cả phiên bản',
+                  hint: 'Mặc định: Tất cả phiên bản',
                 }
               - {
-                  label: 'read',
+                  label: 'Link Xem chi tiết',
                   name: 'read',
                   widget: string,
-                  hint: 'VD (VI): Xem chi tiết phiên bản',
+                  hint: 'Mặc định: Xem chi tiết phiên bản',
                 }
               - {
-                  label: 'empty',
+                  label: 'Chưa có phiên bản',
                   name: 'empty',
                   widget: text,
-                  hint: 'VD (VI): Chưa có bài nào về phiên bản. Có bản cập nhật là mình đăng ở đây.',
+                  hint: 'Mặc định: Chưa có bài nào về phiên bản. Có bản cập nhật là mình đăng ở đây.',
                 }
               - {
-                  label: 'back',
+                  label: 'Link về trang sản phẩm',
                   name: 'back',
                   widget: string,
-                  hint: 'VD (VI): Về trang sản phẩm',
+                  hint: 'Mặc định: Về trang sản phẩm',
                 }
               - {
-                  label: 'source',
+                  label: 'Nhãn tài liệu nguồn',
                   name: 'source',
                   widget: string,
-                  hint: 'VD (VI): Tài liệu nguồn',
+                  hint: 'Mặc định: Tài liệu nguồn',
                 }
               - {
-                  label: 'downloadLatest',
+                  label: 'Nút tải bản mới nhất',
                   name: 'downloadLatest',
                   widget: string,
-                  hint: 'VD (VI): Tải bản mới nhất',
+                  hint: 'Mặc định: Tải bản mới nhất',
                 }
               - {
-                  label: 'portable',
+                  label: 'Nút bản Portable',
                   name: 'portable',
                   widget: string,
-                  hint: 'VD (VI): Bản Portable',
+                  hint: 'Mặc định: Bản Portable',
                 }
               - {
-                  label: 'latestHeading',
+                  label: 'Tiêu đề khung Tải xuống',
                   name: 'latestHeading',
                   widget: string,
-                  hint: 'VD (VI): Tải xuống',
+                  hint: 'Mặc định: Tải xuống',
                 }
               - {
-                  label: 'latestInstaller',
+                  label: 'Nút tải bộ cài ({project})',
                   name: 'latestInstaller',
                   widget: string,
-                  hint: 'VD (VI): Tải {project} bản mới nhất cho Windows',
+                  hint: 'Mặc định: Tải {project} bản mới nhất cho Windows',
                 }
               - {
-                  label: 'feedback',
+                  label: 'Link báo lỗi / góp ý',
                   name: 'feedback',
                   widget: string,
-                  hint: 'VD (VI): Báo lỗi / góp ý',
+                  hint: 'Mặc định: Báo lỗi / góp ý',
                 }
               - {
-                  label: 'discuss',
+                  label: 'Link bình luận phiên bản',
                   name: 'discuss',
                   widget: string,
-                  hint: 'VD (VI): Bình luận về phiên bản này',
+                  hint: 'Mặc định: Bình luận về phiên bản này',
                 }
               - {
-                  label: 'latestNotes',
+                  label: 'Link xem có gì mới',
                   name: 'latestNotes',
                   widget: string,
-                  hint: 'VD (VI): Xem có gì mới',
+                  hint: 'Mặc định: Xem có gì mới',
                 }
               - {
-                  label: 'date',
+                  label: 'Nhãn ngày phát hành',
                   name: 'date',
                   widget: string,
-                  hint: 'VD (VI): Ngày phát hành',
+                  hint: 'Mặc định: Ngày phát hành',
                 }
               - {
-                  label: 'pending',
+                  label: 'Ghi chú bản chưa phát hành',
                   name: 'pending',
                   widget: text,
-                  hint: 'VD (VI): Đây là ghi chú về phiên bản đang phát triển hoặc xem trước, chưa phải thông báo phát hành công khai.',
+                  hint: 'Mặc định: Đây là ghi chú về phiên bản đang phát triển hoặc xem trước, chưa phải thông báo phát hành công khai.',
                 }
               - {
-                  label: 'released',
+                  label: 'Trạng thái Đã phát hành',
                   name: 'released',
                   widget: string,
-                  hint: 'VD (VI): Đã phát hành',
+                  hint: 'Mặc định: Đã phát hành',
                 }
               - {
-                  label: 'preview',
+                  label: 'Trạng thái Bản xem trước',
                   name: 'preview',
                   widget: string,
-                  hint: 'VD (VI): Bản xem trước',
+                  hint: 'Mặc định: Bản xem trước',
                 }
               - {
-                  label: 'development',
+                  label: 'Trạng thái Đang phát triển',
                   name: 'development',
                   widget: string,
-                  hint: 'VD (VI): Đang phát triển',
+                  hint: 'Mặc định: Đang phát triển',
                 }
+          - label: 'Bố cục: thứ tự và ẩn/hiện các phần'
+            name: layout
+            widget: object
+            collapsed: true
+            fields:
+              - label: 'Trang chủ'
+                name: home
+                widget: list
+                hint: 'Kéo để đổi thứ tự, xóa để ẩn phần đó. Phần đầu trang (hero) phải giữ lại; mỗi phần chỉ một lần.'
+                field:
+                  label: 'Phần'
+                  name: part
+                  widget: select
+                  options:
+                    - { label: 'Đầu trang (hero)', value: hero }
+                    - { label: 'Dự án', value: projects }
+                    - { label: 'Về mình (tóm tắt)', value: me }
+                    - { label: 'Về ChiloLab', value: about }
+              - label: 'Trang Về mình'
+                name: about
+                widget: list
+                hint: 'Kéo để đổi thứ tự, xóa để ẩn phần đó. Phần đầu trang (hero) phải giữ lại; mỗi phần chỉ một lần.'
+                field:
+                  label: 'Phần'
+                  name: part
+                  widget: select
+                  options:
+                    - { label: 'Đầu trang (hero)', value: hero }
+                    - { label: 'Kinh nghiệm', value: experience }
+                    - { label: 'Mình làm việc thế nào', value: how }
+                    - { label: 'Kỹ năng', value: skills }
+                    - { label: 'Nhật ký', value: journey }
+                    - { label: 'Khóa học', value: courses }
+                    - { label: 'Mình tự làm', value: built }
+                    - { label: 'Ngoại ngữ', value: languages }
+                    - { label: 'Liên hệ', value: contact }
+          - label: 'Menu đầu trang và footer'
+            name: menu
+            widget: object
+            collapsed: true
+            fields:
+              - label: 'Menu đầu trang'
+                name: header
+                widget: list
+                summary: '{{fields.label}} → {{fields.href}}'
+                hint: 'Nút đổi ngôn ngữ luôn nằm cuối, tự thêm.'
+                fields:
+                  - { label: 'Chữ hiển thị', name: label, widget: string }
+                  - label: 'Đường dẫn'
+                    name: href
+                    widget: string
+                    hint: 'Đường dẫn trong site bắt đầu bằng / (bản tiếng Anh: /en/...), hoặc link ngoài https://...'
+              - label: 'Tiêu đề cột dự án (footer)'
+                name: projectsTitle
+                widget: string
+                hint: 'Cột này tự liệt kê các dự án.'
+              - label: 'Các cột footer'
+                name: footer
+                widget: list
+                summary: '{{fields.title}}'
+                fields:
+                  - { label: 'Tiêu đề cột', name: title, widget: string }
+                  - label: 'Link'
+                    name: links
+                    widget: list
+                    summary: '{{fields.label}} → {{fields.href}}'
+                    fields:
+                      - { label: 'Chữ hiển thị', name: label, widget: string }
+                      - label: 'Đường dẫn'
+                        name: href
+                        widget: string
+                        hint: 'Đường dẫn trong site bắt đầu bằng / (bản tiếng Anh: /en/...), hoặc link ngoài https://...'
       - name: ui_en
         label: Interface text (EN)
         file: /src/content/ui/en.yml
@@ -2456,182 +2518,154 @@ collections:
             collapsed: true
             fields:
               - {
-                  label: 'projects',
+                  label: 'Tiêu đề mục Dự án (trang chủ)',
                   name: 'projects',
                   widget: string,
-                  hint: 'VD (VI): Dự án',
+                  hint: 'Mặc định: Projects',
                 }
               - {
-                  label: 'me',
+                  label: 'Tiêu đề mục Về mình (trang chủ)',
                   name: 'me',
                   widget: string,
-                  hint: 'VD (VI): Về mình',
+                  hint: 'Mặc định: About me',
                 }
               - {
-                  label: 'about',
+                  label: 'Tiêu đề mục Về ChiloLab',
                   name: 'about',
                   widget: string,
-                  hint: 'VD (VI): Về ChiloLab',
+                  hint: 'Mặc định: About ChiloLab',
                 }
               - {
-                  label: 'switch',
+                  label: 'Nút đổi ngôn ngữ',
                   name: 'switch',
                   widget: string,
-                  hint: 'VD (VI): English',
+                  hint: 'Mặc định: Tiếng Việt',
                 }
               - {
-                  label: 'homeTitle',
+                  label: 'Tiêu đề trang chủ (tab trình duyệt, Google)',
                   name: 'homeTitle',
                   widget: string,
-                  hint: 'VD (VI): Nguyễn Tấn Phát, BA/QC và người làm phần mềm',
+                  hint: 'Mặc định: Nguyễn Tấn Phát, BA/QC and software maker',
                 }
               - {
-                  label: 'title',
+                  label: 'Tiêu đề lớn ở hero',
                   name: 'title',
                   widget: text,
-                  hint: 'VD (VI): Chào bạn, mình là Phát. Mình kiểm thử phần mềm, và tự làm app của riêng mình.',
+                  hint: 'Mặc định: Hi, I’m Phát. I test software for a living, and build my own apps on the side.',
                 }
               - {
-                  label: 'intro',
+                  label: 'Đoạn giới thiệu ở hero',
                   name: 'intro',
                   widget: text,
-                  hint: 'VD (VI): Mình đang làm BA/QC ở WeebPal và tốt nghiệp ngành Công nghệ thông tin ở HUFLIT. Ở đây có hai app Windows mình tự viết và tự phát hành: một chú mèo sống ngay trên desktop của bạn, và một công cụ giúp kiểm tra website.',
+                  hint: 'Mặc định: I’m a BA/QC at WeebPal and an Information Technology graduate from HUFLIT. Here you’ll find two Windows apps I wrote and release myself: a cat that lives right on your desktop, and a tool for checking websites.',
                 }
               - {
-                  label: 'metaDescription',
+                  label: 'Mô tả trang chủ cho Google',
                   name: 'metaDescription',
                   widget: text,
-                  hint: 'VD (VI): Portfolio của Nguyễn Tấn Phát, BA/QC tại WeebPal, tốt nghiệp Công nghệ thông tin tại HUFLIT. Kinh nghiệm, kỹ năng và hai ứng dụng Windows tự làm: Pet Desktop và PageSpeed-Auth-Auditor.',
+                  hint: 'Mặc định: Portfolio of Nguyễn Tấn Phát, BA/QC at WeebPal and Information Technology graduate of HUFLIT. Experience, skills and two self-made Windows apps: Pet Desktop and PageSpeed-Auth-Auditor.',
                 }
               - {
-                  label: 'explore',
+                  label: 'Nút "Xem dự án" ở hero',
                   name: 'explore',
                   widget: string,
-                  hint: 'VD (VI): Xem dự án',
+                  hint: 'Mặc định: See my projects',
                 }
               - {
-                  label: 'aboutCta',
+                  label: 'Nút "Về mình" ở hero',
                   name: 'aboutCta',
                   widget: string,
-                  hint: 'VD (VI): Về mình',
+                  hint: 'Mặc định: About me',
                 }
               - {
-                  label: 'hello',
+                  label: 'Lời chào của mèo',
                   name: 'hello',
                   widget: string,
-                  hint: 'VD (VI): Meo, chào bạn!',
+                  hint: 'Mặc định: Meow, hello!',
                 }
               - {
-                  label: 'stack',
+                  label: 'Nhãn "Công nghệ" ở thẻ dự án',
                   name: 'stack',
                   widget: string,
-                  hint: 'VD (VI): Công nghệ',
+                  hint: 'Mặc định: Built with',
                 }
               - {
-                  label: 'skillsHeading',
+                  label: 'Tiêu đề kỹ năng (trang chủ)',
                   name: 'skillsHeading',
                   widget: string,
-                  hint: 'VD (VI): Mình làm việc với',
+                  hint: 'Mặc định: What I work with',
                 }
               - {
-                  label: 'portraitAlt',
+                  label: 'Mô tả ảnh chân dung (alt)',
                   name: 'portraitAlt',
                   widget: string,
-                  hint: 'VD (VI): Nguyễn Tấn Phát mặc áo khoác xám, đứng trước một bức tường treo ảnh.',
+                  hint: 'Mặc định: Nguyễn Tấn Phát in a grey jacket, standing in front of a wall of framed photos.',
                 }
               - {
-                  label: 'selected',
+                  label: 'Câu dưới tiêu đề Dự án',
                   name: 'selected',
                   widget: string,
-                  hint: 'VD (VI): Dự án nào cũng có trang riêng, lịch sử phiên bản và chỗ để bạn góp ý.',
+                  hint: 'Mặc định: Each project has its own page, a version history and a place for your feedback.',
                 }
               - {
-                  label: 'detail',
+                  label: 'Link "Xem dự án" ở thẻ dự án',
                   name: 'detail',
                   widget: string,
-                  hint: 'VD (VI): Xem dự án',
+                  hint: 'Mặc định: Explore project',
                 }
               - {
-                  label: 'back',
+                  label: 'Link quay lại danh sách dự án',
                   name: 'back',
                   widget: string,
-                  hint: 'VD (VI): Tất cả dự án',
+                  hint: 'Mặc định: All projects',
                 }
               - {
-                  label: 'aboutText',
+                  label: 'Đoạn Về ChiloLab',
                   name: 'aboutText',
                   widget: text,
-                  hint: 'VD (VI): ChiloLab là góc nhỏ để mình thử ý tưởng. Ý tưởng nào làm được thì mình biến thành app chạy thật, phát hành từng bản và sửa dần theo góp ý của mọi người. Bạn có thể tải Pet Desktop về chơi, xem mỗi bản mới có gì, hoặc đăng nhập để bình luận và báo lỗi.',
+                  hint: 'Mặc định: ChiloLab is my little corner for trying out ideas. The ones that work become real apps, released version by version and improved from what people tell me. Download Pet Desktop to play, see what’s new in each version, or sign in to comment and report bugs.',
                 }
               - {
-                  label: 'preview',
+                  label: 'Nhãn ảnh minh họa ý tưởng',
                   name: 'preview',
                   widget: string,
-                  hint: 'VD (VI): Minh họa ý tưởng, không phải ảnh sản phẩm',
+                  hint: 'Mặc định: Concept illustration, not a product screenshot',
                 }
               - {
-                  label: 'footer',
+                  label: 'Câu khẩu hiệu ở footer',
                   name: 'footer',
                   widget: string,
-                  hint: 'VD (VI): Ý tưởng nhỏ, phát hành thật, sửa theo góp ý.',
+                  hint: 'Mặc định: Small ideas, real releases, shaped by feedback.',
                 }
-              - label: 'footerLinks'
-                name: 'footerLinks'
-                widget: object
-                fields:
-                  - {
-                      label: 'projects',
-                      name: 'projects',
-                      widget: string,
-                      hint: 'VD (VI): Dự án',
-                    }
-                  - {
-                      label: 'download',
-                      name: 'download',
-                      widget: string,
-                      hint: 'VD (VI): Tải xuống',
-                    }
-                  - {
-                      label: 'versions',
-                      name: 'versions',
-                      widget: string,
-                      hint: 'VD (VI): Các phiên bản',
-                    }
-                  - {
-                      label: 'feedback',
-                      name: 'feedback',
-                      widget: string,
-                      hint: 'VD (VI): Góp ý & báo lỗi',
-                    }
-                  - {
-                      label: 'privacy',
-                      name: 'privacy',
-                      widget: string,
-                      hint: 'VD (VI): Quyền riêng tư',
-                    }
-                  - {
-                      label: 'account',
-                      name: 'account',
-                      widget: string,
-                      hint: 'VD (VI): Đăng nhập / tài khoản',
-                    }
               - {
-                  label: 'demo',
+                  label: 'Dòng bản quyền ở footer',
+                  name: 'copyright',
+                  widget: string,
+                  hint: 'Mặc định: © {year} Nguyễn Tấn Phát, ChiloLab',
+                }
+              - {
+                  label: 'Chữ thương hiệu cạnh logo',
+                  name: 'brand',
+                  widget: string,
+                  hint: 'Mặc định: ChiloLab',
+                }
+              - {
+                  label: 'Nút Dùng thử',
                   name: 'demo',
                   widget: string,
-                  hint: 'VD (VI): Dùng thử',
+                  hint: 'Mặc định: Try it',
                 }
               - {
-                  label: 'repo',
+                  label: 'Nút Xem mã nguồn',
                   name: 'repo',
                   widget: string,
-                  hint: 'VD (VI): Xem mã nguồn',
+                  hint: 'Mặc định: Source code',
                 }
               - {
-                  label: 'download',
+                  label: 'Nút Tải xuống',
                   name: 'download',
                   widget: string,
-                  hint: 'VD (VI): Tải xuống',
+                  hint: 'Mặc định: Download',
                 }
           - label: 'Bình luận'
             name: comments
@@ -2639,304 +2673,304 @@ collections:
             collapsed: true
             fields:
               - {
-                  label: 'heading',
+                  label: 'Tiêu đề phần bình luận',
                   name: 'heading',
                   widget: string,
-                  hint: 'VD (VI): Bình luận',
+                  hint: 'Mặc định: Comments',
                 }
               - {
-                  label: 'introProject',
+                  label: 'Giới thiệu (trang dự án)',
                   name: 'introProject',
                   widget: text,
-                  hint: 'VD (VI): Bình luận của mọi phiên bản được gộp ở đây. Bình luận có ngôn từ xúc phạm sẽ được giữ lại để xem xét.',
+                  hint: 'Mặc định: Comments from every version are gathered here. Comments with abusive language are held for review.',
                 }
               - {
-                  label: 'introVersion',
+                  label: 'Giới thiệu (trang phiên bản)',
                   name: 'introVersion',
                   widget: text,
-                  hint: 'VD (VI): Bình luận về phiên bản này. Bình luận có ngôn từ xúc phạm sẽ được giữ lại để xem xét.',
+                  hint: 'Mặc định: Comments about this version. Comments with abusive language are held for review.',
                 }
               - {
-                  label: 'loading',
+                  label: 'Đang tải',
                   name: 'loading',
                   widget: string,
-                  hint: 'VD (VI): Đang tải bình luận…',
+                  hint: 'Mặc định: Loading comments…',
                 }
               - {
-                  label: 'empty',
+                  label: 'Chưa có bình luận',
                   name: 'empty',
                   widget: string,
-                  hint: 'VD (VI): Chưa có bình luận nào. Hãy là người đầu tiên!',
+                  hint: 'Mặc định: No comments yet. Be the first!',
                 }
               - {
-                  label: 'loadFailed',
+                  label: 'Lỗi tải bình luận',
                   name: 'loadFailed',
                   widget: string,
-                  hint: 'VD (VI): Chưa tải được bình luận. Vui lòng thử lại sau.',
+                  hint: 'Mặc định: Comments could not be loaded. Please try again later.',
                 }
               - {
-                  label: 'signIn',
+                  label: 'Nút đăng nhập để bình luận',
                   name: 'signIn',
                   widget: string,
-                  hint: 'VD (VI): Đăng nhập để bình luận',
+                  hint: 'Mặc định: Sign in to comment',
                 }
               - {
-                  label: 'signedInAs',
+                  label: 'Đang bình luận với tên',
                   name: 'signedInAs',
                   widget: string,
-                  hint: 'VD (VI): Đang bình luận với tên',
+                  hint: 'Mặc định: Commenting as',
                 }
               - {
-                  label: 'placeholder',
+                  label: 'Gợi ý trong ô bình luận',
                   name: 'placeholder',
                   widget: string,
-                  hint: 'VD (VI): Viết bình luận…',
+                  hint: 'Mặc định: Write a comment…',
                 }
               - {
-                  label: 'replyPlaceholder',
+                  label: 'Gợi ý trong ô trả lời',
                   name: 'replyPlaceholder',
                   widget: string,
-                  hint: 'VD (VI): Viết phản hồi…',
+                  hint: 'Mặc định: Write a reply…',
                 }
               - {
-                  label: 'post',
+                  label: 'Nút Gửi',
                   name: 'post',
                   widget: string,
-                  hint: 'VD (VI): Gửi',
+                  hint: 'Mặc định: Post',
                 }
               - {
-                  label: 'cancel',
+                  label: 'Nút Hủy',
                   name: 'cancel',
                   widget: string,
-                  hint: 'VD (VI): Hủy',
+                  hint: 'Mặc định: Cancel',
                 }
               - {
-                  label: 'save',
+                  label: 'Nút Lưu',
                   name: 'save',
                   widget: string,
-                  hint: 'VD (VI): Lưu',
+                  hint: 'Mặc định: Save',
                 }
               - {
-                  label: 'reply',
+                  label: 'Nút Trả lời',
                   name: 'reply',
                   widget: string,
-                  hint: 'VD (VI): Trả lời',
+                  hint: 'Mặc định: Reply',
                 }
               - {
-                  label: 'edit',
+                  label: 'Nút Sửa',
                   name: 'edit',
                   widget: string,
-                  hint: 'VD (VI): Sửa',
+                  hint: 'Mặc định: Edit',
                 }
               - {
-                  label: 'remove',
+                  label: 'Nút Xóa',
                   name: 'remove',
                   widget: string,
-                  hint: 'VD (VI): Xóa',
+                  hint: 'Mặc định: Delete',
                 }
               - {
-                  label: 'confirmRemove',
+                  label: 'Hỏi lại trước khi xóa',
                   name: 'confirmRemove',
                   widget: string,
-                  hint: 'VD (VI): Xóa bình luận này?',
+                  hint: 'Mặc định: Delete this comment?',
                 }
               - {
-                  label: 'edited',
+                  label: 'Nhãn "đã sửa"',
                   name: 'edited',
                   widget: string,
-                  hint: 'VD (VI): đã sửa',
+                  hint: 'Mặc định: edited',
                 }
               - {
-                  label: 'held',
+                  label: 'Bình luận của bạn đang chờ duyệt',
                   name: 'held',
                   widget: string,
-                  hint: 'VD (VI): Đang chờ duyệt — chỉ bạn thấy bình luận này.',
+                  hint: 'Mặc định: Awaiting review — only you can see this comment.',
                 }
               - {
-                  label: 'deleted',
+                  label: 'Bình luận đã bị xóa',
                   name: 'deleted',
                   widget: string,
-                  hint: 'VD (VI): Bình luận này đã bị xóa.',
+                  hint: 'Mặc định: This comment was deleted.',
                 }
               - {
-                  label: 'removed',
+                  label: 'Bình luận bị quản trị viên gỡ',
                   name: 'removed',
                   widget: string,
-                  hint: 'VD (VI): Bình luận này đã bị quản trị viên gỡ.',
+                  hint: 'Mặc định: This comment was removed by a moderator.',
                 }
               - {
-                  label: 'formerUser',
+                  label: 'Tên người dùng đã xóa tài khoản',
                   name: 'formerUser',
                   widget: string,
-                  hint: 'VD (VI): Người dùng đã xóa tài khoản',
+                  hint: 'Mặc định: Deleted account',
                 }
               - {
-                  label: 'showReplies',
+                  label: 'Xem thêm phản hồi ({n})',
                   name: 'showReplies',
                   widget: string,
-                  hint: 'VD (VI): Xem thêm {n} phản hồi',
+                  hint: 'Mặc định: Show {n} more replies',
                 }
               - {
-                  label: 'hideReplies',
+                  label: 'Thu gọn phản hồi',
                   name: 'hideReplies',
                   widget: string,
-                  hint: 'VD (VI): Thu gọn phản hồi',
+                  hint: 'Mặc định: Hide replies',
                 }
               - {
-                  label: 'previous',
+                  label: 'Trang trước',
                   name: 'previous',
                   widget: string,
-                  hint: 'VD (VI): Trước',
+                  hint: 'Mặc định: Previous',
                 }
               - {
-                  label: 'next',
+                  label: 'Trang sau',
                   name: 'next',
                   widget: string,
-                  hint: 'VD (VI): Sau',
+                  hint: 'Mặc định: Next',
                 }
               - {
-                  label: 'pageOf',
+                  label: 'Số trang ({page}/{pages})',
                   name: 'pageOf',
                   widget: string,
-                  hint: 'VD (VI): Trang {page}/{pages}',
+                  hint: 'Mặc định: Page {page} of {pages}',
                 }
               - {
-                  label: 'pagination',
+                  label: 'Tên vùng phân trang (trình đọc màn hình)',
                   name: 'pagination',
                   widget: string,
-                  hint: 'VD (VI): Phân trang bình luận',
+                  hint: 'Mặc định: Comment pages',
                 }
               - {
-                  label: 'count',
+                  label: 'Số bình luận ({n})',
                   name: 'count',
                   widget: string,
-                  hint: 'VD (VI): {n} bình luận',
+                  hint: 'Mặc định: {n} comments',
                 }
               - {
-                  label: 'sending',
+                  label: 'Đang gửi',
                   name: 'sending',
                   widget: string,
-                  hint: 'VD (VI): Đang gửi…',
+                  hint: 'Mặc định: Sending…',
                 }
               - {
-                  label: 'failed',
+                  label: 'Lỗi gửi',
                   name: 'failed',
                   widget: string,
-                  hint: 'VD (VI): Chưa gửi được. Vui lòng thử lại.',
+                  hint: 'Mặc định: Could not send. Please try again.',
                 }
               - {
-                  label: 'rateLimited',
+                  label: 'Gửi quá nhanh',
                   name: 'rateLimited',
                   widget: string,
-                  hint: 'VD (VI): Bạn gửi hơi nhanh, đợi một phút rồi thử lại.',
+                  hint: 'Mặc định: You are posting quickly; wait a minute and try again.',
                 }
               - {
-                  label: 'closed',
+                  label: 'Bình luận đang đóng',
                   name: 'closed',
                   widget: string,
-                  hint: 'VD (VI): Bình luận mới đang tạm đóng.',
+                  hint: 'Mặc định: New comments are closed for now.',
                 }
               - {
-                  label: 'tooLong',
+                  label: 'Bình luận quá dài ({n})',
                   name: 'tooLong',
                   widget: string,
-                  hint: 'VD (VI): Bình luận dài quá, tối đa {n} ký tự.',
+                  hint: 'Mặc định: That comment is too long; the limit is {n} characters.',
                 }
               - {
-                  label: 'hourlyLimit',
+                  label: 'Quá số bình luận trong giờ',
                   name: 'hourlyLimit',
                   widget: string,
-                  hint: 'VD (VI): Bạn đã bình luận nhiều trong giờ qua, vui lòng quay lại sau.',
+                  hint: 'Mặc định: You have posted a lot in the last hour. Please come back later.',
                 }
               - {
-                  label: 'heldNotice',
+                  label: 'Thông báo bình luận bị giữ',
                   name: 'heldNotice',
                   widget: string,
-                  hint: 'VD (VI): Bình luận đang được giữ lại để xem xét và sẽ hiện sau khi được duyệt.',
+                  hint: 'Mặc định: Your comment is being held for review and will appear once approved.',
                 }
               - {
-                  label: 'versionLabel',
+                  label: 'Nhãn phiên bản',
                   name: 'versionLabel',
                   widget: string,
-                  hint: 'VD (VI): Phiên bản',
+                  hint: 'Mặc định: Version',
                 }
               - {
-                  label: 'projectLabel',
+                  label: 'Nhãn trang dự án',
                   name: 'projectLabel',
                   widget: string,
-                  hint: 'VD (VI): Trang dự án',
+                  hint: 'Mặc định: Project page',
                 }
               - {
-                  label: 'authorBadge',
+                  label: 'Huy hiệu Tác giả',
                   name: 'authorBadge',
                   widget: string,
-                  hint: 'VD (VI): Tác giả',
+                  hint: 'Mặc định: Author',
                 }
               - {
-                  label: 'heldOther',
+                  label: 'Bình luận người khác chờ duyệt',
                   name: 'heldOther',
                   widget: string,
-                  hint: 'VD (VI): Đang bị giữ chờ duyệt',
+                  hint: 'Mặc định: Held for review',
                 }
               - {
-                  label: 'approve',
+                  label: 'Nút Duyệt',
                   name: 'approve',
                   widget: string,
-                  hint: 'VD (VI): Duyệt',
+                  hint: 'Mặc định: Approve',
                 }
               - {
-                  label: 'removeOther',
+                  label: 'Nút Gỡ',
                   name: 'removeOther',
                   widget: string,
-                  hint: 'VD (VI): Gỡ',
+                  hint: 'Mặc định: Remove',
                 }
               - {
-                  label: 'confirmRemoveOther',
+                  label: 'Hỏi lại trước khi gỡ',
                   name: 'confirmRemoveOther',
                   widget: string,
-                  hint: 'VD (VI): Gỡ bình luận này của người khác?',
+                  hint: "Mặc định: Remove this person's comment?",
                 }
               - {
-                  label: 'reason_profanity',
+                  label: 'Lý do giữ: ngôn từ thô tục',
                   name: 'reason_profanity',
                   widget: string,
-                  hint: 'VD (VI): chửi thề',
+                  hint: 'Mặc định: profanity',
                 }
               - {
-                  label: 'reason_insult',
+                  label: 'Lý do giữ: xúc phạm',
                   name: 'reason_insult',
                   widget: string,
-                  hint: 'VD (VI): xúc phạm',
+                  hint: 'Mặc định: insult',
                 }
               - {
-                  label: 'reason_hate',
+                  label: 'Lý do giữ: thù ghét',
                   name: 'reason_hate',
                   widget: string,
-                  hint: 'VD (VI): thù ghét',
+                  hint: 'Mặc định: hate',
                 }
               - {
-                  label: 'reason_sexual',
+                  label: 'Lý do giữ: nội dung tình dục',
                   name: 'reason_sexual',
                   widget: string,
-                  hint: 'VD (VI): tình dục',
+                  hint: 'Mặc định: sexual content',
                 }
               - {
-                  label: 'reason_threat',
+                  label: 'Lý do giữ: đe dọa',
                   name: 'reason_threat',
                   widget: string,
-                  hint: 'VD (VI): đe dọa',
+                  hint: 'Mặc định: threat',
                 }
               - {
-                  label: 'reason_spam',
+                  label: 'Lý do giữ: spam',
                   name: 'reason_spam',
                   widget: string,
-                  hint: 'VD (VI): spam',
+                  hint: 'Mặc định: spam',
                 }
               - {
-                  label: 'reason_link',
+                  label: 'Lý do giữ: chứa link',
                   name: 'reason_link',
                   widget: string,
-                  hint: 'VD (VI): có đường link',
+                  hint: 'Mặc định: contains a link',
                 }
           - label: 'Form góp ý'
             name: feedback
@@ -2944,566 +2978,566 @@ collections:
             collapsed: true
             fields:
               - {
-                  label: 'title',
+                  label: 'Tiêu đề trang góp ý',
                   name: 'title',
                   widget: string,
-                  hint: 'VD (VI): Góp ý và báo lỗi',
+                  hint: 'Mặc định: Feedback and bug reports',
                 }
               - {
-                  label: 'intro',
+                  label: 'Giới thiệu',
                   name: 'intro',
                   widget: text,
-                  hint: 'VD (VI): Những gì bạn gửi ở đây chỉ mình đọc, không hiện công khai. Không cần đăng nhập.',
+                  hint: 'Mặc định: Only the maker of ChiloLab reads what you send here; it is not shown publicly. No account needed.',
                 }
               - {
-                  label: 'publicNote',
+                  label: 'Ghi chú thảo luận công khai',
                   name: 'publicNote',
                   widget: string,
-                  hint: 'VD (VI): Muốn thảo luận công khai? Hãy dùng phần bình luận ở',
+                  hint: 'Mặc định: Want a public discussion? Use the comments on',
                 }
               - {
-                  label: 'kind',
+                  label: 'Câu hỏi loại góp ý',
                   name: 'kind',
                   widget: string,
-                  hint: 'VD (VI): Bạn muốn gửi gì?',
+                  hint: 'Mặc định: What would you like to send?',
                 }
-              - label: 'kinds'
+              - label: 'Các loại góp ý'
                 name: 'kinds'
                 widget: object
                 fields:
                   - {
-                      label: 'bug',
+                      label: 'Báo lỗi',
                       name: 'bug',
                       widget: string,
-                      hint: 'VD (VI): Báo lỗi',
+                      hint: 'Mặc định: Bug report',
                     }
                   - {
-                      label: 'idea',
+                      label: 'Ý tưởng',
                       name: 'idea',
                       widget: string,
-                      hint: 'VD (VI): Góp ý / ý tưởng',
+                      hint: 'Mặc định: Suggestion / idea',
                     }
                   - {
-                      label: 'other',
+                      label: 'Khác',
                       name: 'other',
                       widget: string,
-                      hint: 'VD (VI): Khác',
+                      hint: 'Mặc định: Other',
                     }
               - {
-                  label: 'summary',
+                  label: 'Nhãn ô tiêu đề',
                   name: 'summary',
                   widget: string,
-                  hint: 'VD (VI): Tiêu đề ngắn',
+                  hint: 'Mặc định: Short title',
                 }
               - {
-                  label: 'summaryHint',
+                  label: 'Gợi ý ô tiêu đề',
                   name: 'summaryHint',
                   widget: string,
-                  hint: 'VD (VI): Ví dụ: Mèo đứng yên sau khi mở máy lại',
+                  hint: 'Mặc định: Example: The cat stops moving after a restart',
                 }
               - {
-                  label: 'message',
+                  label: 'Nhãn ô chi tiết',
                   name: 'message',
                   widget: string,
-                  hint: 'VD (VI): Chi tiết',
+                  hint: 'Mặc định: Details',
                 }
               - {
-                  label: 'messageHintBug',
+                  label: 'Gợi ý chi tiết (báo lỗi)',
                   name: 'messageHintBug',
                   widget: text,
-                  hint: 'VD (VI): Bạn đã làm gì? Bạn mong đợi điều gì? Thực tế xảy ra gì? Lỗi có lặp lại không?',
+                  hint: 'Mặc định: What did you do? What did you expect? What happened instead? Does it happen again?',
                 }
               - {
-                  label: 'messageHintIdea',
+                  label: 'Gợi ý chi tiết (ý tưởng)',
                   name: 'messageHintIdea',
                   widget: string,
-                  hint: 'VD (VI): Mô tả ý tưởng và vì sao nó hữu ích với bạn.',
+                  hint: 'Mặc định: Describe the idea and why it would help you.',
                 }
               - {
-                  label: 'version',
+                  label: 'Nhãn ô phiên bản',
                   name: 'version',
                   widget: string,
-                  hint: 'VD (VI): Phiên bản đang dùng',
+                  hint: 'Mặc định: Version you use',
                 }
               - {
-                  label: 'versionUnknown',
+                  label: 'Lựa chọn "Không rõ"',
                   name: 'versionUnknown',
                   widget: string,
-                  hint: 'VD (VI): Không rõ / khác',
+                  hint: 'Mặc định: Not sure / other',
                 }
               - {
-                  label: 'os',
+                  label: 'Nhãn ô Windows',
                   name: 'os',
                   widget: string,
-                  hint: 'VD (VI): Phiên bản Windows (không bắt buộc)',
+                  hint: 'Mặc định: Windows version (optional)',
                 }
               - {
-                  label: 'osHint',
+                  label: 'Gợi ý ô Windows',
                   name: 'osHint',
                   widget: string,
-                  hint: 'VD (VI): Ví dụ: Windows 11 23H2',
+                  hint: 'Mặc định: Example: Windows 11 23H2',
                 }
               - {
-                  label: 'contact',
+                  label: 'Nhãn ô liên hệ',
                   name: 'contact',
                   widget: string,
-                  hint: 'VD (VI): Email hoặc cách liên hệ (không bắt buộc)',
+                  hint: 'Mặc định: Email or other contact (optional)',
                 }
               - {
-                  label: 'contactHint',
+                  label: 'Gợi ý ô liên hệ',
                   name: 'contactHint',
                   widget: string,
-                  hint: 'VD (VI): Chỉ dùng để hỏi thêm về nội dung này.',
+                  hint: 'Mặc định: Only used to follow up on this message.',
                 }
               - {
-                  label: 'send',
+                  label: 'Nút Gửi',
                   name: 'send',
                   widget: string,
-                  hint: 'VD (VI): Gửi',
+                  hint: 'Mặc định: Send',
                 }
               - {
-                  label: 'sending',
+                  label: 'Đang gửi',
                   name: 'sending',
                   widget: string,
-                  hint: 'VD (VI): Đang gửi…',
+                  hint: 'Mặc định: Sending…',
                 }
               - {
-                  label: 'sent',
+                  label: 'Gửi thành công',
                   name: 'sent',
                   widget: string,
-                  hint: 'VD (VI): Cảm ơn bạn! Mình đã nhận được rồi nhé.',
+                  hint: 'Mặc định: Thank you! I’ve got your message.',
                 }
               - {
-                  label: 'verifying',
+                  label: 'Đang xác minh chống spam',
                   name: 'verifying',
                   widget: string,
-                  hint: 'VD (VI): Đang xác minh chống spam, vui lòng đợi vài giây rồi bấm gửi lại.',
+                  hint: 'Mặc định: Checking for spam, please wait a few seconds and send again.',
                 }
               - {
-                  label: 'failed',
+                  label: 'Lỗi gửi',
                   name: 'failed',
                   widget: string,
-                  hint: 'VD (VI): Gửi chưa được. Kiểm tra nội dung rồi thử lại.',
+                  hint: 'Mặc định: Could not send. Check your message and try again.',
                 }
               - {
-                  label: 'rateLimited',
+                  label: 'Gửi quá nhanh',
                   name: 'rateLimited',
                   widget: string,
-                  hint: 'VD (VI): Bạn gửi hơi nhanh, đợi một phút rồi thử lại.',
+                  hint: 'Mặc định: You are sending quickly; wait a minute and try again.',
                 }
               - {
-                  label: 'closed',
+                  label: 'Form đang đóng',
                   name: 'closed',
                   widget: string,
-                  hint: 'VD (VI): Form góp ý đang tạm đóng. Vui lòng quay lại sau.',
+                  hint: 'Mặc định: The feedback form is closed for now. Please check back later.',
                 }
               - {
-                  label: 'noscript',
+                  label: 'Cần bật JavaScript',
                   name: 'noscript',
                   widget: string,
-                  hint: 'VD (VI): Cần bật JavaScript để gửi góp ý.',
+                  hint: 'Mặc định: JavaScript is needed to send feedback.',
                 }
               - {
-                  label: 'screenshot',
+                  label: 'Nhãn ô ảnh chụp',
                   name: 'screenshot',
                   widget: string,
-                  hint: 'VD (VI): Ảnh chụp màn hình (không bắt buộc)',
+                  hint: 'Mặc định: Screenshot (optional)',
                 }
               - {
-                  label: 'screenshotHint',
+                  label: 'Gợi ý ô ảnh chụp',
                   name: 'screenshotHint',
                   widget: text,
-                  hint: 'VD (VI): PNG, JPEG hoặc WebP, tối đa 3 MB. Chỉ chủ website xem được. Hãy che thông tin cá nhân trong ảnh trước khi gửi.',
+                  hint: 'Mặc định: PNG, JPEG or WebP, up to 3 MB. Only the site owner can see it. Please hide any personal details in the picture before sending.',
                 }
               - {
-                  label: 'fileTooLarge',
+                  label: 'Ảnh quá lớn',
                   name: 'fileTooLarge',
                   widget: string,
-                  hint: 'VD (VI): Ảnh lớn hơn 3 MB. Hãy chọn ảnh nhỏ hơn hoặc cắt bớt.',
+                  hint: 'Mặc định: The picture is over 3 MB. Please pick a smaller one or crop it.',
                 }
               - {
-                  label: 'fileType',
+                  label: 'Sai loại ảnh',
                   name: 'fileType',
                   widget: string,
-                  hint: 'VD (VI): Chỉ nhận ảnh PNG, JPEG hoặc WebP.',
+                  hint: 'Mặc định: Only PNG, JPEG or WebP pictures are accepted.',
                 }
-          - label: 'Đăng nhập & tài khoản'
+          - label: 'Đăng nhập và tài khoản'
             name: user
             widget: object
             collapsed: true
             fields:
               - {
-                  label: 'loginTitle',
+                  label: 'Tiêu đề trang đăng nhập',
                   name: 'loginTitle',
                   widget: string,
-                  hint: 'VD (VI): Đăng nhập',
+                  hint: 'Mặc định: Sign in',
                 }
               - {
-                  label: 'loginHeading',
+                  label: 'Lời chào trang đăng nhập',
                   name: 'loginHeading',
                   widget: string,
-                  hint: 'VD (VI): Chào mừng đến ChiloLab',
+                  hint: 'Mặc định: Welcome to ChiloLab',
                 }
               - {
-                  label: 'loginIntro',
+                  label: 'Giới thiệu trang đăng nhập',
                   name: 'loginIntro',
                   widget: string,
-                  hint: 'VD (VI): Đăng nhập để bình luận và trả lời về các dự án, phiên bản.',
+                  hint: 'Mặc định: Sign in to comment on projects and versions and reply.',
                 }
               - {
-                  label: 'google',
+                  label: 'Nút đăng nhập Google',
                   name: 'google',
                   widget: string,
-                  hint: 'VD (VI): Tiếp tục với Google',
+                  hint: 'Mặc định: Continue with Google',
                 }
               - {
-                  label: 'or',
+                  label: 'Chữ "hoặc"',
                   name: 'or',
                   widget: string,
-                  hint: 'VD (VI): hoặc',
+                  hint: 'Mặc định: or',
                 }
               - {
-                  label: 'emailLabel',
+                  label: 'Nhãn ô email',
                   name: 'emailLabel',
                   widget: string,
-                  hint: 'VD (VI): Email',
+                  hint: 'Mặc định: Email',
                 }
               - {
-                  label: 'emailPlaceholder',
+                  label: 'Gợi ý ô email',
                   name: 'emailPlaceholder',
                   widget: string,
-                  hint: 'VD (VI): user@example.com',
+                  hint: 'Mặc định: user@example.com',
                 }
               - {
-                  label: 'sendCode',
+                  label: 'Nút gửi mã',
                   name: 'sendCode',
                   widget: string,
-                  hint: 'VD (VI): Gửi mã đăng nhập',
+                  hint: 'Mặc định: Email me a sign-in code',
                 }
               - {
-                  label: 'codeSent',
+                  label: 'Đã gửi mã ({email})',
                   name: 'codeSent',
                   widget: string,
-                  hint: 'VD (VI): Đã gửi mã 6 số tới {email}. Kiểm tra cả hộp thư Spam.',
+                  hint: 'Mặc định: We sent a 6-digit code to {email}. Check your spam folder too.',
                 }
               - {
-                  label: 'codeLabel',
+                  label: 'Nhãn ô mã',
                   name: 'codeLabel',
                   widget: string,
-                  hint: 'VD (VI): Mã 6 số',
+                  hint: 'Mặc định: 6-digit code',
                 }
               - {
-                  label: 'verify',
+                  label: 'Nút xác nhận mã',
                   name: 'verify',
                   widget: string,
-                  hint: 'VD (VI): Đăng nhập',
+                  hint: 'Mặc định: Sign in',
                 }
               - {
-                  label: 'changeEmail',
+                  label: 'Dùng email khác',
                   name: 'changeEmail',
                   widget: string,
-                  hint: 'VD (VI): Dùng email khác',
+                  hint: 'Mặc định: Use another email',
                 }
               - {
-                  label: 'resend',
+                  label: 'Gửi lại mã',
                   name: 'resend',
                   widget: string,
-                  hint: 'VD (VI): Gửi lại mã',
+                  hint: 'Mặc định: Send a new code',
                 }
               - {
-                  label: 'sending',
+                  label: 'Đang gửi',
                   name: 'sending',
                   widget: string,
-                  hint: 'VD (VI): Đang gửi…',
+                  hint: 'Mặc định: Sending…',
                 }
               - {
-                  label: 'verifying',
+                  label: 'Đang xác minh chống spam',
                   name: 'verifying',
                   widget: string,
-                  hint: 'VD (VI): Đang xác minh chống spam, vui lòng đợi vài giây rồi bấm lại.',
+                  hint: 'Mặc định: Checking for spam, please wait a few seconds and try again.',
                 }
-              - label: 'emailErrors'
+              - label: 'Lỗi đăng nhập bằng email'
                 name: 'emailErrors'
                 widget: object
                 fields:
                   - {
-                      label: 'invalid_email',
+                      label: 'Email không hợp lệ',
                       name: 'invalid_email',
                       widget: string,
-                      hint: 'VD (VI): Email không hợp lệ.',
+                      hint: 'Mặc định: That email address is not valid.',
                     }
                   - {
-                      label: 'invalid_code',
+                      label: 'Mã sai hoặc hết hạn',
                       name: 'invalid_code',
                       widget: string,
-                      hint: 'VD (VI): Mã không đúng hoặc đã hết hạn.',
+                      hint: 'Mặc định: The code is wrong or has expired.',
                     }
                   - {
-                      label: 'too_many_attempts',
+                      label: 'Nhập sai quá nhiều lần',
                       name: 'too_many_attempts',
                       widget: string,
-                      hint: 'VD (VI): Nhập sai quá nhiều lần. Hãy gửi mã mới.',
+                      hint: 'Mặc định: Too many wrong attempts. Request a new code.',
                     }
                   - {
-                      label: 'rate_limited',
+                      label: 'Yêu cầu mã quá nhanh',
                       name: 'rate_limited',
                       widget: string,
-                      hint: 'VD (VI): Bạn yêu cầu mã hơi nhanh, đợi một phút rồi thử lại.',
+                      hint: 'Mặc định: You are requesting codes quickly; wait a minute and try again.',
                     }
                   - {
-                      label: 'verification_failed',
+                      label: 'Không xác minh được chống spam',
                       name: 'verification_failed',
                       widget: string,
-                      hint: 'VD (VI): Không xác minh được chống spam, vui lòng thử lại.',
+                      hint: 'Mặc định: Spam check failed, please try again.',
                     }
                   - {
-                      label: 'unavailable',
+                      label: 'Chức năng chưa bật',
                       name: 'unavailable',
                       widget: string,
-                      hint: 'VD (VI): Đăng nhập bằng email chưa được bật.',
+                      hint: 'Mặc định: Email sign-in is not enabled yet.',
                     }
                   - {
-                      label: 'mail_failed',
+                      label: 'Không gửi được email',
                       name: 'mail_failed',
                       widget: string,
-                      hint: 'VD (VI): Chưa gửi được email, vui lòng thử lại sau.',
+                      hint: 'Mặc định: The email could not be sent, please try again later.',
                     }
                   - {
-                      label: 'registration_closed',
+                      label: 'Không nhận tài khoản mới',
                       name: 'registration_closed',
                       widget: string,
-                      hint: 'VD (VI): Hiện không nhận tài khoản mới; chỉ tài khoản đã có đăng nhập được.',
+                      hint: 'Mặc định: New accounts are not accepted right now; only existing accounts can sign in.',
                     }
                   - {
-                      label: 'blocked',
+                      label: 'Tài khoản bị khóa',
                       name: 'blocked',
                       widget: string,
-                      hint: 'VD (VI): Tài khoản này đã bị khóa.',
+                      hint: 'Mặc định: This account has been blocked.',
                     }
               - {
-                  label: 'newAccount',
+                  label: 'Ghi chú tài khoản mới',
                   name: 'newAccount',
                   widget: string,
-                  hint: 'VD (VI): Chưa có tài khoản? Lần đầu đăng nhập sẽ tự tạo tài khoản.',
+                  hint: 'Mặc định: No account yet? Your first sign-in creates one.',
                 }
               - {
-                  label: 'agree',
+                  label: 'Câu đồng ý điều khoản',
                   name: 'agree',
                   widget: string,
-                  hint: 'VD (VI): Khi tiếp tục, bạn đồng ý với',
+                  hint: 'Mặc định: By continuing you accept the',
                 }
               - {
-                  label: 'privacy',
+                  label: 'Link chính sách quyền riêng tư',
                   name: 'privacy',
                   widget: string,
-                  hint: 'VD (VI): Chính sách quyền riêng tư',
+                  hint: 'Mặc định: Privacy policy',
                 }
               - {
-                  label: 'unavailable',
+                  label: 'Chức năng chưa bật',
                   name: 'unavailable',
                   widget: string,
-                  hint: 'VD (VI): Đăng nhập bằng Google chưa được bật. Vui lòng quay lại sau.',
+                  hint: 'Mặc định: Google sign-in is not enabled yet. Please check back later.',
                 }
-              - label: 'errors'
+              - label: 'Lỗi đăng nhập Google'
                 name: 'errors'
                 widget: object
                 fields:
                   - {
-                      label: 'cancelled',
+                      label: 'Đã hủy đăng nhập',
                       name: 'cancelled',
                       widget: string,
-                      hint: 'VD (VI): Bạn đã hủy đăng nhập.',
+                      hint: 'Mặc định: You cancelled the sign-in.',
                     }
                   - {
-                      label: 'expired',
+                      label: 'Phiên hết hạn',
                       name: 'expired',
                       widget: string,
-                      hint: 'VD (VI): Phiên đăng nhập đã hết hạn, vui lòng thử lại.',
+                      hint: 'Mặc định: The sign-in expired, please try again.',
                     }
                   - {
-                      label: 'google',
+                      label: 'Nút đăng nhập Google',
                       name: 'google',
                       widget: string,
-                      hint: 'VD (VI): Google không xác nhận được tài khoản, vui lòng thử lại.',
+                      hint: 'Mặc định: Google could not confirm the account, please try again.',
                     }
                   - {
-                      label: 'unavailable',
+                      label: 'Chức năng chưa bật',
                       name: 'unavailable',
                       widget: string,
-                      hint: 'VD (VI): Đăng nhập bằng Google chưa được bật.',
+                      hint: 'Mặc định: Google sign-in is not enabled yet.',
                     }
                   - {
-                      label: 'registration_closed',
+                      label: 'Không nhận tài khoản mới',
                       name: 'registration_closed',
                       widget: string,
-                      hint: 'VD (VI): Hiện không nhận tài khoản mới; chỉ tài khoản đã có đăng nhập được.',
+                      hint: 'Mặc định: New accounts are not accepted right now; only existing accounts can sign in.',
                     }
                   - {
-                      label: 'blocked',
+                      label: 'Tài khoản bị khóa',
                       name: 'blocked',
                       widget: string,
-                      hint: 'VD (VI): Tài khoản này đã bị khóa.',
+                      hint: 'Mặc định: This account has been blocked.',
                     }
               - {
-                  label: 'accountTitle',
+                  label: 'Tiêu đề trang tài khoản',
                   name: 'accountTitle',
                   widget: string,
-                  hint: 'VD (VI): Tài khoản',
+                  hint: 'Mặc định: Account',
                 }
               - {
-                  label: 'signedInAs',
+                  label: 'Đang đăng nhập với',
                   name: 'signedInAs',
                   widget: string,
-                  hint: 'VD (VI): Đăng nhập với',
+                  hint: 'Mặc định: Signed in as',
                 }
               - {
-                  label: 'displayName',
+                  label: 'Nhãn tên hiển thị',
                   name: 'displayName',
                   widget: string,
-                  hint: 'VD (VI): Tên hiển thị',
+                  hint: 'Mặc định: Display name',
                 }
               - {
-                  label: 'displayNameHint',
+                  label: 'Gợi ý tên hiển thị',
                   name: 'displayNameHint',
                   widget: string,
-                  hint: 'VD (VI): Tên này hiện cạnh bình luận của bạn (2–40 ký tự).',
+                  hint: 'Mặc định: Shown next to your comments (2–40 characters).',
                 }
               - {
-                  label: 'save',
+                  label: 'Nút Lưu',
                   name: 'save',
                   widget: string,
-                  hint: 'VD (VI): Lưu',
+                  hint: 'Mặc định: Save',
                 }
               - {
-                  label: 'saved',
+                  label: 'Đã lưu',
                   name: 'saved',
                   widget: string,
-                  hint: 'VD (VI): Đã lưu.',
+                  hint: 'Mặc định: Saved.',
                 }
               - {
-                  label: 'signOut',
+                  label: 'Nút Đăng xuất',
                   name: 'signOut',
                   widget: string,
-                  hint: 'VD (VI): Đăng xuất',
+                  hint: 'Mặc định: Sign out',
                 }
               - {
-                  label: 'adminLink',
+                  label: 'Link trang quản trị',
                   name: 'adminLink',
                   widget: string,
-                  hint: 'VD (VI): Vào trang quản trị',
+                  hint: 'Mặc định: Open the admin panel',
                 }
               - {
-                  label: 'deleteTitle',
+                  label: 'Tiêu đề xóa tài khoản',
                   name: 'deleteTitle',
                   widget: string,
-                  hint: 'VD (VI): Xóa tài khoản',
+                  hint: 'Mặc định: Delete account',
                 }
               - {
-                  label: 'deleteIntro',
+                  label: 'Giải thích xóa tài khoản',
                   name: 'deleteIntro',
                   widget: text,
-                  hint: 'VD (VI): Xóa tài khoản sẽ xóa vĩnh viễn tên, email và nội dung mọi bình luận của bạn. Bình luận có người trả lời sẽ chỉ còn dòng "đã bị xóa".',
+                  hint: 'Mặc định: Deleting your account permanently removes your name, email and the text of all your comments. Comments with replies keep only a "deleted" line.',
                 }
               - {
-                  label: 'deleteButton',
+                  label: 'Nút xóa tài khoản',
                   name: 'deleteButton',
                   widget: string,
-                  hint: 'VD (VI): Xóa tài khoản của tôi',
+                  hint: 'Mặc định: Delete my account',
                 }
               - {
-                  label: 'deleteConfirm',
+                  label: 'Hỏi lại trước khi xóa tài khoản',
                   name: 'deleteConfirm',
                   widget: string,
-                  hint: 'VD (VI): Xóa vĩnh viễn tài khoản và mọi bình luận của bạn?',
+                  hint: 'Mặc định: Permanently delete your account and all your comments?',
                 }
               - {
-                  label: 'deleted',
+                  label: 'Đã xóa tài khoản',
                   name: 'deleted',
                   widget: string,
-                  hint: 'VD (VI): Tài khoản đã được xóa.',
+                  hint: 'Mặc định: Your account was deleted.',
                 }
               - {
-                  label: 'failed',
+                  label: 'Lỗi chung',
                   name: 'failed',
                   widget: string,
-                  hint: 'VD (VI): Chưa thực hiện được, vui lòng thử lại.',
+                  hint: 'Mặc định: That did not work, please try again.',
                 }
-          - label: 'Email báo bản mới, hủy nhận'
+          - label: 'Email báo bản mới'
             name: updates
             widget: object
             collapsed: true
             fields:
               - {
-                  label: 'projectLink',
+                  label: 'Link nhận email (trang dự án)',
                   name: 'projectLink',
                   widget: string,
-                  hint: 'VD (VI): Nhận email khi có bản mới',
+                  hint: 'Mặc định: Email me about new versions',
                 }
               - {
-                  label: 'title',
+                  label: 'Tiêu đề phần email bản mới',
                   name: 'title',
                   widget: string,
-                  hint: 'VD (VI): Email báo bản mới',
+                  hint: 'Mặc định: New version emails',
                 }
               - {
-                  label: 'intro',
+                  label: 'Giới thiệu',
                   name: 'intro',
                   widget: text,
-                  hint: 'VD (VI): Chọn dự án bạn muốn nhận email khi có bản phát hành mới. Email gửi tới địa chỉ của tài khoản này, bằng ngôn ngữ của trang bạn đang xem lúc chọn.',
+                  hint: "Mặc định: Choose the projects you want an email about when a new version is released. Emails go to this account's address, in the language of the page you are on when you choose.",
                 }
               - {
-                  label: 'note',
+                  label: 'Ghi chú hủy nhận',
                   name: 'note',
                   widget: text,
-                  hint: 'VD (VI): Mỗi email có link hủy nhận. Bỏ chọn ở đây cũng hủy ngay.',
+                  hint: 'Mặc định: Every email has an unsubscribe link. Unticking a project here also stops them at once.',
                 }
               - {
-                  label: 'saved',
+                  label: 'Đã lưu',
                   name: 'saved',
                   widget: string,
-                  hint: 'VD (VI): Đã lưu lựa chọn.',
+                  hint: 'Mặc định: Saved.',
                 }
               - {
-                  label: 'failed',
+                  label: 'Lỗi lưu',
                   name: 'failed',
                   widget: string,
-                  hint: 'VD (VI): Chưa lưu được, vui lòng thử lại.',
+                  hint: 'Mặc định: That did not save, please try again.',
                 }
               - {
-                  label: 'unsubscribeTitle',
+                  label: 'Tiêu đề trang hủy nhận',
                   name: 'unsubscribeTitle',
                   widget: string,
-                  hint: 'VD (VI): Hủy nhận email bản mới',
+                  hint: 'Mặc định: Stop new version emails',
                 }
               - {
-                  label: 'unsubscribeIntro',
+                  label: 'Giới thiệu trang hủy nhận',
                   name: 'unsubscribeIntro',
                   widget: text,
-                  hint: 'VD (VI): Bấm nút dưới đây để không nhận email báo bản mới của dự án trong email bạn vừa nhận nữa.',
+                  hint: 'Mặc định: Press the button below to stop getting new version emails for the project in the email you received.',
                 }
               - {
-                  label: 'unsubscribeButton',
+                  label: 'Nút hủy nhận',
                   name: 'unsubscribeButton',
                   widget: string,
-                  hint: 'VD (VI): Hủy nhận email',
+                  hint: 'Mặc định: Unsubscribe',
                 }
               - {
-                  label: 'unsubscribed',
+                  label: 'Đã hủy nhận',
                   name: 'unsubscribed',
                   widget: text,
-                  hint: 'VD (VI): Đã hủy. Bạn sẽ không nhận email báo bản mới của {project} nữa.',
+                  hint: 'Mặc định: Done. You will not get new version emails for {project} any more.',
                 }
               - {
-                  label: 'unsubscribeInvalid',
+                  label: 'Link hủy sai',
                   name: 'unsubscribeInvalid',
                   widget: string,
-                  hint: 'VD (VI): Link hủy không đúng hoặc đã được dùng rồi.',
+                  hint: 'Mặc định: This unsubscribe link is wrong or has already been used.',
                 }
               - {
-                  label: 'manage',
+                  label: 'Link quản lý email',
                   name: 'manage',
                   widget: string,
-                  hint: 'VD (VI): Quản lý email bản mới trong trang tài khoản',
+                  hint: 'Mặc định: Manage new version emails on your account page',
                 }
           - label: 'Số lượt tải'
             name: downloads
@@ -3511,16 +3545,16 @@ collections:
             collapsed: true
             fields:
               - {
-                  label: 'count',
+                  label: 'Số lượt tải ({n})',
                   name: 'count',
                   widget: string,
-                  hint: 'VD (VI): {n} lượt tải',
+                  hint: 'Mặc định: {n} downloads',
                 }
               - {
-                  label: 'source',
+                  label: 'Giải thích nguồn số lượt tải',
                   name: 'source',
                   widget: text,
-                  hint: 'VD (VI): Số lần tải bộ cài và bản portable từ GitHub Releases, cập nhật mỗi phút.',
+                  hint: 'Mặc định: Installer and portable downloads from GitHub Releases, updated every minute.',
                 }
           - label: 'Dải chủ site và nút sửa'
             name: owner
@@ -3528,153 +3562,159 @@ collections:
             collapsed: true
             fields:
               - {
-                  label: 'mode',
+                  label: 'Tên dải chủ site',
                   name: 'mode',
                   widget: string,
-                  hint: 'VD (VI): Chế độ chủ site',
+                  hint: 'Mặc định: Owner mode',
                 }
               - {
-                  label: 'note',
+                  label: 'Ghi chú dải chủ site',
                   name: 'note',
                   widget: string,
-                  hint: 'VD (VI): Khách không thấy dải này.',
+                  hint: 'Mặc định: Visitors do not see this bar.',
                 }
               - {
-                  label: 'pending',
+                  label: 'Việc chờ xử lý ({held}, {feedback})',
                   name: 'pending',
                   widget: string,
-                  hint: 'VD (VI): {held} bình luận chờ duyệt · {feedback} góp ý mới',
+                  hint: 'Mặc định: {held} held comments · {feedback} new feedback',
                 }
               - {
-                  label: 'manage',
+                  label: 'Link trang quản trị',
                   name: 'manage',
                   widget: string,
-                  hint: 'VD (VI): Mở trang quản trị',
+                  hint: 'Mặc định: Open the admin panel',
                 }
               - {
-                  label: 'cms',
+                  label: 'Link mở CMS',
                   name: 'cms',
                   widget: string,
-                  hint: 'VD (VI): Mở CMS',
+                  hint: 'Mặc định: Open the CMS',
                 }
               - {
-                  label: 'editPage',
+                  label: 'Link sửa trang này',
                   name: 'editPage',
                   widget: string,
-                  hint: 'VD (VI): Sửa trang này',
+                  hint: 'Mặc định: Edit this page',
                 }
               - {
-                  label: 'edit',
+                  label: 'Chữ trên nút ✎',
                   name: 'edit',
                   widget: string,
-                  hint: 'VD (VI): Sửa',
+                  hint: 'Mặc định: Edit',
                 }
           - label: 'Chữ phụ (skip link, 404, ảnh, video)'
             name: chrome
             widget: object
             collapsed: true
             fields:
+              - label: 'Ảnh chia sẻ link mặc định (Facebook, Zalo…)'
+                name: shareImage
+                widget: image
+                media_folder: /src/assets
+                public_folder: ../../assets
+                hint: 'Ảnh hiện khi chia sẻ link một trang không có ảnh riêng. Nên rộng ít nhất 1200 px.'
               - {
-                  label: 'skip',
+                  label: 'Link "Đến nội dung" (bàn phím)',
                   name: 'skip',
                   widget: string,
-                  hint: 'VD (VI): Đến nội dung',
+                  hint: 'Mặc định: Skip to content',
                 }
               - {
-                  label: 'mainNav',
+                  label: 'Tên menu chính (trình đọc màn hình)',
                   name: 'mainNav',
                   widget: string,
-                  hint: 'VD (VI): Điều hướng chính',
+                  hint: 'Mặc định: Main navigation',
                 }
               - {
-                  label: 'feedTitle',
+                  label: 'Tên RSS ghi chú phiên bản',
                   name: 'feedTitle',
                   widget: string,
-                  hint: 'VD (VI): ChiloLab: ghi chú phiên bản',
+                  hint: 'Mặc định: ChiloLab: version notes',
                 }
               - {
-                  label: 'shareAlt',
+                  label: 'Mô tả ảnh chia sẻ mặc định (alt)',
                   name: 'shareAlt',
                   widget: string,
-                  hint: 'VD (VI): Giao diện Pet Desktop trên desktop Windows',
+                  hint: 'Mặc định: Pet Desktop on a Windows desktop',
                 }
               - {
-                  label: 'notFoundTitle',
+                  label: 'Tiêu đề trang 404',
                   name: 'notFoundTitle',
                   widget: string,
-                  hint: 'VD (VI): Không tìm thấy trang',
+                  hint: 'Mặc định: Page not found',
                 }
               - {
-                  label: 'notFound',
+                  label: 'Câu chính trang 404',
                   name: 'notFound',
                   widget: string,
-                  hint: 'VD (VI): Trang này chưa có ở đây.',
+                  hint: "Mặc định: This page doesn't exist.",
                 }
               - {
-                  label: 'notFoundDescription',
+                  label: 'Mô tả trang 404',
                   name: 'notFoundDescription',
                   widget: string,
-                  hint: 'VD (VI): Trang bạn tìm không tồn tại.',
+                  hint: 'Mặc định: This page does not exist.',
                 }
               - {
-                  label: 'notFoundHome',
+                  label: 'Nút về trang chủ (404)',
                   name: 'notFoundHome',
                   widget: string,
-                  hint: 'VD (VI): Về trang chủ',
+                  hint: 'Mặc định: Home in English',
                 }
               - {
-                  label: 'gallery',
+                  label: 'Tiêu đề thư viện ảnh',
                   name: 'gallery',
                   widget: string,
-                  hint: 'VD (VI): Hình trong app',
+                  hint: 'Mặc định: In the app',
                 }
               - {
-                  label: 'galleryViewer',
+                  label: 'Tên khung xem ảnh',
                   name: 'galleryViewer',
                   widget: string,
-                  hint: 'VD (VI): Xem ảnh lớn',
+                  hint: 'Mặc định: Picture viewer',
                 }
               - {
-                  label: 'galleryPrevious',
+                  label: 'Nút ảnh trước',
                   name: 'galleryPrevious',
                   widget: string,
-                  hint: 'VD (VI): Ảnh trước',
+                  hint: 'Mặc định: Previous picture',
                 }
               - {
-                  label: 'galleryNext',
+                  label: 'Nút ảnh sau',
                   name: 'galleryNext',
                   widget: string,
-                  hint: 'VD (VI): Ảnh sau',
+                  hint: 'Mặc định: Next picture',
                 }
               - {
-                  label: 'galleryClose',
+                  label: 'Nút đóng ảnh',
                   name: 'galleryClose',
                   widget: string,
-                  hint: 'VD (VI): Đóng',
+                  hint: 'Mặc định: Close',
                 }
               - {
-                  label: 'install',
+                  label: 'Tiêu đề cài đặt ({n} bước)',
                   name: 'install',
                   widget: string,
-                  hint: 'VD (VI): Cài đặt trong {n} bước',
+                  hint: 'Mặc định: Install in {n} steps',
                 }
               - {
-                  label: 'installSteps',
+                  label: 'Link "Xem từng bước"',
                   name: 'installSteps',
                   widget: string,
-                  hint: 'VD (VI): Xem từng bước',
+                  hint: 'Mặc định: See each step',
                 }
               - {
-                  label: 'video',
+                  label: 'Tên video ({project})',
                   name: 'video',
                   widget: string,
-                  hint: 'VD (VI): Video giới thiệu {project}',
+                  hint: 'Mặc định: {project} introduction video',
                 }
               - {
-                  label: 'openVideo',
+                  label: 'Link mở video',
                   name: 'openVideo',
                   widget: string,
-                  hint: 'VD (VI): Mở video',
+                  hint: 'Mặc định: Open video',
                 }
           - label: 'Trang phiên bản'
             name: versions
@@ -3682,116 +3722,188 @@ collections:
             collapsed: true
             fields:
               - {
-                  label: 'heading',
+                  label: 'Tiêu đề Phiên bản',
                   name: 'heading',
                   widget: string,
-                  hint: 'VD (VI): Phiên bản',
+                  hint: 'Mặc định: Versions',
                 }
               - {
-                  label: 'intro',
+                  label: 'Giới thiệu trang phiên bản',
                   name: 'intro',
                   widget: string,
-                  hint: 'VD (VI): Mỗi bản cập nhật có gì mới, sửa gì, mình ghi lại ở đây.',
+                  hint: 'Mặc định: What’s new and what’s fixed in each update, written down here.',
                 }
               - {
-                  label: 'all',
+                  label: 'Link Tất cả phiên bản',
                   name: 'all',
                   widget: string,
-                  hint: 'VD (VI): Tất cả phiên bản',
+                  hint: 'Mặc định: All versions',
                 }
               - {
-                  label: 'read',
+                  label: 'Link Xem chi tiết',
                   name: 'read',
                   widget: string,
-                  hint: 'VD (VI): Xem chi tiết phiên bản',
+                  hint: 'Mặc định: Read version details',
                 }
               - {
-                  label: 'empty',
+                  label: 'Chưa có phiên bản',
                   name: 'empty',
                   widget: text,
-                  hint: 'VD (VI): Chưa có bài nào về phiên bản. Có bản cập nhật là mình đăng ở đây.',
+                  hint: 'Mặc định: No version posts yet. I’ll post here when an update comes out.',
                 }
               - {
-                  label: 'back',
+                  label: 'Link về trang sản phẩm',
                   name: 'back',
                   widget: string,
-                  hint: 'VD (VI): Về trang sản phẩm',
+                  hint: 'Mặc định: Back to product',
                 }
               - {
-                  label: 'source',
+                  label: 'Nhãn tài liệu nguồn',
                   name: 'source',
                   widget: string,
-                  hint: 'VD (VI): Tài liệu nguồn',
+                  hint: 'Mặc định: Source documentation',
                 }
               - {
-                  label: 'downloadLatest',
+                  label: 'Nút tải bản mới nhất',
                   name: 'downloadLatest',
                   widget: string,
-                  hint: 'VD (VI): Tải bản mới nhất',
+                  hint: 'Mặc định: Download the latest version',
                 }
               - {
-                  label: 'portable',
+                  label: 'Nút bản Portable',
                   name: 'portable',
                   widget: string,
-                  hint: 'VD (VI): Bản Portable',
+                  hint: 'Mặc định: Portable build',
                 }
               - {
-                  label: 'latestHeading',
+                  label: 'Tiêu đề khung Tải xuống',
                   name: 'latestHeading',
                   widget: string,
-                  hint: 'VD (VI): Tải xuống',
+                  hint: 'Mặc định: Download',
                 }
               - {
-                  label: 'latestInstaller',
+                  label: 'Nút tải bộ cài ({project})',
                   name: 'latestInstaller',
                   widget: string,
-                  hint: 'VD (VI): Tải {project} bản mới nhất cho Windows',
+                  hint: 'Mặc định: Download the latest {project} for Windows',
                 }
               - {
-                  label: 'feedback',
+                  label: 'Link báo lỗi / góp ý',
                   name: 'feedback',
                   widget: string,
-                  hint: 'VD (VI): Báo lỗi / góp ý',
+                  hint: 'Mặc định: Report a bug / suggest',
                 }
               - {
-                  label: 'discuss',
+                  label: 'Link bình luận phiên bản',
                   name: 'discuss',
                   widget: string,
-                  hint: 'VD (VI): Bình luận về phiên bản này',
+                  hint: 'Mặc định: Comment on this version',
                 }
               - {
-                  label: 'latestNotes',
+                  label: 'Link xem có gì mới',
                   name: 'latestNotes',
                   widget: string,
-                  hint: 'VD (VI): Xem có gì mới',
+                  hint: 'Mặc định: See what’s new',
                 }
               - {
-                  label: 'date',
+                  label: 'Nhãn ngày phát hành',
                   name: 'date',
                   widget: string,
-                  hint: 'VD (VI): Ngày phát hành',
+                  hint: 'Mặc định: Release date',
                 }
               - {
-                  label: 'pending',
+                  label: 'Ghi chú bản chưa phát hành',
                   name: 'pending',
                   widget: text,
-                  hint: 'VD (VI): Đây là ghi chú về phiên bản đang phát triển hoặc xem trước, chưa phải thông báo phát hành công khai.',
+                  hint: 'Mặc định: These notes describe a development or preview version, not a public release announcement.',
                 }
               - {
-                  label: 'released',
+                  label: 'Trạng thái Đã phát hành',
                   name: 'released',
                   widget: string,
-                  hint: 'VD (VI): Đã phát hành',
+                  hint: 'Mặc định: Released',
                 }
               - {
-                  label: 'preview',
+                  label: 'Trạng thái Bản xem trước',
                   name: 'preview',
                   widget: string,
-                  hint: 'VD (VI): Bản xem trước',
+                  hint: 'Mặc định: Preview',
                 }
               - {
-                  label: 'development',
+                  label: 'Trạng thái Đang phát triển',
                   name: 'development',
                   widget: string,
-                  hint: 'VD (VI): Đang phát triển',
+                  hint: 'Mặc định: In development',
                 }
+          - label: 'Bố cục: thứ tự và ẩn/hiện các phần'
+            name: layout
+            widget: object
+            collapsed: true
+            fields:
+              - label: 'Trang chủ'
+                name: home
+                widget: list
+                hint: 'Kéo để đổi thứ tự, xóa để ẩn phần đó. Phần đầu trang (hero) phải giữ lại; mỗi phần chỉ một lần.'
+                field:
+                  label: 'Phần'
+                  name: part
+                  widget: select
+                  options:
+                    - { label: 'Đầu trang (hero)', value: hero }
+                    - { label: 'Dự án', value: projects }
+                    - { label: 'Về mình (tóm tắt)', value: me }
+                    - { label: 'Về ChiloLab', value: about }
+              - label: 'Trang Về mình'
+                name: about
+                widget: list
+                hint: 'Kéo để đổi thứ tự, xóa để ẩn phần đó. Phần đầu trang (hero) phải giữ lại; mỗi phần chỉ một lần.'
+                field:
+                  label: 'Phần'
+                  name: part
+                  widget: select
+                  options:
+                    - { label: 'Đầu trang (hero)', value: hero }
+                    - { label: 'Kinh nghiệm', value: experience }
+                    - { label: 'Mình làm việc thế nào', value: how }
+                    - { label: 'Kỹ năng', value: skills }
+                    - { label: 'Nhật ký', value: journey }
+                    - { label: 'Khóa học', value: courses }
+                    - { label: 'Mình tự làm', value: built }
+                    - { label: 'Ngoại ngữ', value: languages }
+                    - { label: 'Liên hệ', value: contact }
+          - label: 'Menu đầu trang và footer'
+            name: menu
+            widget: object
+            collapsed: true
+            fields:
+              - label: 'Menu đầu trang'
+                name: header
+                widget: list
+                summary: '{{fields.label}} → {{fields.href}}'
+                hint: 'Nút đổi ngôn ngữ luôn nằm cuối, tự thêm.'
+                fields:
+                  - { label: 'Chữ hiển thị', name: label, widget: string }
+                  - label: 'Đường dẫn'
+                    name: href
+                    widget: string
+                    hint: 'Đường dẫn trong site bắt đầu bằng / (bản tiếng Anh: /en/...), hoặc link ngoài https://...'
+              - label: 'Tiêu đề cột dự án (footer)'
+                name: projectsTitle
+                widget: string
+                hint: 'Cột này tự liệt kê các dự án.'
+              - label: 'Các cột footer'
+                name: footer
+                widget: list
+                summary: '{{fields.title}}'
+                fields:
+                  - { label: 'Tiêu đề cột', name: title, widget: string }
+                  - label: 'Link'
+                    name: links
+                    widget: list
+                    summary: '{{fields.label}} → {{fields.href}}'
+                    fields:
+                      - { label: 'Chữ hiển thị', name: label, widget: string }
+                      - label: 'Đường dẫn'
+                        name: href
+                        widget: string
+                        hint: 'Đường dẫn trong site bắt đầu bằng / (bản tiếng Anh: /en/...), hoặc link ngoài https://...'

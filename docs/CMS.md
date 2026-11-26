@@ -74,6 +74,16 @@ Dùng hằng ngày:
 2. Mở `https://chilolab.com/admin`: CMS tự đăng nhập. `public/admin/boot.js` lấy token từ `/api/cms/token` (chỉ trả cho phiên owner), lưu vào `localStorage["sveltia-cms.user"]` rồi mới nạp Sveltia. Nếu bước này lỗi, trang vẫn hiện nút **Sign In with GitHub** như cũ: cửa sổ nhỏ mở `/api/cms/auth`, kiểm tra phiên owner và trả token; không có trang đăng nhập GitHub nào.
 3. Soạn và Save: mỗi lần Save là một commit lên `main`, Workers Builds build lại website.
 
+Trình soạn: mỗi mục mở ra dạng một trang form (không chia đôi). Nút **Xem trước** cạnh **Save** thay form bằng bản xem trước dùng CSS thật của site, gồm cả thay đổi chưa lưu; bấm **Quay lại sửa** để về form. Dự án, ghi chú phiên bản và quyền riêng tư có template giống trang public (`public/admin/editor.js`); các mục khác dùng preview mặc định của Sveltia. Nếu tắt **Show Preview** trong menu ⋮, nút Xem trước ẩn đi và trình soạn trở về bố cục gốc của Sveltia.
+
+Menu: **Chữ giao diện → Menu đầu trang và footer** chứa link menu đầu trang, tiêu đề cột dự án và các cột footer (thêm, xóa, kéo đổi thứ tự). Link trong site bắt đầu bằng `/`; bản tiếng Anh dùng `/en/...`. Nút đổi ngôn ngữ và cột dự án luôn tự thêm. Link không bắt đầu bằng `/`, `https://` hay `mailto:` làm build lỗi (site cũ giữ nguyên); link trong site trỏ tới trang không có thì vẫn deploy, nhưng GitHub Actions (`npm run verify`) báo lỗi, nên xem tab Actions sau khi đổi menu.
+
+Bố cục: **Chữ giao diện → Bố cục** chọn phần nào hiện và theo thứ tự nào trên trang chủ và trang Về mình (kéo để đổi thứ tự, xóa để ẩn). Phần đầu trang (hero) chứa tiêu đề trang nên bắt buộc giữ; mỗi phần chỉ một lần, sai thì build lỗi và site cũ giữ nguyên. Ẩn phần Dự án hoặc Về ChiloLab thì sửa luôn các link `#projects`, `#about` trong menu, nếu không GitHub Actions báo link hỏng.
+
+Ảnh: ảnh chân dung nằm ở **Về mình → Ảnh chân dung**; ảnh chia sẻ link mặc định ở **Chữ giao diện → Chữ phụ**. Cả hai lưu trong `src/assets`, Astro tự nén. Chữ thương hiệu cạnh logo và dòng bản quyền (`{year}` là năm hiện tại) ở **Chữ giao diện → Trang chủ, menu, footer**.
+
+Không đưa vào CMS (cố ý): màu, font và bố cục chi tiết theo DESIGN.md, để giữ độ tương phản WCAG AA và hệ thiết kế đã chốt.
+
 Sửa ngay từ trang web: khi đăng nhập owner, dải vàng trên cùng có **Sửa trang này**, **Mở CMS** và **Mở trang quản trị**; mỗi phần của trang (hero, từng dự án, khung tải xuống, các mục trang Về mình, quyền riêng tư, footer…) có nút **✎ Sửa** ở góc phải, mở thẳng mục đó trong CMS. Phần nào sửa ở mục nào được khai báo bằng thuộc tính `data-edit` (link dựng bằng `src/lib/edit.ts`); thêm phần mới thì gắn `data-edit` cho nó. Khách không thấy và không tải gì thêm: script chỉ chạy khi có cookie gợi ý owner và `/api/me` xác nhận.
 
 Người không phải owner mở `/admin` bị chuyển sang trang đăng nhập (hoặc nhận 403 nếu đã đăng nhập bằng tài khoản thường); `/api/cms/auth` và `/api/cms/token` trả lỗi và không lộ token (`/api/cms/token` còn từ chối yêu cầu từ trang khác qua `Sec-Fetch-Site`). Token nằm trong `localStorage` của trình duyệt owner; trên máy dùng chung, bấm Sign Out trong CMS và đăng xuất khỏi trang khi xong. Token hết hạn hoặc bị thu hồi thì tạo token mới và chạy lại bước 2. Phiên owner hết hạn sau 7 ngày.

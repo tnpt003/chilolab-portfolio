@@ -3,7 +3,6 @@ import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Logo from './Logo.astro';
 import WindowBar from './WindowBar.astro';
-import portrait from '../assets/phat-portrait.jpg';
 import petOnDesktop from '../assets/pet-on-desktop.png';
 import {
   getProfile,
@@ -26,7 +25,10 @@ interface Props {
 }
 const { locale } = Astro.props;
 const p = await getProfile(locale);
+const portrait = p.portrait;
 const t = (await getUi(locale)).site;
+// Which sections show, in which order (CMS: Chữ giao diện → Bố cục).
+const layout = (await getUi(locale)).layout;
 const projects = await listProjects(locale);
 const toeicText = [p.toeicScore, p.toeicYear && `(${p.toeicYear})`]
   .filter(Boolean)
@@ -89,267 +91,292 @@ const kindTint = { study: 'lavender', work: 'mint', release: 'apricot' };
   edit={editProfile(locale)}
   share={{ image: portrait, alt: t.portraitAlt }}
 >
-  <div class="desk">
-    <section class="about-hero wrap" data-edit={editProfile(locale)}>
-      <div class="about-hero-copy">
-        <h1>{p.heading}</h1>
-        <p class="lead">{p.lead}</p>
-        <ul class="fact-list">
-          {p.facts.map((fact) => (
-            <li>{fact.text}</li>
-          ))}
-        </ul>
-        <div class="actions">
-          <a class="button" href={`mailto:${email}`}>
-            {p.emailMe}
-          </a>
-          <a class="button button-quiet" href={`${pathFor(locale)}#projects`}>
-            {p.seeProjects}
-          </a>
-          <a class="button button-quiet" href={githubUrl}>
-            {p.github}
-          </a>
+  {layout.about.map((part) => (
+    <Fragment>
+      {part === 'hero' && (
+        <div class="desk">
+          <section class="about-hero wrap" data-edit={editProfile(locale)}>
+            <div class="about-hero-copy">
+              <h1>{p.heading}</h1>
+              <p class="lead">{p.lead}</p>
+              <ul class="fact-list">
+                {p.facts.map((fact) => (
+                  <li>{fact.text}</li>
+                ))}
+              </ul>
+              <div class="actions">
+                <a class="button" href={`mailto:${email}`}>
+                  {p.emailMe}
+                </a>
+                <a
+                  class="button button-quiet"
+                  href={`${pathFor(locale)}#projects`}
+                >
+                  {p.seeProjects}
+                </a>
+                <a class="button button-quiet" href={githubUrl}>
+                  {p.github}
+                </a>
+              </div>
+            </div>
+            <div class="about-hero-art">
+              <figure class="cat-frame">
+                <Image
+                  src={portrait}
+                  alt={t.portraitAlt}
+                  widths={[300, 420]}
+                  sizes="(max-width: 720px) 70vw, 380px"
+                  format="webp"
+                  loading="eager"
+                />
+              </figure>
+              <figure class="pet-polaroid">
+                <Image
+                  src={petOnDesktop}
+                  alt={p.petAlt}
+                  widths={[200, 400]}
+                  sizes="200px"
+                  format="webp"
+                  loading="eager"
+                />
+              </figure>
+            </div>
+          </section>
         </div>
-      </div>
-      <div class="about-hero-art">
-        <figure class="cat-frame">
-          <Image
-            src={portrait}
-            alt={t.portraitAlt}
-            widths={[300, 420]}
-            sizes="(max-width: 720px) 70vw, 380px"
-            format="webp"
-            loading="eager"
-          />
-        </figure>
-        <figure class="pet-polaroid">
-          <Image
-            src={petOnDesktop}
-            alt={p.petAlt}
-            widths={[200, 400]}
-            sizes="200px"
-            format="webp"
-            loading="eager"
-          />
-        </figure>
-      </div>
-    </section>
-  </div>
+      )}
 
-  <section
-    data-edit={editProfile(locale)}
-    class="about-block wrap"
-    aria-labelledby="experience-title"
-  >
-    <h2 id="experience-title">{p.experienceTitle}</h2>
-    <div class="job">
-      <div>
-        <p class="job-title">
-          <strong>{p.role}</strong>
-          <span>{p.company}</span>
-          <span class="badge">{p.current}</span>
-        </p>
-        <p class="job-period">{p.jobPeriod}</p>
-        <ul class="job-duties">
-          {p.duties.map((duty) => (
-            <li>{duty}</li>
-          ))}
-        </ul>
-      </div>
-    </div>
-    <div class="job">
-      <div>
-        <h3>{p.educationTitle}</h3>
-        <p class="job-period">{p.educationPeriod}</p>
-        <p>{p.education}</p>
-      </div>
-    </div>
-  </section>
+      {part === 'experience' && (
+        <section
+          data-edit={editProfile(locale)}
+          class="about-block wrap"
+          aria-labelledby="experience-title"
+        >
+          <h2 id="experience-title">{p.experienceTitle}</h2>
+          <div class="job">
+            <div>
+              <p class="job-title">
+                <strong>{p.role}</strong>
+                <span>{p.company}</span>
+                <span class="badge">{p.current}</span>
+              </p>
+              <p class="job-period">{p.jobPeriod}</p>
+              <ul class="job-duties">
+                {p.duties.map((duty) => (
+                  <li>{duty}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          <div class="job">
+            <div>
+              <h3>{p.educationTitle}</h3>
+              <p class="job-period">{p.educationPeriod}</p>
+              <p>{p.education}</p>
+            </div>
+          </div>
+        </section>
+      )}
 
-  <section
-    data-edit={editProfile(locale)}
-    class="about-block wrap"
-    aria-labelledby="how-title"
-  >
-    <div class="section-heading">
-      <h2 id="how-title">{p.howTitle}</h2>
-      <p>{p.howIntro}</p>
-    </div>
-    <ol class="steps">
-      {p.steps.map((step, index) => (
-        <li>
-          <span class="step-number">{index + 1}</span>
-          <h3>{step.title}</h3>
-          <p>{step.text}</p>
-        </li>
-      ))}
-    </ol>
-  </section>
+      {part === 'how' && (
+        <section
+          data-edit={editProfile(locale)}
+          class="about-block wrap"
+          aria-labelledby="how-title"
+        >
+          <div class="section-heading">
+            <h2 id="how-title">{p.howTitle}</h2>
+            <p>{p.howIntro}</p>
+          </div>
+          <ol class="steps">
+            {p.steps.map((step, index) => (
+              <li>
+                <span class="step-number">{index + 1}</span>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      )}
 
-  <section
-    data-edit={editProfile(locale)}
-    class="about-block wrap"
-    aria-labelledby="skills-title"
-  >
-    <div class="section-heading">
-      <h2 id="skills-title">{p.skillsTitle}</h2>
-      <p>{p.skillsIntro}</p>
-    </div>
-    <dl class="skill-grid">
-      {p.skills.map((group) => (
-        <div>
-          <dt>{group.name}</dt>
-          <dd>{group.items.join(', ')}</dd>
-        </div>
-      ))}
-    </dl>
-  </section>
+      {part === 'skills' && (
+        <section
+          data-edit={editProfile(locale)}
+          class="about-block wrap"
+          aria-labelledby="skills-title"
+        >
+          <div class="section-heading">
+            <h2 id="skills-title">{p.skillsTitle}</h2>
+            <p>{p.skillsIntro}</p>
+          </div>
+          <dl class="skill-grid">
+            {p.skills.map((group) => (
+              <div>
+                <dt>{group.name}</dt>
+                <dd>{group.items.join(', ')}</dd>
+              </div>
+            ))}
+          </dl>
+        </section>
+      )}
 
-  <section
-    data-edit={editProfile(locale)}
-    class="about-block wrap"
-    aria-labelledby="journey-title"
-  >
-    <h2 id="journey-title">{p.journeyTitle}</h2>
-    <div class="journey">
-      {/* The ChiloLab cat rides down the rail as the reader scrolls. */}
-      <div class="journey-rail" aria-hidden="true">
-        <span class="journey-cat">
-          <Logo />
-        </span>
-      </div>
-      <ol class="journey-years">
-        {years.map(({ year, entries }) => (
-          <li>
-            <h3 class="journey-year">{year}</h3>
-            <ol class="journey-list">
-              {entries.map((entry) => (
-                <li class="journey-entry">
-                  <p class="journey-meta">
-                    <span class:list={['kind', kindTint[entry.kind]]}>
-                      {p.journeyKinds[entry.kind]}
-                    </span>
-                    {entry.date && entry.label && (
-                      <time datetime={entry.date}>{entry.label}</time>
-                    )}
-                  </p>
-                  <h4>
-                    {entry.href ? (
-                      <a href={entry.href}>{entry.title}</a>
-                    ) : (
-                      entry.title
-                    )}
-                  </h4>
-                  {entry.text && <p>{entry.text}</p>}
+      {part === 'journey' && (
+        <section
+          data-edit={editProfile(locale)}
+          class="about-block wrap"
+          aria-labelledby="journey-title"
+        >
+          <h2 id="journey-title">{p.journeyTitle}</h2>
+          <div class="journey">
+            {/* The ChiloLab cat rides down the rail as the reader scrolls. */}
+            <div class="journey-rail" aria-hidden="true">
+              <span class="journey-cat">
+                <Logo />
+              </span>
+            </div>
+            <ol class="journey-years">
+              {years.map(({ year, entries }) => (
+                <li>
+                  <h3 class="journey-year">{year}</h3>
+                  <ol class="journey-list">
+                    {entries.map((entry) => (
+                      <li class="journey-entry">
+                        <p class="journey-meta">
+                          <span class:list={['kind', kindTint[entry.kind]]}>
+                            {p.journeyKinds[entry.kind]}
+                          </span>
+                          {entry.date && entry.label && (
+                            <time datetime={entry.date}>{entry.label}</time>
+                          )}
+                        </p>
+                        <h4>
+                          {entry.href ? (
+                            <a href={entry.href}>{entry.title}</a>
+                          ) : (
+                            entry.title
+                          )}
+                        </h4>
+                        {entry.text && <p>{entry.text}</p>}
+                      </li>
+                    ))}
+                  </ol>
                 </li>
               ))}
             </ol>
-          </li>
-        ))}
-      </ol>
-    </div>
-  </section>
-
-  <section
-    data-edit={editProfile(locale)}
-    class="about-block wrap"
-    aria-labelledby="courses-title"
-  >
-    <h2 id="courses-title">{p.coursesTitle}</h2>
-    <ul class="course-list">
-      {p.courses.map((course) => (
-        <li>
-          <span class="course-name">{course}</span>
-          <a class="course-provider" href={athenaUrl}>
-            Athena
-          </a>
-        </li>
-      ))}
-    </ul>
-    <p class="course-note">
-      {p.coursesNote} <a href={athenaUrl}>athena.edu.vn</a>
-    </p>
-  </section>
-
-  <section
-    data-edit={editProfile(locale)}
-    class="about-block wrap"
-    aria-labelledby="built-title"
-  >
-    <div class="section-heading">
-      <h2 id="built-title">{p.builtTitle}</h2>
-      <p>{p.builtIntro}</p>
-    </div>
-    <ul class="built-grid">
-      {projects.map(({ data }) => (
-        <li>
-          <a href={pathFor(locale, data.slug)}>
-            {data.preview && (
-              <div class="window">
-                <WindowBar title={data.title} />
-                <Image
-                  src={data.preview.image}
-                  alt={data.preview.alt}
-                  widths={[400, 700]}
-                  sizes="(max-width: 720px) 100vw, 50vw"
-                  format="webp"
-                  loading="lazy"
-                />
-              </div>
-            )}
-            <span class="built-title">{data.title}</span>
-            <span class="built-text">{data.description}</span>
-          </a>
-        </li>
-      ))}
-    </ul>
-  </section>
-
-  <section
-    data-edit={editProfile(locale)}
-    class="about-block wrap"
-    aria-labelledby="languages-title"
-  >
-    <h2 id="languages-title">{p.languagesTitle}</h2>
-    <div class="job">
-      <div>
-        <p>{p.english}</p>
-        {showToeic && (
-          <div class="profile-toeic">
-            <p>
-              <strong>{p.toeicLabel}</strong>
-              {toeicText && ` ${toeicText}`}
-            </p>
-            {toeicImage && (
-              <a href={toeicImage.src} aria-label={p.toeicOpen}>
-                <Image
-                  src={toeicImage}
-                  alt={p.toeicAlt}
-                  widths={[360, 720]}
-                  sizes="(max-width: 720px) 100vw, 360px"
-                  format="webp"
-                />
-              </a>
-            )}
           </div>
-        )}
-      </div>
-    </div>
-  </section>
+        </section>
+      )}
 
-  <section
-    data-edit={editProfile(locale)}
-    class="contact wrap"
-    aria-labelledby="contact-title"
-  >
-    <div class="contact-panel">
-      <h2 id="contact-title">{p.contactTitle}</h2>
-      <p>{p.contactText}</p>
-      <div class="actions">
-        <a class="button contact-email" href={`mailto:${email}`}>
-          {email}
-        </a>
-      </div>
-    </div>
-  </section>
+      {part === 'courses' && (
+        <section
+          data-edit={editProfile(locale)}
+          class="about-block wrap"
+          aria-labelledby="courses-title"
+        >
+          <h2 id="courses-title">{p.coursesTitle}</h2>
+          <ul class="course-list">
+            {p.courses.map((course) => (
+              <li>
+                <span class="course-name">{course}</span>
+                <a class="course-provider" href={athenaUrl}>
+                  Athena
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p class="course-note">
+            {p.coursesNote} <a href={athenaUrl}>athena.edu.vn</a>
+          </p>
+        </section>
+      )}
+
+      {part === 'built' && (
+        <section
+          data-edit={editProfile(locale)}
+          class="about-block wrap"
+          aria-labelledby="built-title"
+        >
+          <div class="section-heading">
+            <h2 id="built-title">{p.builtTitle}</h2>
+            <p>{p.builtIntro}</p>
+          </div>
+          <ul class="built-grid">
+            {projects.map(({ data }) => (
+              <li>
+                <a href={pathFor(locale, data.slug)}>
+                  {data.preview && (
+                    <div class="window">
+                      <WindowBar title={data.title} />
+                      <Image
+                        src={data.preview.image}
+                        alt={data.preview.alt}
+                        widths={[400, 700]}
+                        sizes="(max-width: 720px) 100vw, 50vw"
+                        format="webp"
+                        loading="lazy"
+                      />
+                    </div>
+                  )}
+                  <span class="built-title">{data.title}</span>
+                  <span class="built-text">{data.description}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
+      {part === 'languages' && (
+        <section
+          data-edit={editProfile(locale)}
+          class="about-block wrap"
+          aria-labelledby="languages-title"
+        >
+          <h2 id="languages-title">{p.languagesTitle}</h2>
+          <div class="job">
+            <div>
+              <p>{p.english}</p>
+              {showToeic && (
+                <div class="profile-toeic">
+                  <p>
+                    <strong>{p.toeicLabel}</strong>
+                    {toeicText && ` ${toeicText}`}
+                  </p>
+                  {toeicImage && (
+                    <a href={toeicImage.src} aria-label={p.toeicOpen}>
+                      <Image
+                        src={toeicImage}
+                        alt={p.toeicAlt}
+                        widths={[360, 720]}
+                        sizes="(max-width: 720px) 100vw, 360px"
+                        format="webp"
+                      />
+                    </a>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {part === 'contact' && (
+        <section
+          data-edit={editProfile(locale)}
+          class="contact wrap"
+          aria-labelledby="contact-title"
+        >
+          <div class="contact-panel">
+            <h2 id="contact-title">{p.contactTitle}</h2>
+            <p>{p.contactText}</p>
+            <div class="actions">
+              <a class="button contact-email" href={`mailto:${email}`}>
+                {email}
+              </a>
+            </div>
+          </div>
+        </section>
+      )}
+    </Fragment>
+  ))}
 </Base>

@@ -7,7 +7,6 @@ import Logo from './Logo.astro';
 import WalkingCat from './WalkingCat.astro';
 import DownloadStat from './DownloadStat.astro';
 import { email } from '../lib/profile';
-import portrait from '../assets/phat-portrait.jpg';
 import {
   getProfile,
   getUi,
@@ -22,9 +21,12 @@ interface Props {
 }
 const { locale } = Astro.props;
 const t = (await getUi(locale)).site;
+// Which sections show, in which order (CMS: Chữ giao diện → Bố cục).
+const layout = (await getUi(locale)).layout;
 const v = (await getUi(locale)).versions;
 const projects = await listProjects(locale);
 const me = await getProfile(locale);
+const portrait = me.portrait;
 
 // Each row shows the project's real state, read from its newest version note.
 const rows = await Promise.all(
@@ -50,128 +52,151 @@ const rows = await Promise.all(
 >
   {/* The hero is a desktop: the portrait window sits on it, and the
       ChiloLab cat walks along the taskbar, as Pet Desktop does. */}
-  <section class="desk" data-edit={editUi(locale)}>
-    <div class="hero home-hero wrap">
-      <div class="hero-copy">
-        <h1>{t.title}</h1>
-        <p class="lead">{t.intro}</p>
-        <ul class="fact-list">
-          {me.facts.map((fact) => (
-            <li>{fact.text}</li>
-          ))}
-        </ul>
-        <div class="actions">
-          <a class="button" href="#projects">
-            {t.explore}
-          </a>
-          <a class="button button-quiet" href={pathFor(locale, 'about')}>
-            {t.aboutCta}
-          </a>
-          <a class="text-link" href={`mailto:${email}`}>
-            {email}
-          </a>
-        </div>
-      </div>
-      <figure class="cat-frame home-frame">
-        <Image
-          src={portrait}
-          alt={t.portraitAlt}
-          widths={[280, 390]}
-          sizes="(max-width: 720px) 70vw, 340px"
-          format="webp"
-          loading="eager"
-        />
-      </figure>
-    </div>
-    <div class="wrap">
-      <WalkingCat hello={t.hello} />
-    </div>
-    <nav class="taskbar" aria-label={t.projects}>
-      <a class="taskbar-start" href={pathFor(locale)} aria-label="ChiloLab">
-        <Logo />
-      </a>
-      {projects.map(({ data }) => (
-        <a href={`#${data.slug}`}>
-          <Icon name={data.kind === 'pet' ? 'cat' : 'testing'} size={18} />
-          {data.title}
-        </a>
-      ))}
-    </nav>
-  </section>
-
-  <section class="projects wrap" id="projects" aria-labelledby="projects-title">
-    <div class="section-heading">
-      <h2 id="projects-title">{t.projects}</h2>
-      <p>{t.selected}</p>
-    </div>
-    <div class="project-list">
-      {rows.map(({ project: { data }, version, status, released }) => (
-        <article
-          class="project"
-          id={data.slug}
-          data-edit={editProject(locale, data.slug)}
-        >
-          <a class="project-link" href={pathFor(locale, data.slug)}>
-            <ProjectVisual
-              kind={data.kind}
-              label={t.preview}
-              title={data.title}
-              preview={data.preview}
-            />
-            <div class="project-copy">
-              {status && (
-                <p class:list={['project-status', { released }]}>
-                  <span class="status-dot" aria-hidden="true"></span>
-                  <strong>{version}</strong>
-                  <span>{status}</span>
-                  <DownloadStat project={data.slug} locale={locale} />
-                </p>
-              )}
-              <h3>{data.title}</h3>
-              <p>{data.description}</p>
-              {data.stack.length > 0 && (
-                <p class="stack">
-                  <span>{t.stack}</span>
-                  {data.stack.join(', ')}
-                </p>
-              )}
-              <span class="text-link">{t.detail}</span>
+  {layout.home.map((part) => (
+    <Fragment>
+      {part === 'hero' && (
+        <section class="desk" data-edit={editUi(locale)}>
+          <div class="hero home-hero wrap">
+            <div class="hero-copy">
+              <h1>{t.title}</h1>
+              <p class="lead">{t.intro}</p>
+              <ul class="fact-list">
+                {me.facts.map((fact) => (
+                  <li>{fact.text}</li>
+                ))}
+              </ul>
+              <div class="actions">
+                <a class="button" href="#projects">
+                  {t.explore}
+                </a>
+                <a class="button button-quiet" href={pathFor(locale, 'about')}>
+                  {t.aboutCta}
+                </a>
+                <a class="text-link" href={`mailto:${email}`}>
+                  {email}
+                </a>
+              </div>
             </div>
-          </a>
-        </article>
-      ))}
-    </div>
-  </section>
-
-  <section
-    class="me-teaser wrap"
-    aria-labelledby="me-title"
-    data-edit={editProfile(locale)}
-  >
-    <div>
-      <h2 id="me-title">{t.me}</h2>
-      <p>{me.teaser}</p>
-      <div class="actions">
-        <a class="button" href={pathFor(locale, 'about')}>
-          {me.readMore}
-        </a>
-      </div>
-    </div>
-    <div>
-      <h3 class="skills-heading">{t.skillsHeading}</h3>
-      <dl class="skill-mini">
-        {me.skills.map((group) => (
-          <div>
-            <dt>{group.name}</dt>
-            <dd>{group.items.slice(0, 3).join(', ')}</dd>
+            <figure class="cat-frame home-frame">
+              <Image
+                src={portrait}
+                alt={t.portraitAlt}
+                widths={[280, 390]}
+                sizes="(max-width: 720px) 70vw, 340px"
+                format="webp"
+                loading="eager"
+              />
+            </figure>
           </div>
-        ))}
-      </dl>
-    </div>
-  </section>
+          <div class="wrap">
+            <WalkingCat hello={t.hello} />
+          </div>
+          <nav class="taskbar" aria-label={t.projects}>
+            <a
+              class="taskbar-start"
+              href={pathFor(locale)}
+              aria-label={t.brand}
+            >
+              <Logo />
+            </a>
+            {projects.map(({ data }) => (
+              <a href={`#${data.slug}`}>
+                <Icon
+                  name={data.kind === 'pet' ? 'cat' : 'testing'}
+                  size={18}
+                />
+                {data.title}
+              </a>
+            ))}
+          </nav>
+        </section>
+      )}
 
-  <section class="about wrap" id="about" data-edit={editUi(locale)}>
-    <h2>{t.about}</h2>
-    <p>{t.aboutText}</p>
-  </section>
+      {part === 'projects' && (
+        <section
+          class="projects wrap"
+          id="projects"
+          aria-labelledby="projects-title"
+        >
+          <div class="section-heading">
+            <h2 id="projects-title">{t.projects}</h2>
+            <p>{t.selected}</p>
+          </div>
+          <div class="project-list">
+            {rows.map(({ project: { data }, version, status, released }) => (
+              <article
+                class="project"
+                id={data.slug}
+                data-edit={editProject(locale, data.slug)}
+              >
+                <a class="project-link" href={pathFor(locale, data.slug)}>
+                  <ProjectVisual
+                    kind={data.kind}
+                    label={t.preview}
+                    title={data.title}
+                    preview={data.preview}
+                  />
+                  <div class="project-copy">
+                    {status && (
+                      <p class:list={['project-status', { released }]}>
+                        <span class="status-dot" aria-hidden="true"></span>
+                        <strong>{version}</strong>
+                        <span>{status}</span>
+                        <DownloadStat project={data.slug} locale={locale} />
+                      </p>
+                    )}
+                    <h3>{data.title}</h3>
+                    <p>{data.description}</p>
+                    {data.stack.length > 0 && (
+                      <p class="stack">
+                        <span>{t.stack}</span>
+                        {data.stack.join(', ')}
+                      </p>
+                    )}
+                    <span class="text-link">{t.detail}</span>
+                  </div>
+                </a>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {part === 'me' && (
+        <section
+          class="me-teaser wrap"
+          aria-labelledby="me-title"
+          data-edit={editProfile(locale)}
+        >
+          <div>
+            <h2 id="me-title">{t.me}</h2>
+            <p>{me.teaser}</p>
+            <div class="actions">
+              <a class="button" href={pathFor(locale, 'about')}>
+                {me.readMore}
+              </a>
+            </div>
+          </div>
+          <div>
+            <h3 class="skills-heading">{t.skillsHeading}</h3>
+            <dl class="skill-mini">
+              {me.skills.map((group) => (
+                <div>
+                  <dt>{group.name}</dt>
+                  <dd>{group.items.slice(0, 3).join(', ')}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+      )}
+
+      {part === 'about' && (
+        <section class="about wrap" id="about" data-edit={editUi(locale)}>
+          <h2>{t.about}</h2>
+          <p>{t.aboutText}</p>
+        </section>
+      )}
+    </Fragment>
+  ))}
 </Base>

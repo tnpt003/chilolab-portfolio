@@ -39,6 +39,12 @@ function loadCms() {
   script.src = CMS_SRC;
   script.integrity = CMS_INTEGRITY;
   script.crossOrigin = 'anonymous';
+  // Page-like editor and previews (editor.js) need window.CMS.
+  script.addEventListener('load', () => {
+    const editor = document.createElement('script');
+    editor.src = '/admin/editor.js';
+    document.body.append(editor);
+  });
   document.body.append(script);
 }
 

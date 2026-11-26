@@ -2038,6 +2038,14 @@ a:has(> .icon),
   text-decoration: none;
   box-shadow: 0 2px 6px rgb(0 0 0 / 0.18);
 }
+/* The header's button sits under its bottom edge, clear of the menu. */
+.header > .edit-pin {
+  top: auto;
+  right: auto;
+  bottom: -0.9rem;
+  left: 50%;
+  transform: translateX(-50%);
+}
 .edit-pin:hover {
   background: #ffd27a;
 }

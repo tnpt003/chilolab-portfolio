@@ -22,13 +22,8 @@ site:
   aboutText: ChiloLab is my little corner for trying out ideas. The ones that work become real apps, released version by version and improved from what people tell me. Download Pet Desktop to play, see what’s new in each version, or sign in to comment and report bugs.
   preview: Concept illustration, not a product screenshot
   footer: Small ideas, real releases, shaped by feedback.
-  footerLinks:
-    projects: Projects
-    download: Download
-    versions: All versions
-    feedback: Feedback & bug reports
-    privacy: Privacy
-    account: Sign in / account
+  copyright: '© {year} Nguyễn Tấn Phát, ChiloLab'
+  brand: ChiloLab
   demo: Try it
   repo: Source code
   download: Download
@@ -191,6 +186,7 @@ owner:
   editPage: Edit this page
   edit: Edit
 chrome:
+  shareImage: ../../assets/pet-battle-hub.png
   skip: Skip to content
   mainNav: Main navigation
   feedTitle: 'ChiloLab: version notes'
@@ -228,3 +224,45 @@ versions:
   released: Released
   preview: Preview
   development: In development
+menu:
+  header:
+    - label: Projects
+      href: /en#projects
+    - label: About me
+      href: /en/about
+  projectsTitle: Projects
+  footer:
+    - title: Pet Desktop
+      links:
+        - label: Download
+          href: /en/pet-desktop#download-heading
+        - label: All versions
+          href: /en/pet-desktop/versions
+        - label: Feedback & bug reports
+          href: /en/pet-desktop/feedback
+    - title: ChiloLab
+      links:
+        - label: About me
+          href: /en/about
+        - label: About ChiloLab
+          href: /en#about
+        - label: Privacy
+          href: /en/privacy
+        - label: Sign in / account
+          href: /en/user/login
+layout:
+  home:
+    - hero
+    - projects
+    - me
+    - about
+  about:
+    - hero
+    - experience
+    - how
+    - skills
+    - journey
+    - courses
+    - built
+    - languages
+    - contact
